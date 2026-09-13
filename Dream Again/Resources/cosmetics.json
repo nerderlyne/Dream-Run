@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "all_items_cosmetic_only": true,
+  "items": [
+    {
+      "id": "bare_head",
+      "name": "No hat",
+      "slot": "hat",
+      "balloon_price": 0,
+      "required_achievement": null,
+      "notes": "Default; never unequip the head itself."
+    },
+    {
+      "id": "paper_hat",
+      "name": "Paper hat",
+      "slot": "hat",
+      "balloon_price": 150,
+      "required_achievement": null,
+      "notes": "Folded pale paper; small clear silhouette."
+    },
+    {
+      "id": "bow",
+      "name": "Ribbon bow",
+      "slot": "hat",
+      "balloon_price": 300,
+      "required_achievement": null,
+      "notes": "Reuse ribbon motif, not a world-asset slot."
+    },
+    {
+      "id": "nightcap",
+      "name": "Nightcap",
+      "slot": "hat",
+      "balloon_price": 450,
+      "required_achievement": null,
+      "notes": "Soft tapered cap with pompom."
+    },
+    {
+      "id": "bucket_hat",
+      "name": "Bucket hat",
+      "slot": "hat",
+      "balloon_price": 600,
+      "required_achievement": null,
+      "notes": "Broad but screen-safe brim."
+    },
+    {
+      "id": "balloon_hat",
+      "name": "Balloon hat",
+      "slot": "hat",
+      "balloon_price": 800,
+      "required_achievement": null,
+      "notes": "One small floating balloon fixed to head anchor."
+    },
+    {
+      "id": "checker_cap",
+      "name": "Checker cap",
+      "slot": "hat",
+      "balloon_price": 1000,
+      "required_achievement": null,
+      "notes": "Checker pattern complements route."
+    },
+    {
+      "id": "eight_ball_hat",
+      "name": "Eight-ball hat",
+      "slot": "hat",
+      "balloon_price": 1200,
+      "required_achievement": null,
+      "notes": "Small eight-ball on a cushion-like cap."
+    },
+    {
+      "id": "tiny_house_hat",
+      "name": "Little house",
+      "slot": "hat",
+      "balloon_price": 1600,
+      "required_achievement": null,
+      "notes": "Miniature world-house motif."
+    },
+    {
+      "id": "moon_hat",
+      "name": "Moon hat",
+      "slot": "hat",
+      "balloon_price": 2000,
+      "required_achievement": null,
+      "notes": "Small crescent, kept within cosmetic bounds."
+    },
+    {
+      "id": "pearl_body",
+      "name": "Pearl body",
+      "slot": "body_color",
+      "balloon_price": 500,
+      "required_achievement": null,
+      "notes": "Cosmetic material preset only."
+    },
+    {
+      "id": "rose_body",
+      "name": "Rose body",
+      "slot": "body_color",
+      "balloon_price": 500,
+      "required_achievement": null,
+      "notes": "Cosmetic material preset only."
+    },
+    {
+      "id": "mint_body",
+      "name": "Mint body",
+      "slot": "body_color",
+      "balloon_price": 500,
+      "required_achievement": null,
+      "notes": "Cosmetic material preset only."
+    },
+    {
+      "id": "ribbon_trail",
+      "name": "Ribbon trail",
+      "slot": "trail",
+      "balloon_price": 1000,
+      "required_achievement": null,
+      "notes": "Low-intensity, short, behind the runner."
+    },
+    {
+      "id": "lucky_pig_hat",
+      "name": "Lucky pig hat",
+      "slot": "hat",
+      "balloon_price": null,
+      "required_achievement": "lucky_dream",
+      "notes": "Three tiny pigs and a clover; never sold."
+    },
+    {
+      "id": "unbroken_clover",
+      "name": "Unbroken clover pin",
+      "slot": "accessory",
+      "balloon_price": null,
+      "required_achievement": "lucky_dream_unbroken",
+      "notes": "Marks a fresh lucky ending with no continue; never sold."
+    },
+    {
+      "id": "beyond_crown",
+      "name": "Beyond crown",
+      "slot": "hat",
+      "balloon_price": null,
+      "required_achievement": "still_dreaming",
+      "notes": "Minimal broken ring with three floating points; never sold."
+    },
+    {
+      "id": "void_ribbon",
+      "name": "Void ribbon",
+      "slot": "trail",
+      "balloon_price": null,
+      "required_achievement": "empty_dream",
+      "notes": "Subtle pearl trace; never sold."
+    }
+  ]
+}

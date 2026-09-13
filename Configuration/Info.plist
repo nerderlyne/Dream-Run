@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleIcons</key><dict><key>CFBundlePrimaryIcon</key><dict><key>CFBundleIconFiles</key><array><string>DreamAgainIcon</string></array></dict></dict>
+<key>CFBundleURLTypes</key><array><dict><key>CFBundleURLName</key><string>Dream identity import</string><key>CFBundleURLSchemes</key><array><string>dreamagain</string></array></dict></array>
+<key>CFBundleDocumentTypes</key><array><dict><key>CFBundleTypeName</key><string>Dream Again seed</string><key>LSHandlerRank</key><string>Owner</string><key>LSItemContentTypes</key><array><string>com.example.dreamagain.seed</string></array></dict></array>
+<key>UTExportedTypeDeclarations</key><array><dict><key>UTTypeIdentifier</key><string>com.example.dreamagain.seed</string><key>UTTypeConformsTo</key><array><string>public.json</string></array><key>UTTypeDescription</key><string>Versioned Dream Again seed</string><key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>dream</string></array></dict></dict></array>
+<key>NSMotionUsageDescription</key><string>Tilt gently to steer through your dream.</string>
+</dict></plist>

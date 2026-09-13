@@ -1,0 +1,12 @@
+{
+  "production_sales_enabled": false,
+  "ads_enabled": false,
+  "game_center_enabled": false,
+  "cloud_sync_enabled": false,
+  "privacy_url": null,
+  "support_url": null,
+  "universal_link_domain": null,
+  "google_app_id": null,
+  "google_rewarded_unit_id": null,
+  "product_ids": ["com.example.dreamagain.balloons.500", "com.example.dreamagain.balloons.1500", "com.example.dreamagain.balloons.4000"]
+}

@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "instruction": "These are starting art-direction values, not permission to recolor semantic danger cues. In gameplay enforce track edge visibility and collectible contrast; white_lucky is non-interactive.",
+  "palettes": [
+    {
+      "id": "cloud_rose",
+      "name": "Cloud rose",
+      "phase": "base",
+      "sky": "#90B7E8",
+      "fog": "#D8CAEB",
+      "track_light": "#FCF3EE",
+      "track_dark": "#7B648E",
+      "accent_a": "#FBBCD6",
+      "accent_b": "#B1E2D2"
+    },
+    {
+      "id": "aqua_courtyard",
+      "name": "Aqua courtyard",
+      "phase": "base",
+      "sky": "#B7A2D6",
+      "fog": "#98C5C7",
+      "track_light": "#EEF9F0",
+      "track_dark": "#45616F",
+      "accent_a": "#A1E5D5",
+      "accent_b": "#E3B5DF"
+    },
+    {
+      "id": "pearl_dusk",
+      "name": "Pearl dusk",
+      "phase": "base",
+      "sky": "#3D486E",
+      "fog": "#6B648A",
+      "track_light": "#F4EBE8",
+      "track_dark": "#675175",
+      "accent_a": "#DDA7C6",
+      "accent_b": "#A6DDD9"
+    },
+    {
+      "id": "glass_sky",
+      "name": "Glass sky",
+      "phase": "base",
+      "sky": "#7EA9DC",
+      "fog": "#BFD7E9",
+      "track_light": "#FFF3DC",
+      "track_dark": "#566A99",
+      "accent_a": "#FFBBD2",
+      "accent_b": "#B1CCF0"
+    },
+    {
+      "id": "pink_night",
+      "name": "Pink night",
+      "phase": "base",
+      "sky": "#251C32",
+      "fog": "#382E4B",
+      "track_light": "#F2C6D9",
+      "track_dark": "#5B3A62",
+      "accent_a": "#DE75AA",
+      "accent_b": "#CBAF7C"
+    },
+    {
+      "id": "void_gold",
+      "name": "Void gold",
+      "phase": "base",
+      "sky": "#050607",
+      "fog": "#0A0B0D",
+      "track_light": "#EFDFC4",
+      "track_dark": "#605150",
+      "accent_a": "#EA8AAF",
+      "accent_b": "#9DD9D1"
+    },
+    {
+      "id": "sterile_mint",
+      "name": "Sterile mint",
+      "phase": "base",
+      "sky": "#809995",
+      "fog": "#BED5BA",
+      "track_light": "#F6F3DE",
+      "track_dark": "#526763",
+      "accent_a": "#DB9FBB",
+      "accent_b": "#CBD47D"
+    },
+    {
+      "id": "white_lucky",
+      "name": "White lucky",
+      "phase": "ending",
+      "sky": "#F4F3EF",
+      "fog": "#F4F3EF",
+      "track_light": "#F8F7F3",
+      "track_dark": "#C6C2BA",
+      "accent_a": "#E8CFD9",
+      "accent_b": "#C4D6C1"
+    },
+    {
+      "id": "acid_cobalt",
+      "name": "Acid cobalt",
+      "phase": "post_mastery",
+      "sky": "#162CA3",
+      "fog": "#202557",
+      "track_light": "#F2ED60",
+      "track_dark": "#24202B",
+      "accent_a": "#EE4C92",
+      "accent_b": "#67D9B4"
+    },
+    {
+      "id": "red_cyan",
+      "name": "Red cyan",
+      "phase": "post_mastery",
+      "sky": "#842029",
+      "fog": "#322343",
+      "track_light": "#D2FAF1",
+      "track_dark": "#273B4B",
+      "accent_a": "#F15545",
+      "accent_b": "#5DE5DD"
+    },
+    {
+      "id": "ink_lime",
+      "name": "Ink lime",
+      "phase": "post_mastery",
+      "sky": "#0A1111",
+      "fog": "#172821",
+      "track_light": "#E3F477",
+      "track_dark": "#244139",
+      "accent_a": "#EE84D8",
+      "accent_b": "#92D9E5"
+    },
+    {
+      "id": "violet_orange",
+      "name": "Violet orange",
+      "phase": "post_mastery",
+      "sky": "#382358",
+      "fog": "#502650",
+      "track_light": "#FFF0BC",
+      "track_dark": "#553363",
+      "accent_a": "#E58B2A",
+      "accent_b": "#89C9E4"
+    }
+  ]
+}

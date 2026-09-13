@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "production_sales_require_configuration": true,
+  "prices": "Always show StoreKit localized displayPrice. No real-world price is asserted by this spec. Configure and test tiers in App Store Connect.",
+  "products": [
+    {
+      "id": "com.example.dreamagain.balloons.500",
+      "type": "consumable",
+      "balloons": 500,
+      "local_test_price_usd": "0.99"
+    },
+    {
+      "id": "com.example.dreamagain.balloons.1500",
+      "type": "consumable",
+      "balloons": 1500,
+      "local_test_price_usd": "2.99"
+    },
+    {
+      "id": "com.example.dreamagain.balloons.4000",
+      "type": "consumable",
+      "balloons": 4000,
+      "local_test_price_usd": "6.99"
+    }
+  ],
+  "prohibited_products": [
+    "clovers",
+    "pig_odds_boost",
+    "achievement_unlock",
+    "score_boost",
+    "loot_box",
+    "revive_currency",
+    "energy"
+  ]
+}

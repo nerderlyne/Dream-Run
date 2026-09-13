@@ -1,0 +1,64 @@
+{
+  "identifier": "B12F68F3-4621-4322-8950-E2044F547982",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "0.99",
+      "familyShareable": false,
+      "internalID": "1",
+      "localizations": [
+        {
+          "description": "500 cosmetic balloons \u2014 local test",
+          "displayName": "500 balloons",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.example.dreamagain.balloons.500",
+      "referenceName": "500 balloons",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "2",
+      "localizations": [
+        {
+          "description": "1500 cosmetic balloons \u2014 local test",
+          "displayName": "1500 balloons",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.example.dreamagain.balloons.1500",
+      "referenceName": "1500 balloons",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "6.99",
+      "familyShareable": false,
+      "internalID": "3",
+      "localizations": [
+        {
+          "description": "4000 cosmetic balloons \u2014 local test",
+          "displayName": "4000 balloons",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.example.dreamagain.balloons.4000",
+      "referenceName": "4000 balloons",
+      "type": "Consumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "",
+    "_developerTeamID": "",
+    "_failTransactionsEnabled": false,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}

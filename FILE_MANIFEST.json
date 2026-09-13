@@ -1,0 +1,133 @@
+{
+  "pack": "Dream Again \u2014 Codex implementation specification",
+  "version": "1.0",
+  "date": "2026-09-13",
+  "artifact_kind": "specification_not_compiled_game",
+  "files": [
+    {
+      "path": "ACCEPTANCE_TESTS.md",
+      "bytes": 14577,
+      "sha256": "706721cf1d71101ec72c6642f41aa5edc5fb7cbedb926c044b3977388070594d"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 3902,
+      "sha256": "de6c3fb3b6c84513c4486fc002ef4b3f36d703dc3f70a765cf044de37ab766ca"
+    },
+    {
+      "path": "CODEX_PROMPT.md",
+      "bytes": 2795,
+      "sha256": "e3d69dbe1941045768b6cf6bea8dc26ccdb5c1599f79ef6d54a5e055f179e393"
+    },
+    {
+      "path": "GAME_SYSTEM_SPEC.md",
+      "bytes": 115103,
+      "sha256": "4dc0ce608f4fdb6e716f68fadb3a97efa886bc21e8a31f97b26fb4bd77fc6abd"
+    },
+    {
+      "path": "START_HERE.md",
+      "bytes": 4033,
+      "sha256": "f20947551d2b96e29cc3ebe5f7b0242274ec649c726937321f6614f6a19fb41c"
+    },
+    {
+      "path": "VALIDATION_REPORT.md",
+      "bytes": 2938,
+      "sha256": "d92b774672d769bac5f98ffe392db35dd87258f87b04bcbd7239949164ada38e"
+    },
+    {
+      "path": "data/achievements.json",
+      "bytes": 3706,
+      "sha256": "c4e4269121c5501f4716882632102ae973b55f164970dde3009345199abc4300"
+    },
+    {
+      "path": "data/asset_catalog.json",
+      "bytes": 24725,
+      "sha256": "8628c8f048e12342eb32dae87248de06fa3323a6f15f1852da9a78081edd6d88"
+    },
+    {
+      "path": "data/conformance_vectors.json",
+      "bytes": 28209,
+      "sha256": "2ab6435fa3a08403f0e3a6849372c33cbc734091ca159aaeef8b8ebaa9ff58e0"
+    },
+    {
+      "path": "data/cosmetics.json",
+      "bytes": 3936,
+      "sha256": "28aed41e80d216464928574a8c42e2c38e0746a7f2ed8be43bb74736419f42b5"
+    },
+    {
+      "path": "data/game_config.json",
+      "bytes": 4772,
+      "sha256": "3a564444006a667e3cab13c1891575143e4c36b00c7b23465d2b66edbd2be0aa"
+    },
+    {
+      "path": "data/palettes.json",
+      "bytes": 3395,
+      "sha256": "6b8ed01fed38abee297bb4701ec38251a35dd3ec7dadcd0a129e3c009a6f22f2"
+    },
+    {
+      "path": "data/persistence_schema.sql",
+      "bytes": 4403,
+      "sha256": "6ddc80abfce8817b0a4b10b121232fd61ebe55e77def9eacab6af20de9677fc9"
+    },
+    {
+      "path": "data/store_products.json",
+      "bytes": 875,
+      "sha256": "f16764296f3775f8aa7a06d56911c2cc87a03067259183af323cc34d779494b8"
+    },
+    {
+      "path": "docs/REFERENCE_ALGORITHMS.md",
+      "bytes": 8361,
+      "sha256": "85d424788cdf058c63168f079982ffc98cb0f414c684bec2d5c599440aa17f6c"
+    },
+    {
+      "path": "docs/SOURCES.md",
+      "bytes": 4871,
+      "sha256": "365650178f59d1ec42c98dda7bee878f95d19632c7b399f0391223592c354f94"
+    },
+    {
+      "path": "references/01_visual_reference.jpeg",
+      "bytes": 851852,
+      "sha256": "5d011bf72a75d4b9db83a6f338481851097bf2d7549b265e78cff53b4fe05163"
+    },
+    {
+      "path": "references/02_visual_reference.jpeg",
+      "bytes": 388462,
+      "sha256": "3defa5d92a2b6de2603a9cf149fabe89e4444352644329c5094382271ca4438b"
+    },
+    {
+      "path": "references/03_visual_reference.jpeg",
+      "bytes": 229032,
+      "sha256": "7b0aa1bef196ed242b7ef1e32721c8f42fe630e608d49bd1de7d8232d7752add"
+    },
+    {
+      "path": "references/04_visual_reference.jpeg",
+      "bytes": 178191,
+      "sha256": "0357bc8d029b4a158b3f7cade5d52be8ccab6f2a201eb2fab61829d7125e3415"
+    },
+    {
+      "path": "references/05_visual_reference.jpeg",
+      "bytes": 399022,
+      "sha256": "c46fb95d91eb372e86de1968b3b211e482849ba17313434f65f4a1159aaefafa"
+    },
+    {
+      "path": "references/06_visual_reference.jpeg",
+      "bytes": 212618,
+      "sha256": "625bf48e8491ae6eeffabf2f659ae10c0a1812fe14ebf4c45e501f51a0e2afaa"
+    },
+    {
+      "path": "references/README.md",
+      "bytes": 936,
+      "sha256": "1d1905140a6b2ef05358b58de4bfd9d56d49b75885861c14bfd5f8e80b3bb2fc"
+    },
+    {
+      "path": "tools/reference_rules.py",
+      "bytes": 6017,
+      "sha256": "86902b8873196f823c0c970e5ce2ee1809ad660f07341aa61d1cad1cc4bd08c1"
+    },
+    {
+      "path": "tools/validate_spec.py",
+      "bytes": 9255,
+      "sha256": "a3ce47e3446d424ee7c5e5e8dd78cc57222ed31f39dbd8f26d60dfe45f9421e1"
+    }
+  ]
+}

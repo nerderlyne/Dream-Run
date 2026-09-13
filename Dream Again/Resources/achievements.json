@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "note": "Names beyond Lucky Dream are implementation defaults. any excludes all debug/reviewer-assist runs. No collectible reward exists outside this catalogue.",
+  "achievements": [
+    {
+      "id": "first_dream",
+      "name": "First Dream",
+      "description": "You remember something.",
+      "trigger": "Finish one non-debug run.",
+      "eligibility": "any",
+      "hidden_before_unlock": false,
+      "cosmetic_reward": null
+    },
+    {
+      "id": "five_minutes",
+      "name": "A Little Longer",
+      "description": "Five minutes somewhere else.",
+      "trigger": "Reach 300 active gameplay seconds.",
+      "eligibility": "fresh_unbroken",
+      "hidden_before_unlock": false,
+      "cosmetic_reward": null
+    },
+    {
+      "id": "long_dream",
+      "name": "Long Dream",
+      "description": "You stayed a while.",
+      "trigger": "Reach 1800 active gameplay seconds.",
+      "eligibility": "fresh_unbroken",
+      "hidden_before_unlock": false,
+      "cosmetic_reward": null
+    },
+    {
+      "id": "very_long_dream",
+      "name": "Very Long Dream",
+      "description": "An hour elsewhere.",
+      "trigger": "Reach 3600 active gameplay seconds.",
+      "eligibility": "fresh_unbroken",
+      "hidden_before_unlock": true,
+      "cosmetic_reward": null
+    },
+    {
+      "id": "through_the_glass",
+      "name": "Through the Glass",
+      "description": "Not a reflection.",
+      "trigger": "Cross a mirror gateway.",
+      "eligibility": "any",
+      "hidden_before_unlock": true,
+      "cosmetic_reward": null
+    },
+    {
+      "id": "another_way_down",
+      "name": "Another Way Down",
+      "description": "There was somewhere below.",
+      "trigger": "Complete a certified safe drop.",
+      "eligibility": "any",
+      "hidden_before_unlock": true,
+      "cosmetic_reward": null
+    },
+    {
+      "id": "lucky_pig",
+      "name": "Lucky Pig",
+      "description": "A fortunate meeting.",
+      "trigger": "Collect one clover pig.",
+      "eligibility": "fresh",
+      "hidden_before_unlock": true,
+      "cosmetic_reward": null
+    },
+    {
+      "id": "empty_dream",
+      "name": "Empty Dream",
+      "description": "The dark did not keep you.",
+      "trigger": "Accumulate 120 active seconds in one void chapter, then leave that chapter alive.",
+      "eligibility": "fresh_unbroken",
+      "hidden_before_unlock": true,
+      "cosmetic_reward": "void_ribbon"
+    },
+    {
+      "id": "lucky_dream",
+      "name": "Lucky Dream",
+      "description": "You were very lucky.",
+      "trigger": "Collect three clover pigs in one fresh run and finish white-ending presentation; continued allowed.",
+      "eligibility": "fresh",
+      "hidden_before_unlock": true,
+      "cosmetic_reward": "lucky_pig_hat"
+    },
+    {
+      "id": "lucky_dream_unbroken",
+      "name": "Lucky Dream — Unbroken",
+      "description": "No second chance.",
+      "trigger": "Finish Lucky Dream in a fresh run with zero continues.",
+      "eligibility": "fresh_unbroken",
+      "hidden_before_unlock": true,
+      "cosmetic_reward": "unbroken_clover"
+    },
+    {
+      "id": "still_dreaming",
+      "name": "Still Dreaming",
+      "description": "Three hours, and still here.",
+      "trigger": "Reach 10800 active gameplay seconds in a fresh run with zero continues.",
+      "eligibility": "fresh_unbroken",
+      "hidden_before_unlock": true,
+      "cosmetic_reward": "beyond_crown"
+    },
+    {
+      "id": "remembered_dream",
+      "name": "Remembered Dream",
+      "description": "Somewhere worth keeping.",
+      "trigger": "Save a dream bookmark.",
+      "eligibility": "any",
+      "hidden_before_unlock": false,
+      "cosmetic_reward": null
+    }
+  ]
+}

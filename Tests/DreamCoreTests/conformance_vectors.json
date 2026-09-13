@@ -1,0 +1,1051 @@
+{
+  "schema_version": 1,
+  "splitmix64_initial_zero_first_10_hex": [
+    "E220A8397B1DCDAF",
+    "6E789E6AA1B965F4",
+    "06C45D188009454F",
+    "F88BB8A8724C81EC",
+    "1B39896A51A8749B",
+    "53CB9F0C747EA2EA",
+    "2C829ABE1F4532E1",
+    "C584133AC916AB3C",
+    "3EE5789041C98AC3",
+    "F3B8488C368CB0A6"
+  ],
+  "fnv1a64_vectors": [
+    {
+      "ascii": "",
+      "hex": "CBF29CE484222325"
+    },
+    {
+      "ascii": "hello",
+      "hex": "A430D84680AABD0B"
+    },
+    {
+      "ascii": "DR1|G1|R1|C1|000000000000002A|pigPresence|1",
+      "hex": "2958FD78EDC27478"
+    }
+  ],
+  "dream_ids": [
+    {
+      "seed_decimal_string": "0",
+      "seed_hex": "0000000000000000",
+      "code": "DR1-G1-R1-C1-0000000000000-PT70"
+    },
+    {
+      "seed_decimal_string": "1",
+      "seed_hex": "0000000000000001",
+      "code": "DR1-G1-R1-C1-0000000000001-RP3P"
+    },
+    {
+      "seed_decimal_string": "42",
+      "seed_hex": "000000000000002A",
+      "code": "DR1-G1-R1-C1-000000000001A-460B"
+    },
+    {
+      "seed_decimal_string": "123456789",
+      "seed_hex": "00000000075BCD15",
+      "code": "DR1-G1-R1-C1-00000003NQK8N-F184"
+    },
+    {
+      "seed_decimal_string": "16045690984503111693",
+      "seed_hex": "DEADBEEFCAFEF00D",
+      "code": "DR1-G1-R1-C1-DXBDYXZ5FXW0D-21HY"
+    },
+    {
+      "seed_decimal_string": "18446744073709551615",
+      "seed_hex": "FFFFFFFFFFFFFFFF",
+      "code": "DR1-G1-R1-C1-FZZZZZZZZZZZZ-580X"
+    }
+  ],
+  "pig_traces": [
+    {
+      "seed_decimal_string": "0",
+      "checkpoints": [
+        {
+          "checkpoint": 1,
+          "nominal_seconds": 780,
+          "presence_draw": 1,
+          "clover_draw": 1,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 2,
+          "nominal_seconds": 1560,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 3,
+          "nominal_seconds": 2340,
+          "presence_draw": 0,
+          "clover_draw": 4,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 4,
+          "nominal_seconds": 3120,
+          "presence_draw": 1,
+          "clover_draw": 2,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 5,
+          "nominal_seconds": 3900,
+          "presence_draw": 0,
+          "clover_draw": 4,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 6,
+          "nominal_seconds": 4680,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 7,
+          "nominal_seconds": 5460,
+          "presence_draw": 0,
+          "clover_draw": 3,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 8,
+          "nominal_seconds": 6240,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 9,
+          "nominal_seconds": 7020,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 10,
+          "nominal_seconds": 7800,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 11,
+          "nominal_seconds": 8580,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 12,
+          "nominal_seconds": 9360,
+          "presence_draw": 0,
+          "clover_draw": 3,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 13,
+          "nominal_seconds": 10140,
+          "presence_draw": 0,
+          "clover_draw": 5,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 14,
+          "nominal_seconds": 10920,
+          "presence_draw": 1,
+          "clover_draw": 2,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 15,
+          "nominal_seconds": 11700,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 16,
+          "nominal_seconds": 12480,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 17,
+          "nominal_seconds": 13260,
+          "presence_draw": 0,
+          "clover_draw": 4,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 18,
+          "nominal_seconds": 14040,
+          "presence_draw": 0,
+          "clover_draw": 3,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 19,
+          "nominal_seconds": 14820,
+          "presence_draw": 1,
+          "clover_draw": 2,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 20,
+          "nominal_seconds": 15600,
+          "presence_draw": 0,
+          "clover_draw": 1,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": false
+        }
+      ]
+    },
+    {
+      "seed_decimal_string": "1",
+      "checkpoints": [
+        {
+          "checkpoint": 1,
+          "nominal_seconds": 780,
+          "presence_draw": 1,
+          "clover_draw": 2,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 2,
+          "nominal_seconds": 1560,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 3,
+          "nominal_seconds": 2340,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 4,
+          "nominal_seconds": 3120,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 5,
+          "nominal_seconds": 3900,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 6,
+          "nominal_seconds": 4680,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 7,
+          "nominal_seconds": 5460,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 8,
+          "nominal_seconds": 6240,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 9,
+          "nominal_seconds": 7020,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 10,
+          "nominal_seconds": 7800,
+          "presence_draw": 1,
+          "clover_draw": 3,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 11,
+          "nominal_seconds": 8580,
+          "presence_draw": 0,
+          "clover_draw": 4,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 12,
+          "nominal_seconds": 9360,
+          "presence_draw": 1,
+          "clover_draw": 1,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 13,
+          "nominal_seconds": 10140,
+          "presence_draw": 1,
+          "clover_draw": 3,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 14,
+          "nominal_seconds": 10920,
+          "presence_draw": 0,
+          "clover_draw": 4,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 15,
+          "nominal_seconds": 11700,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 16,
+          "nominal_seconds": 12480,
+          "presence_draw": 1,
+          "clover_draw": 2,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 17,
+          "nominal_seconds": 13260,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 18,
+          "nominal_seconds": 14040,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 19,
+          "nominal_seconds": 14820,
+          "presence_draw": 1,
+          "clover_draw": 1,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 20,
+          "nominal_seconds": 15600,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        }
+      ]
+    },
+    {
+      "seed_decimal_string": "42",
+      "checkpoints": [
+        {
+          "checkpoint": 1,
+          "nominal_seconds": 780,
+          "presence_draw": 0,
+          "clover_draw": 3,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 2,
+          "nominal_seconds": 1560,
+          "presence_draw": 1,
+          "clover_draw": 2,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 3,
+          "nominal_seconds": 2340,
+          "presence_draw": 0,
+          "clover_draw": 3,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 4,
+          "nominal_seconds": 3120,
+          "presence_draw": 0,
+          "clover_draw": 4,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 5,
+          "nominal_seconds": 3900,
+          "presence_draw": 0,
+          "clover_draw": 1,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 6,
+          "nominal_seconds": 4680,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 7,
+          "nominal_seconds": 5460,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 8,
+          "nominal_seconds": 6240,
+          "presence_draw": 0,
+          "clover_draw": 1,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 9,
+          "nominal_seconds": 7020,
+          "presence_draw": 1,
+          "clover_draw": 4,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 10,
+          "nominal_seconds": 7800,
+          "presence_draw": 0,
+          "clover_draw": 1,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 11,
+          "nominal_seconds": 8580,
+          "presence_draw": 0,
+          "clover_draw": 3,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 12,
+          "nominal_seconds": 9360,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 13,
+          "nominal_seconds": 10140,
+          "presence_draw": 0,
+          "clover_draw": 4,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 14,
+          "nominal_seconds": 10920,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 15,
+          "nominal_seconds": 11700,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 16,
+          "nominal_seconds": 12480,
+          "presence_draw": 0,
+          "clover_draw": 5,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 17,
+          "nominal_seconds": 13260,
+          "presence_draw": 0,
+          "clover_draw": 5,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 18,
+          "nominal_seconds": 14040,
+          "presence_draw": 1,
+          "clover_draw": 4,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 19,
+          "nominal_seconds": 14820,
+          "presence_draw": 1,
+          "clover_draw": 4,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 20,
+          "nominal_seconds": 15600,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        }
+      ]
+    },
+    {
+      "seed_decimal_string": "123456789",
+      "checkpoints": [
+        {
+          "checkpoint": 1,
+          "nominal_seconds": 780,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 2,
+          "nominal_seconds": 1560,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 3,
+          "nominal_seconds": 2340,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 4,
+          "nominal_seconds": 3120,
+          "presence_draw": 0,
+          "clover_draw": 3,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 5,
+          "nominal_seconds": 3900,
+          "presence_draw": 1,
+          "clover_draw": 1,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 6,
+          "nominal_seconds": 4680,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 7,
+          "nominal_seconds": 5460,
+          "presence_draw": 1,
+          "clover_draw": 1,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 8,
+          "nominal_seconds": 6240,
+          "presence_draw": 0,
+          "clover_draw": 1,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 9,
+          "nominal_seconds": 7020,
+          "presence_draw": 1,
+          "clover_draw": 3,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 10,
+          "nominal_seconds": 7800,
+          "presence_draw": 0,
+          "clover_draw": 1,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 11,
+          "nominal_seconds": 8580,
+          "presence_draw": 1,
+          "clover_draw": 2,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 12,
+          "nominal_seconds": 9360,
+          "presence_draw": 0,
+          "clover_draw": 3,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 13,
+          "nominal_seconds": 10140,
+          "presence_draw": 0,
+          "clover_draw": 5,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 14,
+          "nominal_seconds": 10920,
+          "presence_draw": 1,
+          "clover_draw": 1,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 15,
+          "nominal_seconds": 11700,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 16,
+          "nominal_seconds": 12480,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 17,
+          "nominal_seconds": 13260,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 18,
+          "nominal_seconds": 14040,
+          "presence_draw": 1,
+          "clover_draw": 3,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 19,
+          "nominal_seconds": 14820,
+          "presence_draw": 1,
+          "clover_draw": 1,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 20,
+          "nominal_seconds": 15600,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        }
+      ]
+    },
+    {
+      "seed_decimal_string": "16045690984503111693",
+      "checkpoints": [
+        {
+          "checkpoint": 1,
+          "nominal_seconds": 780,
+          "presence_draw": 1,
+          "clover_draw": 1,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 2,
+          "nominal_seconds": 1560,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 3,
+          "nominal_seconds": 2340,
+          "presence_draw": 0,
+          "clover_draw": 0,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
+        },
+        {
+          "checkpoint": 4,
+          "nominal_seconds": 3120,
+          "presence_draw": 0,
+          "clover_draw": 4,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 5,
+          "nominal_seconds": 3900,
+          "presence_draw": 1,
+          "clover_draw": 4,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 6,
+          "nominal_seconds": 4680,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 7,
+          "nominal_seconds": 5460,
+          "presence_draw": 0,
+          "clover_draw": 1,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 8,
+          "nominal_seconds": 6240,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 9,
+          "nominal_seconds": 7020,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 10,
+          "nominal_seconds": 7800,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 11,
+          "nominal_seconds": 8580,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 12,
+          "nominal_seconds": 9360,
+          "presence_draw": 1,
+          "clover_draw": 5,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 13,
+          "nominal_seconds": 10140,
+          "presence_draw": 1,
+          "clover_draw": 0,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 14,
+          "nominal_seconds": 10920,
+          "presence_draw": 1,
+          "clover_draw": 4,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 15,
+          "nominal_seconds": 11700,
+          "presence_draw": 0,
+          "clover_draw": 1,
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 16,
+          "nominal_seconds": 12480,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 17,
+          "nominal_seconds": 13260,
+          "presence_draw": 1,
+          "clover_draw": 4,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 18,
+          "nominal_seconds": 14040,
+          "presence_draw": 1,
+          "clover_draw": 4,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 19,
+          "nominal_seconds": 14820,
+          "presence_draw": 0,
+          "clover_draw": 2,
+          "pig_present": true,
+          "has_clover": false,
+          "continued_has_clover": false
+        },
+        {
+          "checkpoint": 20,
+          "nominal_seconds": 15600,
+          "presence_draw": 1,
+          "clover_draw": 1,
+          "pig_present": false,
+          "has_clover": false,
+          "continued_has_clover": false
+        }
+      ]
+    }
+  ],
+  "probabilities": [
+    {
+      "minutes": 39,
+      "checkpoints": 3,
+      "clean_exact": "1/216",
+      "clean_percentage": 0.4629629629629629,
+      "continued_from_start_percentage": 0.057870370370370364
+    },
+    {
+      "minutes": 52,
+      "checkpoints": 4,
+      "clean_exact": "7/432",
+      "clean_percentage": 1.6203703703703702,
+      "continued_from_start_percentage": 0.2170138888888889
+    },
+    {
+      "minutes": 65,
+      "checkpoints": 5,
+      "clean_exact": "23/648",
+      "clean_percentage": 3.5493827160493825,
+      "continued_from_start_percentage": 0.5087770061728395
+    },
+    {
+      "minutes": 78,
+      "checkpoints": 6,
+      "clean_exact": "1453/23328",
+      "clean_percentage": 6.228566529492455,
+      "continued_from_start_percentage": 0.9545262131344308
+    },
+    {
+      "minutes": 104,
+      "checkpoints": 8,
+      "clean_exact": "75497/559872",
+      "clean_percentage": 13.484689357567445,
+      "continued_from_start_percentage": 2.3539929941575934
+    },
+    {
+      "minutes": 130,
+      "checkpoints": 10,
+      "clean_exact": "566299/2519424",
+      "clean_percentage": 22.477320212874055,
+      "continued_from_start_percentage": 4.448369375084592
+    },
+    {
+      "minutes": 180,
+      "checkpoints": 13,
+      "clean_exact": "202398709/544195584",
+      "clean_percentage": 37.192273320615556,
+      "continued_from_start_percentage": 8.801132741791752
+    },
+    {
+      "minutes": 234,
+      "checkpoints": 18,
+      "clean_exact": "15166600495229/25389989167104",
+      "clean_percentage": 59.73456859477232,
+      "continued_from_start_percentage": 18.536599956183586
+    }
+  ],
+  "notes": [
+    "All probabilities condition on surviving and collecting every lucky appearance.",
+    "The delayed physical encounter does not add a new RNG roll.",
+    "UInt64 values are decimal strings or hexadecimal strings to avoid JavaScript number precision loss."
+  ]
+}

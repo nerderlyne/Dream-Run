@@ -1,0 +1,88 @@
+import XCTest
+@testable import DreamCore
+final class CoreTests: XCTestCase {
+    func testFramePacingAndStall() {
+        for rate in [30,60,120] {var clock=FixedStepClock(),ticks=0;for _ in 0..<rate*10 {ticks += clock.consume(1/Double(rate)) ?? 0};XCTAssertEqual(ticks,600)}
+        var clock=FixedStepClock();XCTAssertNil(clock.consume(0.1));XCTAssertNil(clock.consume(0.3));XCTAssertEqual(clock.consume(1.0/60),1)
+    }
+    func testHeldSlideCannotRemainLowForever() {
+        var simulation=safe(),standing=0
+        for _ in 0..<240 {_=simulation.step(InputFrame(slide:true));if simulation.state.player.slideTicks == 0 {standing += 1}}
+        XCTAssertGreaterThan(standing,20)
+    }
+    func testMotionNormalization() {
+        XCTAssertEqual(SteeringNormalizer.normalize(degrees:0),0);XCTAssertEqual(SteeringNormalizer.normalize(degrees:1),0)
+        XCTAssertEqual(SteeringNormalizer.normalize(degrees:18),1);XCTAssertEqual(SteeringNormalizer.normalize(degrees:-100),-1)
+        XCTAssertEqual(SteeringNormalizer.normalize(degrees:.nan),0)
+    }
+    func fixtures() throws -> [String:Any] { try JSONSerialization.jsonObject(with:Data(contentsOf:Bundle.module.url(forResource:"conformance_vectors",withExtension:"json")!)) as! [String:Any] }
+    func testAllGoldenVectors() throws {
+        let f=try fixtures(); var rng=SplitMix64(0)
+        for hex in f["splitmix64_initial_zero_first_10_hex"] as! [String] { XCTAssertEqual(String(format:"%016llX",rng.next()),hex) }
+        for v in f["fnv1a64_vectors"] as! [[String:String]] { XCTAssertEqual(String(format:"%016llX",SplitMix64.fnv(v["ascii"]!)),v["hex"]) }
+        for v in f["dream_ids"] as! [[String:String]] { let id=DreamIdentity(seed:UInt64(v["seed_decimal_string"]!)!); XCTAssertEqual(id.code,v["code"]); XCTAssertEqual(try DreamIdentity.parse(id.code.lowercased()),id) }
+        for trace in f["pig_traces"] as! [[String:Any]] {
+            let id=DreamIdentity(seed:UInt64(trace["seed_decimal_string"] as! String)!)
+            for row in trace["checkpoints"] as! [[String:Any]] {
+                let k=row["checkpoint"] as! Int, a=PigDecision(identity:id,ordinal:k,continued:false), b=PigDecision(identity:id,ordinal:k,continued:true)
+                XCTAssertEqual(a.presenceDraw,UInt64(row["presence_draw"] as! Int)); XCTAssertEqual(a.cloverDraw,UInt64(row["clover_draw"] as! Int)); XCTAssertEqual(a.clover,row["has_clover"] as! Bool); XCTAssertEqual(b.clover,row["continued_has_clover"] as! Bool)
+            }
+        }
+    }
+    func testIDsRejectBadInput() throws {
+        for s in ["",String(repeating:"0",count:200),"DR2-G1-R1-C1-000000000001A-460B","DR1-G1-R1-C1-ZZZZZZZZZZZZZ-580X","DR1-G0-R1-C1-000000000001A-460B","DR1-G1-R1-C1-000000000001A-460C"] { XCTAssertThrowsError(try DreamIdentity.parse(s)) }
+        XCTAssertEqual(try DreamIdentity.parse("  dr1-g1-r1-c1-OOOOOOOOOOO1a-46Ob  ").seed,42)
+        var future=DreamIdentity(seed:42); future.rulesVersion=2; XCTAssertThrowsError(try DreamIdentity.parse(future.code)); XCTAssertEqual(try DreamIdentity.parse(future.code,requireSupported:false),future)
+        XCTAssertThrowsError(try DreamFile.read(Data("{\"format\":1,\"dreamID\":\"a\",\"url\":\"x\"}".utf8)))
+    }
+    func testExactProbability() {
+        var present=0, clean=0, continued=0
+        for p in 0..<2 { for c in 0..<6 { let a=PigDecision(ordinal:1,presence:UInt64(p),clover:UInt64(c),continued:false), b=PigDecision(ordinal:1,presence:UInt64(p),clover:UInt64(c),continued:true); present += a.present ? 1 : 0; clean += a.clover ? 1 : 0; continued += b.clover ? 1 : 0 } }
+        XCTAssertEqual(present,6); XCTAssertEqual(clean,2); XCTAssertEqual(continued,1)
+        XCTAssertEqual(PigDecision.probabilityAtLeastThree(Array(repeating:1.0/6,count:3)),1.0/216,accuracy:1e-12)
+        XCTAssertEqual(PigDecision.probabilityAtLeastThree(Array(repeating:1.0/6,count:5)),23.0/648,accuracy:1e-12)
+        XCTAssertEqual(3/(1.0/6)*13,234); XCTAssertEqual(3/(1.0/12)*13,468)
+    }
+    func safe() -> GameSimulation { var s=GameSimulation(identity:DreamIdentity(seed:42)); s.state.phase = .running; s.state.safeUntilDistance=1e9; return s }
+    func testMovementAndPauseSnapshot() throws {
+        var s=safe(); for _ in 0..<90 { _=s.step(InputFrame(steering:1)) }; XCTAssertEqual(s.state.player.lateral,1.25,accuracy:0.0001)
+        _=s.step(InputFrame(jump:true)); XCTAssertGreaterThan(s.state.player.height,0)
+        let bytes=try JSONEncoder().encode(s.state), restored=try JSONDecoder().decode(RunState.self,from:bytes)
+        var r=try GameSimulation(snapshot:restored)
+        for _ in 0..<20 { _=s.step(); _=r.step() }; XCTAssertEqual(s.state.distance,r.state.distance); XCTAssertEqual(s.state.player,r.state.player)
+        s.pause(); let ticks=s.state.activeTicks; for _ in 0..<3600 { _=s.step() }; XCTAssertEqual(ticks,s.state.activeTicks)
+        s.resume(); XCTAssertEqual(s.state.continueCount,0)
+    }
+    func testSoftFatalSlideAndDedup() {
+        var s=safe(); s.state.safeUntilDistance=0
+        func hazard(_ id: String,_ asset: AssetID,_ encounter: Encounter = .rolling) -> HazardDescription { HazardDescription(id:id,asset:asset,encounter:encounter,distance:s.state.distance+0.1,lateral:0,radius:0.45,height:1) }
+        s.state.hazards=[hazard("one",.soccer)]; XCTAssertTrue(s.step().contains(.stumble)); XCTAssertEqual(s.state.phase,.running)
+        for _ in 0..<49 { _=s.step() }; s.state.hazards=[hazard("two",.softball)]; XCTAssertTrue(s.step().contains(.waking))
+        s=safe(); s.state.safeUntilDistance=0; s.state.softImmunityUntil=100; s.state.hazards=[hazard("rabbit",.rabbit,.dodge)]; XCTAssertTrue(s.step().contains(.waking))
+        s=safe(); s.state.safeUntilDistance=0; s.state.hazards=[hazard("zebra",.zebra,.slide)]; _=s.step(InputFrame(slide:true)); XCTAssertEqual(s.state.phase,.running)
+        for _ in 0..<65 { _=s.step() }; XCTAssertEqual(s.state.player.slideTicks,0)
+    }
+    func testPigCommitAndDeepNonterminal() throws {
+        var s=safe(); s.state.activeTicks=46439; _=s.step(); XCTAssertEqual(s.state.pendingPig?.ordinal,1)
+        let p=s.state.pendingPig; s.wake("test"); XCTAssertTrue(s.continueRun()); XCTAssertEqual(s.state.pendingPig,p)
+        s.state.phase = .running; s.state.activeTicks=647999; _=s.step(); XCTAssertEqual(s.state.visual,.deepStripping); XCTAssertNotEqual(s.state.phase,.finished)
+        XCTAssertEqual(VisualPhase.at(seconds:11050),.deepSparse); XCTAssertEqual(VisualPhase.at(seconds:11200),.deepRebuilding); XCTAssertEqual(VisualPhase.at(seconds:12000),.beyond); XCTAssertEqual(VisualPhase.at(seconds:21600),.deepStripping)
+    }
+    func testRegistryAndGeneration() {
+        XCTAssertEqual(AssetID.allCases.count,42); XCTAssertEqual(AssetID.pig.rawValue,42)
+        for seed in 0..<20 { let g=WorldGenerator(DreamIdentity(seed:UInt64(seed))); for i in 0..<1000 { let c=g.chunk(i); XCTAssertTrue(FairnessValidator.validate(c)); XCTAssertEqual(c,g.chunk(i)); XCTAssertTrue(g.sample(c.end).y.isFinite) } }
+    }
+    func testWalletTransactionsRefundAndDebug() throws {
+        let url=FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathComponent("profile.json")
+        let store=try ProfileStore(url:url)
+        var run=safe().state; run.balloons=100
+        try store.transaction { $0.settle(run,finished:false,catalogue:[]) }; try store.transaction { $0.settle(run,finished:false,catalogue:[]) }; XCTAssertEqual(store.profile.balance,100)
+        run.continueCount=1; run.balloons=150; try store.transaction { $0.settle(run,finished:false,catalogue:[]); $0.credit(id:"purchase:1",amount:500,source:"purchase"); $0.credit(id:"purchase:1",amount:500,source:"purchase") }; XCTAssertEqual(store.profile.balance,650)
+        let item=CosmeticDefinition(id:"paper_hat",name:"Paper",slot:"hat",balloon_price:150)
+        try store.transaction { try $0.buy(item) }; XCTAssertThrowsError(try store.transaction { try $0.buy(item) }); XCTAssertEqual(store.profile.balance,500)
+        try store.transaction { $0.revoke("1"); $0.revoke("1") }; XCTAssertEqual(store.profile.balance,0)
+        run.mode = .debug; run.balloons=999; try store.transaction { $0.settle(run,finished:true,catalogue:[]) }; XCTAssertEqual(store.profile.balance,0)
+        XCTAssertEqual(try ProfileStore(url:url).profile.balance,0)
+        XCTAssertThrowsError(try store.transaction { $0.credit(id:"bad",amount:50,source:"earned"); throw DreamError.unavailable }); XCTAssertEqual(store.profile.balance,0)
+    }
+}

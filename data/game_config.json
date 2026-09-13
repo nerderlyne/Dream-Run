@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "working_title": "Dream Again",
+  "swift_module": "DreamAgain",
+  "deployment_target_ios": "18.0",
+  "versions": {
+    "generator": 1,
+    "rules": 1,
+    "content": 1,
+    "save": 1
+  },
+  "simulation": {
+    "ticks_per_second": 60,
+    "max_catchup_steps": 4,
+    "stall_pause_seconds": 0.25,
+    "base_speed_mps": 7.0,
+    "max_speed_mps": 16.0,
+    "speed_time_constant_seconds": 300.0,
+    "speed_model": "v(t)=7+9*(1-exp(-t/300)); t is active gameplay seconds"
+  },
+  "movement": {
+    "track_width_m": 4.0,
+    "min_track_width_m": 3.2,
+    "max_lateral_offset_m": 1.25,
+    "max_lateral_speed_mps": 4.5,
+    "tilt_full_scale_degrees": 18.0,
+    "tilt_deadzone_degrees": 1.5,
+    "tilt_smoothing_seconds": 0.075,
+    "player_height_m": 1.55,
+    "player_radius_m": 0.28,
+    "slide_height_m": 0.58,
+    "gravity_mps2": 22.0,
+    "jump_velocity_mps": 8.0,
+    "slide_seconds": 0.85,
+    "slide_max_clearance_extension_seconds": 0.25,
+    "jump_buffer_seconds": 0.12,
+    "coyote_seconds": 0.08,
+    "swipe_min_points": 34.0,
+    "swipe_max_seconds": 0.45
+  },
+  "camera": {
+    "vertical_fov_degrees": 62.0,
+    "behind_player_m": 4.8,
+    "height_above_route_m": 2.8,
+    "lookahead_m": 9.0,
+    "lateral_follow_fraction": 0.2,
+    "camera_roll_degrees": 0.0
+  },
+  "generation": {
+    "chunk_length_m": 24.0,
+    "ahead_m": 240.0,
+    "behind_m": 48.0,
+    "origin_rebase_m": 192.0,
+    "min_telegraph_seconds": 2.0,
+    "min_between_required_actions_seconds": 1.0,
+    "min_after_blind_transition_seconds": 2.0,
+    "rolling_speed_towards_player_mps": 4.0,
+    "max_candidate_retries": 8,
+    "recent_asset_history": 12,
+    "max_consecutive_same_chunk_family": 2,
+    "max_consecutive_same_hazard_family": 2,
+    "mirror_min_separation_seconds": 75,
+    "mirror_target_interval_range_seconds": [
+      90,
+      210
+    ],
+    "safe_drop_max_seconds": 3.0
+  },
+  "stumble": {
+    "immunity_to_soft_hits_seconds": 0.8,
+    "destabilized_seconds": 5.0,
+    "speed_multiplier": 0.75,
+    "speed_recovery_seconds": 1.0,
+    "second_soft_hit_during_destabilized_wakes": true,
+    "fatal_hits_ignore_soft_immunity": true
+  },
+  "pigs": {
+    "checkpoint_seconds": 780,
+    "presence_numerator": 1,
+    "presence_denominator": 2,
+    "clover_given_pig_numerator": 1,
+    "clover_given_pig_denominator": 3,
+    "after_continue_clover_given_pig_denominator": 6,
+    "required_clover_pigs": 3,
+    "pity_system": false,
+    "guaranteed_checkpoint": false,
+    "reset_at_mirror": false,
+    "roll_commit_lead_seconds": 6,
+    "max_safe_presentation_delay_seconds": 10
+  },
+  "continues": {
+    "max_per_run": 1,
+    "method": "explicit rewarded ad only in v1",
+    "penalty_applies_once": true,
+    "seconds_of_safe_recovery": 2.0,
+    "retain_collected_clovers": true,
+    "retain_currency": true,
+    "permit_lucky_ending": true,
+    "eligible_for_unbroken_mastery": false
+  },
+  "endings": {
+    "void_wipe_seconds": 1.25,
+    "lucky_fade_seconds": 45,
+    "lucky_terminal_seconds": 12,
+    "freeze_score_at_third_clover": true,
+    "white_never_flash": true
+  },
+  "deep_dream": {
+    "threshold_seconds": 10800,
+    "strip_seconds": 240,
+    "hold_seconds": 60,
+    "rebuild_seconds": 300,
+    "end_run": false,
+    "future_visual_cycle_seconds": 10800,
+    "future_mastery_awards": false
+  },
+  "currency": {
+    "id": "balloons",
+    "pickup_value": 1,
+    "initial_balance": 0,
+    "first_dream_bonus": 100,
+    "expire": false,
+    "spent_on": "cosmetics only",
+    "purchasable": true,
+    "no_score_or_luck_benefit": true
+  },
+  "integrations": {
+    "storekit_mode_default": "local_configuration",
+    "ads_mode_default": "disabled_or_debug_mock",
+    "game_center_default": false,
+    "cloud_sync_default": false,
+    "analytics_default": "local_only"
+  },
+  "performance_targets": {
+    "target_fps": 60,
+    "low_power_render_fps": 30,
+    "maximum_active_chunks": 16,
+    "soft_active_render_entity_budget": 750,
+    "soft_draw_call_budget": 180,
+    "soft_visible_triangle_budget": 220000,
+    "soft_memory_budget_mb": 350
+  },
+  "accessibility": {
+    "touch_steering": true,
+    "tap_jump_and_slide_buttons": true,
+    "pause_without_penalty": true,
+    "recalibrate_while_paused": true,
+    "reduced_motion": true,
+    "reduced_flash": true,
+    "haptics_toggle": true,
+    "no_audio_only_critical_cues": true
+  },
+  "encounter_dimensions": {
+    "ordinary_ball_radius_m": 0.45,
+    "nazar_radius_m": 0.7,
+    "rabbit_footprint_radius_m": 0.35,
+    "ordinary_pig_footprint_radius_m": 0.38,
+    "clover_pig_pickup_radius_m": 0.65,
+    "slide_passage_clear_height_m": 0.85,
+    "low_jump_column_height_m": 0.45,
+    "gap_length_formula": "min(4.8, max(1.8, 0.30 * approachSpeed)); always additionally validate trajectory"
+  }
+}
