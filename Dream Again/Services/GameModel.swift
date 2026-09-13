@@ -3,6 +3,14 @@ import SwiftUI
 import Combine
 import UIKit
 
+@MainActor private final class DreamDisplayTarget:NSObject {
+    weak var owner:GameModel?
+    @objc func tick(_ display:CADisplayLink) {
+        guard let owner else {display.invalidate();return}
+        owner.frame(display)
+    }
+}
+
 @MainActor final class GameModel:NSObject,ObservableObject {
     @Published var screen="home"
     @Published var simulation=GameSimulation(identity:DreamIdentity(seed:42))
@@ -29,7 +37,9 @@ import UIKit
     var homeDream=GameSimulation(identity:DreamIdentity(seed:42),mode:.reviewDemo)
     var homeFrames=0
     var motion=MotionInput(), audio=DreamAudio()
+    private let displayTarget=DreamDisplayTarget()
     var link:CADisplayLink?
+    var artReview=false
     var previousTime=0.0
     var clock=FixedStepClock()
     var provider:any RewardedContinueProvider = DisabledRewardProvider()
@@ -62,9 +72,20 @@ import UIKit
             renderer?.render(run,equipped:profile.equipped,menu:true)
             #if DEBUG
             if ProcessInfo.processInfo.arguments.contains("--ui-test") { settings.music=false; settings.effects=false }
+            if ProcessInfo.processInfo.arguments.contains("--art-review") {
+                artReview=true;settings.music=false;settings.effects=false
+                let arguments=ProcessInfo.processInfo.arguments
+                let theme=arguments.firstIndex(of:"--art-theme").flatMap{index in arguments.indices.contains(index+1) ? Int(arguments[index+1]) : nil} ?? 0
+                let distance=arguments.firstIndex(of:"--art-distance").flatMap{index in arguments.indices.contains(index+1) ? Double(arguments[index+1]) : nil} ?? 37.5
+                let pose=arguments.firstIndex(of:"--art-pose").flatMap{index in arguments.indices.contains(index+1) ? arguments[index+1] : nil} ?? "run"
+                labArt(theme:theme,distance:distance,pose:pose)
+
+            }
+
             #endif
         } catch { self.error=error.localizedDescription }
-        link=CADisplayLink(target:self,selector:#selector(frame(_:))); link?.add(to:.main,forMode:.common)
+        displayTarget.owner=self
+        link=CADisplayLink(target:displayTarget,selector:#selector(DreamDisplayTarget.tick(_:))); link?.add(to:.main,forMode:.common)
         NotificationCenter.default.addObserver(self,selector:#selector(interrupted(_:)),name:AVAudioSession.interruptionNotification,object:nil)
     }
     @objc func interrupted(_ notification:Notification) {
@@ -77,6 +98,7 @@ import UIKit
         do { try store.transaction(action); refresh() } catch { self.error=error.localizedDescription; simulation.pause() }
     }
     func start(identity:DreamIdentity? = nil,mode:RunMode? = nil) {
+        artReview=false;renderer?.artPalette=nil
         guard store != nil, renderer != nil else { error="The game resources or profile could not be loaded."; return }
         if let identity, !identity.supported { error=DreamError.unsupportedVersion.localizedDescription; return }
         let selectedMode=mode ?? (identity == nil ? (profile.achievements.contains("first_dream") ? .fresh : .tutorial) : .revisit)
@@ -90,6 +112,7 @@ import UIKit
         renderer?.render(run,equipped:profile.equipped); persist()
     }
     func ready() {
+        artReview=false
         notice="";input=InputFrame()
         if !simulatorDragInput { motion.start(); motion.calibrate() }
         simulation.resume(); previousTime=0; clock.reset(); persist()
@@ -101,6 +124,7 @@ import UIKit
         transact { $0.snapshot=snapshot; $0.settings=settings }
     }
     func resumeSaved() {
+        artReview=false;renderer?.artPalette=nil
         guard let snapshot=profile.snapshot else { return }
         do {
             simulation=try GameSimulation(snapshot:snapshot)
@@ -185,6 +209,7 @@ import UIKit
         }
     }
     @objc func frame(_ display:CADisplayLink) {
+        if artReview {previousTime=0;return}
         if screen == "home",let renderer {
             homeFrames += 1
             if homeFrames%2 == 0 {
@@ -227,6 +252,16 @@ import UIKit
         audio.update(active:true,palette:run.paletteIndex,settings:settings)
     }
     #if DEBUG
+    func labArt(theme:Int,distance:Double=37.5,pose:String="run") {
+        artReview=true;renderer?.artPalette=max(0,min(palettes.count-1,theme))
+        simulation=GameSimulation(identity:DreamIdentity.current(seed:42),mode:.debug)
+        simulation.state.distance=distance.isFinite ? max(0,min(100_000,distance)) : 37.5
+        simulation.state.activeTicks=180;simulation.state.phase = .running
+        if pose == "slide" {simulation.state.player.slideTicks=20}
+        if pose == "jump" {simulation.state.player.height=1.1}
+        if pose == "white" {simulation.state.pigs=[CollectedPig(ordinal:1,hue:0),CollectedPig(ordinal:2,hue:1),CollectedPig(ordinal:3,hue:2)];simulation.state.endingElapsed=53;simulation.state.phase = .whiteEnding}
+        simulation.streamChunks();screen="gameplay";renderer?.render(run,equipped:profile.equipped)
+    }
     func previewAsset() { renderer?.preview(AssetID(rawValue:labAsset)!,palette:labPalette,style:labStyle,lod:labLOD,colliders:labColliders) }
     func labWorld(_ code:String) {
         do {let identity=try DreamIdentity.parse(code);simulation=GameSimulation(identity:identity,mode:.debug);renderer?.render(run,equipped:profile.equipped)} catch {self.error=error.localizedDescription}

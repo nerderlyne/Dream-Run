@@ -4,6 +4,7 @@ final class Dream_AgainUITests:XCTestCase {
         let app=XCUIApplication();app.launchArguments=["--ui-test"];app.launch()
         XCTAssertTrue(app.buttons["dream"].waitForExistence(timeout:10))
         app.buttons["dream"].tap();XCTAssertTrue(app.buttons["ready"].waitForExistence(timeout:10));app.buttons["ready"].tap()
+        XCTAssertTrue(app.buttons["ready"].waitForNonExistence(timeout:3),"The full ready button must accept a tap")
         let unexpectedPause=XCTNSPredicateExpectation(predicate:NSPredicate(format:"exists == true"),object:app.buttons["ready"])
         unexpectedPause.isInverted=true;wait(for:[unexpectedPause],timeout:8)
         XCTAssertEqual(app.sliders.count,0)

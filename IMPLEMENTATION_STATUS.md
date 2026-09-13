@@ -4,15 +4,15 @@ Implemented native first-playable source, Xcode project, shared scheme, offline 
 
 ## Delivered
 
-- SwiftUI + non-AR RealityKit close-camera runner, continuous touch/calibrated tilt adapters, jump/slide, swept collision, automatic stairs and streamed route.
-- Exactly 42 original procedural world families, generated checker route geometry, eight material treatments, twelve palettes, three mesh detail levels, humanoid and catalogue cosmetics.
+- SwiftUI + non-AR RealityKit close-camera runner, calibrated tilt on device and a Simulator-only drag adapter, jump/slide, swept collision, automatic stairs and streamed route.
+- Exactly 42 original procedural world families, generated checker route geometry, ten PBR material treatments, twelve palettes, three mesh detail levels, humanoid and catalogue cosmetics.
 - Versioned deterministic seeds, golden-vector RNG, certified encounter witnesses and bounded fallback, mirrors, marked drops, exact pig/continue policy, white ending and nonterminal deep evolution.
 - Serialized transactional wallet/ownership/settlements, last-good backup, suspend/resume, bookmarks and native share/import, achievements, generated audio/haptics, all menu flows and isolated Debug Lab.
 - Real StoreKit adapter with local configuration, honest disabled rewarded ads plus optional SDK bridge, disabled Game Center/cloud integration seams and owner setup guide.
 
 ## Actual verification
 
-Host: Apple Silicon macOS. Xcode **26.6 (17F113)**; Apple Swift **6.3.3**, swiftlang-6.3.3.1.3. iPhone Simulator SDK 26.5; minimum deployment iOS/iPadOS 18. Signing disabled for build checks. No device or simulator was launched.
+Host: Apple Silicon macOS. Xcode **26.6 (17F113)**; Apple Swift **6.3.3**, swiftlang-6.3.3.1.3. iPhone Simulator SDK 26.5; minimum deployment iOS/iPadOS 18. Signing disabled for build checks. These initial build checks did not launch a device or simulator; the later visual-pass section records actual simulator execution.
 
 Commands are reproduced in `README.md` and `scripts/verify.sh`. Raw outputs are in `evidence/`.
 
@@ -26,7 +26,7 @@ Commands are reproduced in `README.md` and `scripts/verify.sh`. Raw outputs are 
 - **PASS:** final focused suite after the scenery-only curtain/ribbon recipe addition — **17 tests, 0 failures, 3.522 seconds**, excluding the unchanged long traversal. Output: `evidence/core-unit-tests.log`.
 
 
-CoreSimulator discovery failed in the sandbox and the request for external access was denied. Generic SDK compilation succeeded independently. Native app/resource/UI tests were **compiled but NOT RUN**. No gameplay screenshot, physical tilt, GPU, memory, thermal or battery measurement is claimed.
+At the initial milestone, CoreSimulator access was unavailable and native tests were compiled only. The visual pass below supersedes that limitation with approved simulator execution and actual screenshots. Physical-device/GPU/thermal measurements remain unperformed.
 
 During implementation, build errors in an environment-resource API were fixed against the installed SDK. Icon catalogue compilation required unavailable simulator access; original icon PNG is supplied through legacy bundle metadata, pending production rendition validation. An oracle regression exposed a moving ball entering an earlier underpass: rolling hazards now arm only inside a 60 m approach and certification samples early, middle and capped speeds. The final logs supersede earlier iterations.
 
@@ -38,7 +38,7 @@ PASS below means the named automated/source/build check was performed. NOT RUN m
 |---|---|---|
 | A01 | PASS | Debug test-bundle and Release generic Simulator SDK builds; native SwiftUI/RealityKit sources and shared scheme. |
 | A02 | NOT RUN | Offline service defaults implemented; fresh-install airplane-mode launch NOT RUN. |
-| A03 | NOT RUN | All requested flows implemented and native UI test compiled; controls/empty states not executed. |
+| A03 | PARTIAL | Actual start, ready, uninterrupted play, pause and wardrobe UI flow passed in the visual pass; remaining flows/empty states still need execution. |
 | A04 | NOT RUN | No small/tall iPhone or iPad layout execution. |
 | B01 | PASS | testMovementAndPauseSnapshot checks +1 steering convergence; continuous bounded integrator is used for all offsets. |
 | B02 | NOT RUN | Angle normalization and shared InputFrame implemented/tested; full adapter trace parity not executed. |
@@ -52,9 +52,9 @@ PASS below means the named automated/source/build check was performed. NOT RUN m
 | B10 | NOT RUN | Swept interval collision implemented; oracle exercises closing balls, but complete narrow-ledge/pickup sweep matrix outstanding. |
 | B11 | NOT RUN | Cosmetics are renderer/profile only; all-item replay and camera-obstruction review outstanding. |
 | C01 | PASS | testRegistryAndGeneration plus specification validator: exactly 42, pig ordinal 42. |
-| C02 | NOT RUN | 42 procedural builders and native geometry test compile; silhouette gallery NOT RUN. |
+| C02 | PARTIAL | All 42 builders executed successfully in native tests; complete final-art silhouette gallery is outstanding. |
 | C03 | NOT RUN | Eight materials, twelve palettes, three LODs implemented; perceptual comparison NOT RUN. |
-| C04 | NOT RUN | No rendered mood screenshots obtained. |
+| C04 | PARTIAL | Actual baseline and revised visual-slice screenshots reviewed; reference-level final art across all families is not achieved. |
 | C05 | NOT RUN | Semantic materials/roles implemented; all-palette visibility review NOT RUN. |
 | C06 | NOT RUN | Bounded caches and Lab counts implemented; gallery/triangle/device profiling NOT RUN. |
 | D01 | NOT RUN | Analytic shared route sockets and core soak checked; rendered gap/floor alignment NOT RUN. |
@@ -175,3 +175,41 @@ The slide now rotates the avatar face-up with feet leading and the head behind, 
 Build evidence: `evidence/avatar-motion-build.log`. Visual animation and underpass clearance still need device execution; no live screenshot evidence is claimed.
 
 PASS: Debug generic iOS Simulator build after the final pose update. This is a renderer-only change; core tests were not repeated.
+
+## Visual art direction pass — 2026-09-13
+
+This pass supersedes the earlier environment-unavailable notes for **simulator execution**. External CoreSimulator access was approved for this visual review. Physical iPhone/iPad measurements remain unavailable.
+
+Implemented a representative cloud/window/stair slice and propagated shared PBR materials, smooth geometry, sky/environment light, shadows, distance haze and a bounded seeded horizon landscape through the renderer. Near scenery inherits coherent cloud, aqua-courtyard or dark-world composition. The horizon uses the existing 42 families at architectural and landscape scales, with density tied to the nonterminal visual evolution. Gameplay controls, speeds, collision semantics, seed versions, pig decisions and economy contracts were not changed.
+
+The runner now has a tailored, longer-legged silhouette, articulated clothing and a stable hat socket. It remains an improved procedural stand-in. A validated optional local USDZ/animation adapter is implemented; no authored character asset is fabricated or claimed as delivered. The rabbit has a joined implicit surface. Other animals and several furniture/rock forms remain provisional. See `docs/VISUAL_ART_DIRECTION.md` for the art and replacement contracts.
+
+Real render review caught and corrected cloud/camera overlap, over-tall stair risers, sky detail lost in environment filtering, horizon elements outside the portrait camera, and cloud-card border artifacts. Native testing caught slow per-pixel texture drawing and a display-link retain cycle; direct texture buffers and a weak display target address these. Color blending now converts PBR colors into a common sRGB space before the white ending.
+
+Evidence:
+
+- `evidence/art-before.png`: actual baseline simulator screenshot.
+- `evidence/art-cloud-review.png`: current full-frame cloud composition. `art-slice-01/02/03.png` are explicitly superseded intermediate renders, including the rejected cloud-overlap iteration.
+- `evidence/art-core-tests.log`: **25 XCTest tests, 0 failures, 26.184 seconds**. The unchanged six-hour/twenty-seed core soak was excluded from this focused renderer regression run; its earlier results above are historical evidence, not a new run.
+- `evidence/art-spec-validation.log`: **51 specification checks passed**.
+- `evidence/art-release-preflight.log`: **offline release/registry/resource guards passed**.
+- `evidence/art-native-tests.log`: first native run; one color-space assertion failed, while offline UI flow passed. It is retained as diagnostic history and superseded by the final run.
+- Final native, Release and screenshot evidence is recorded below.
+
+**Not certified:** reference-level finished art across all 42 assets, authored character/animal animation quality, all-seed hazard visibility, physical tilt, iPad/small-phone layouts, sustained device frame pacing, GPU/memory/thermal/battery budgets, live services or App Store readiness. D02/D04's pre-existing exhaustive-certification limitations remain unchanged.
+
+### Final UI verification
+
+`evidence/art-ui-recheck.log` reports **TEST SUCCEEDED**, with the complete offline start/ready/play/pause/wardrobe flow passing twice (**32.927 s**, **27.766 s**). Each run asserts that ready disappears after one tap, no slider/mode switch is present, and ready does not return during eight seconds of play. The earlier `art-native-final.log` UI failure was an unaccepted initial ready-button tap, confirmed from its screen recording—not a resumed run pausing. The button label now owns the full rounded hit area and the decorative border cannot intercept touches. The same earlier run's seven renderer tests and both light/dark launch checks passed; the UI failure is retained and superseded by the repeated recheck.
+
+Current screenshots on iPhone 16 Pro Max / iOS 26.5: cloud, aqua courtyard, void, slide and the three-pig white ending (`evidence/art-*-review.png`). These are Debug, reward-ineligible, frozen review states, not device-performance captures. All 42 builders execute in native tests. Smoothness settings for oversized distant geometry and the fainting root offset were refined after screenshot review; final renderer results follow.
+
+### Final renderer verification
+
+- **PASS:** `evidence/art-renderer-final.log` — **7 native XCTest tests, 0 failures, 12.190 seconds**, actually executed on iPhone 16 Pro Max / iOS 26.5. Covers all 42 resource builders and finite bounds; sculpted normals/indices; distinct PBR properties and nonaccumulating white-ending tint; rejection of incomplete authored art; reward/snapshot isolation in art previews; and display-link lifetime.
+- **PASS:** the focused Swift package suite remains **25 tests / 0 failures**; no core files changed in this visual pass.
+- **PASS:** repeated offline UI recheck as above; the two launch/appearance checks also executed successfully. Broader device/layout/commerce UI matrices remain untested.
+- **PASS:** `evidence/art-slice-build.log` — final Debug simulator build, including white-ending HUD contrast.
+- **PASS:** `evidence/art-release-build.log` — final Release generic Simulator build (**BUILD SUCCEEDED**). Signing is disabled; no live services were provisioned or charged.
+
+The visual pass is a tested implementation increment toward the references. It is **not** a claim that the reference-level final-art acceptance bar or physical-device performance target has been achieved. The remaining art limitations are explicit in `KNOWN_LIMITATIONS.md` and `docs/VISUAL_ART_DIRECTION.md`.

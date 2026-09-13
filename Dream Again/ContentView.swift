@@ -55,7 +55,13 @@ struct ContentView:View {
         .onChange(of:scenePhase){_,phase in if phase != .active {game.pause()} }
     }
     func button(_ title:String,_ action:@escaping ()->Void)->some View {
-        Button(action:action){Text(title).font(.system(size:17,weight:.medium,design:.rounded)).frame(maxWidth:.infinity).padding(.vertical,14)}.buttonStyle(.bordered).accessibilityIdentifier(title)
+        Button(action:action) {
+            Text(title).font(.system(size:17,weight:.medium,design:.rounded))
+                .frame(maxWidth:.infinity).padding(.vertical,14)
+                .background(.white.opacity(0.08),in:RoundedRectangle(cornerRadius:22))
+                .overlay(RoundedRectangle(cornerRadius:22).strokeBorder(.white.opacity(0.15)).allowsHitTesting(false))
+                .contentShape(RoundedRectangle(cornerRadius:22))
+        }.buttonStyle(.plain).accessibilityIdentifier(title)
     }
     func menu<Content:View>(_ title:String,@ViewBuilder content:()->Content)->some View {
         VStack(spacing:12){HStack{Button("‹ home"){game.screen="home"};Spacer();Text(title).font(.title2);Spacer()}.padding(.bottom,8)
@@ -101,16 +107,19 @@ struct ContentView:View {
                     if dy < 0 {game.input.jump=true} else {game.input.slide=true}
                 })
             VStack {
-                HStack(alignment:.top){VStack(alignment:.leading){Text(game.time(game.run.activeTicks)).monospacedDigit();Text("\(game.run.balloons) balloons").font(.caption);if !game.run.pigs.isEmpty {Text(String(repeating:"♧ ",count:game.run.pigs.count)).accessibilityLabel("\(game.run.pigs.count) clover pigs")}}
-                    Spacer();Button("pause"){game.pause()}.accessibilityIdentifier("pause")
-                }.padding(18).background(.black.opacity(0.2))
-                if game.run.mode != .fresh { Text(game.run.mode == .debug ? "DEVELOPER PREVIEW · NO REWARDS" : game.run.mode.rawValue.uppercased()).font(.caption2).padding(6).background(.black.opacity(0.4),in:Capsule()) }
+                HStack(spacing:20) {
+                    Text(game.time(game.run.activeTicks)).monospacedDigit().tracking(2)
+                    Spacer()
+                    Label("\(game.run.balloons)",systemImage:"balloon").monospacedDigit()
+                    Button {game.pause()} label:{Image(systemName:"pause").frame(width:44,height:44)}.accessibilityLabel("pause").accessibilityIdentifier("pause")
+                }.font(.system(size:14,weight:.medium)).padding(.leading,24).padding(.trailing,12).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.65) : .white).shadow(color:.black.opacity(0.5),radius:5,y:1)
+                if game.run.mode != .fresh {Text(game.run.mode == .debug ? "PREVIEW · NO REWARDS" : game.run.mode.rawValue.uppercased()).font(.system(size:9,weight:.medium)).tracking(2).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.5) : .white.opacity(0.7)).allowsHitTesting(false)}
                 if game.run.stumbleWeight > 0 && game.run.phase == .running {
                     Text("stumbled").font(.callout.weight(.semibold)).padding(.horizontal,14).padding(.vertical,8).background(.black.opacity(0.5),in:Capsule()).allowsHitTesting(false)
                 }
                 if game.run.mode == .tutorial {Text(tutorialPrompt).font(.callout).padding().background(.ultraThinMaterial,in:Capsule())}
                 Spacer()
-                if [.luckyTransition,.whiteEnding,.waking].contains(game.run.phase) {Button("skip presentation"){let events=game.simulation.presentationStep(0,skip:true);if events.contains(.ending){game.finish();game.screen="results"}}.padding().disabled(game.run.endingElapsed < (game.run.pigs.count == 3 ? 5 : 0.35))}
+                if [.luckyTransition,.whiteEnding,.waking].contains(game.run.phase) {Button("skip presentation"){let events=game.simulation.presentationStep(0,skip:true);if events.contains(.ending){game.finish();game.screen="results"}}.padding().disabled(game.run.endingElapsed < (game.run.pigs.count == 3 ? 5 : 0.35)).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.65) : .white)}
             }
             if [.ready,.paused].contains(game.run.phase) {
                 VStack(spacing:12){Text(game.run.phase == .ready ? "a little tilt.\na leap. a dream." : "paused").font(.largeTitle).multilineTextAlignment(.center)
@@ -207,6 +216,7 @@ struct ContentView:View {
             VStack(spacing:8){Text("\(game.labAsset)/42 · \(game.assets.first(where:{$0.number == game.labAsset})?.name ?? "")").font(.headline)
                 Stepper("Asset",value:$game.labAsset,in:1...42).onChange(of:game.labAsset){_,_ in game.previewAsset()}
                 HStack{Button("palette"){game.labPalette=(game.labPalette+1)%12;game.previewAsset()};Button("material"){game.labStyle=(game.labStyle+1)%8;game.previewAsset()};Button("LOD \(game.labLOD)"){game.labLOD=(game.labLOD+1)%3;game.previewAsset()}}
+                HStack {Button("cloud slice"){game.labArt(theme:0)};Button("aqua slice"){game.labArt(theme:1)};Button("void slice"){game.labArt(theme:5)}}.font(.caption)
                 Toggle("Show role bounds",isOn:$game.labColliders).onChange(of:game.labColliders){_,_ in game.previewAsset()}
                 HStack{TextField("Dream ID for world preview",text:$code).font(.caption).textFieldStyle(.roundedBorder);Button("preview"){game.labWorld(code)};Button("+24m"){game.labStep()}}
                 ScrollView(.horizontal){HStack{ForEach(["Rabbit","Nazar","Zebra","Ball","Mirror","Drop","Ordinary pig","Clover pig","Lucky Dream","Three hours","Sparse","Beyond","Void","Waking"],id:\.self){event in Button(event){game.labEvent(event)}.buttonStyle(.bordered)}}}

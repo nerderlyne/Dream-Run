@@ -23,12 +23,16 @@ struct Geometry {
         }
         for y in 0..<rings { for x in 0..<segments { let a=base+UInt32(y*(segments+1)+x), b=a+UInt32(segments+1); indices += [a,a+1,b,a+1,b+1,b] } }
     }
-    mutating func tube(_ points: [SIMD3<Float>], radius: Float, segments: Int = 8) {
-        guard points.count > 1 else { return }
+    mutating func tube(_ points:[SIMD3<Float>],radius:Float,segments:Int=12) {
+        guard points.count>1 else{return}
         for i in 0..<points.count-1 {
-            let a=points[i],b=points[i+1],direction=simd_normalize(b-a)
-            let right=simd_normalize(simd_cross(direction,abs(direction.y)>0.95 ? SIMD3<Float>(1,0,0) : SIMD3<Float>(0,1,0))), up=simd_cross(direction,right)
-            for j in 0..<segments { let t=Float(j)/Float(segments)*2*Float.pi,u=Float(j+1)/Float(segments)*2*Float.pi, p=(right*cos(t)+up*sin(t))*radius,q=(right*cos(u)+up*sin(u))*radius; quad(a+p,a+q,b+q,b+p) }
+            let a=points[i],b=points[i+1],delta=b-a
+            guard simd_length_squared(delta)>0.0000001 else{continue}
+            let direction=simd_normalize(delta),right=simd_normalize(simd_cross(direction,abs(direction.y)>0.95 ? SIMD3<Float>(1,0,0) : SIMD3<Float>(0,1,0))),up=simd_cross(direction,right)
+            for j in 0..<segments {
+                let t=Float(j)/Float(segments)*2*Float.pi,u=Float(j+1)/Float(segments)*2*Float.pi,p=right*cos(t)+up*sin(t),q=right*cos(u)+up*sin(u),base=UInt32(positions.count)
+                positions += [a+p*radius,a+q*radius,b+q*radius,b+p*radius];normals += [p,q,q,p];indices += [base,base+1,base+2,base,base+2,base+3]
+            }
         }
     }
     mutating func polygon(_ points: [SIMD2<Float>], center: SIMD3<Float>, depth: Float) {
@@ -43,44 +47,27 @@ struct Geometry {
     }
 }
 extension UIColor {
+    var artSRGB:UIColor {
+        guard let space=CGColorSpace(name:CGColorSpace.extendedSRGB),let c=cgColor.converted(to:space,intent:.defaultIntent,options:nil) else{return self}
+        return UIColor(cgColor:c)
+    }
+
     convenience init(hex: String) { let n=UInt32(hex.replacingOccurrences(of:"#",with:""),radix:16) ?? 0xEFE7EB; self.init(red:CGFloat((n>>16)&255)/255,green:CGFloat((n>>8)&255)/255,blue:CGFloat(n&255)/255,alpha:1) }
 }
 @MainActor final class PrefabFactory {
     var cache: [String:Entity] = [:]
     var triangleCounts: [String:Int] = [:]
-    var textures:[Int:TextureResource]=[:]
-    var materials:[String:SimpleMaterial]=[:]
+    let surface=DreamMaterials()
     let palettes: [PaletteDefinition]
     init(palettes: [PaletteDefinition]) { self.palettes=palettes }
-    func material(_ color: UIColor, style: Int) -> SimpleMaterial {
-        let key="\(color.description):\(style)"
-        if let cached=materials[key] {return cached}
-        var result=SimpleMaterial(color:style == 5 ? color.withAlphaComponent(0.6) : color,roughness:style == 1 || style == 5 ? 0.16 : style == 2 || style == 4 ? 0.3 : style == 3 ? 0.98 : 0.64,isMetallic:style == 2 || style == 4)
-        if [3,4,6].contains(style) {
-            if textures[style] == nil {
-                let format=UIGraphicsImageRendererFormat();format.scale=1
-                let image=UIGraphicsImageRenderer(size:CGSize(width:96,height:96),format:format).image {context in
-                    for y in 0..<96 {for x in 0..<96 {
-                        let noise=Double((x*73+y*199+x*y*7)%97)/97
-                        let wave=sin(Double(x)*0.13+sin(Double(y)*0.1)*2)
-                        let level=style == 6 ? 0.73+0.27*abs(wave) : style == 3 ? 0.76+noise*0.24 : 0.9+0.1*wave
-                        let c=style == 4 ? UIColor(red:level,green:0.94,blue:1,alpha:1) : UIColor(white:level,alpha:1)
-                        context.cgContext.setFillColor(c.cgColor);context.cgContext.fill(CGRect(x:x,y:y,width:1,height:1))
-                    }}
-                }
-                if let cg=image.cgImage {textures[style]=try? TextureResource.generate(from:cg,options:.init(semantic:.color))}
-            }
-            if let texture=textures[style] {result.color = .init(tint:color,texture:.init(texture))}
-        }
-        if materials.count >= 128 {materials.removeAll(keepingCapacity:true)};materials[key]=result;return result
-    }
+    func material(_ color:UIColor,style:Int)->PhysicallyBasedMaterial {surface.make(color,style:style)}
     func build(_ id: AssetID, palette: Int = 0, style: Int = 0, lod: Int = 0) -> Entity {
         let key="\(id.rawValue):\(palette):\(style):\(lod)"
         if let cached=cache[key] { return cached.clone(recursive:true) }
         let p=palettes[palette % palettes.count], root=Entity()
         var body=Geometry(),trim=Geometry(),dark=Geometry(),semantic=Geometry()
         var bodyColor=UIColor(hex:p.accent_a),trimColor=UIColor(hex:p.accent_b),darkColor=UIColor(hex:p.track_dark),semanticColor=UIColor.white
-        let segments=lod == 0 ? 16 : lod == 1 ? 10 : 6
+        let segments=lod == 0 ? 40 : lod == 1 ? 32 : 16
         func sphere(_ g: inout Geometry,_ c: SIMD3<Float>,_ s: SIMD3<Float>) { g.ellipsoid(c,s,segments:segments,rings:max(4,segments/2)) }
         func ring(_ g: inout Geometry,_ center: SIMD3<Float>,_ radius: Float,_ tube: Float, vertical: Bool = false) {
             let points=(0...24).map { i -> SIMD3<Float> in let t=Float(i)/24*2*Float.pi; return center + (vertical ? SIMD3<Float>(cos(t)*radius,sin(t)*radius,0) : SIMD3<Float>(cos(t)*radius,0,sin(t)*radius)) }; g.tube(points,radius:tube)
@@ -95,6 +82,13 @@ extension UIColor {
                 if id == .trackBroken && (10...13).contains(n) { continue }
                 let s=Float(n),x=curve ? 24*(1-cos(s/24)) : 0, y=stairs || id == .trackRamp ? s*0.13 : 0
                 body.box([x,y-0.22,-s],[4,0.4,1.02])
+                if stairs {
+                    for side:Float in [-1,1] {
+                        let nextX=curve ? 24*(1-cos((s+1)/24)) : 0
+                        trim.tube([[x+side*2,y+1.05,-s],[nextX+side*2,y+1.18,-s-1]],radius:0.028,segments:8)
+                        if n%2 == 0 {trim.tube([[x+side*2,y,-s],[x+side*2,y+1.05,-s]],radius:0.018,segments:8)}
+                    }
+                }
                 for j in 0..<4 { let c=SIMD3<Float>(x+Float(j)-1.5,y,-s); if (n+j)%2 == 0 { trim.box(c,[1,0.035,1]) } else { dark.box(c,[1,0.035,1]) } }
             }
             trimColor=UIColor(hex:p.track_light)
@@ -106,9 +100,18 @@ extension UIColor {
             body.tube([[0,0.2,0],[0,3.8,0]],radius:0.32,segments:12)
             for y:Float in [0.15,3.8,4] { trim.box([0,y,0],[0.95,0.2,0.95]) }
         case .window:
-            for x:Float in [-1.5,1.5] { body.box([x,2,0],[0.15,4,0.2]) }
-            for y:Float in [0,4] { body.box([0,y,0],[3.15,0.15,0.2]) }
-            for sign:Float in [-1,1] { let x=sign*2.1; for y:Float in [0,1.4,2.7,4] { trim.tube([[sign*1.5,y,0],[x,y,0.9]],radius:0.06) }; trim.tube([[x,0,0.9],[x,4,0.9]],radius:0.06) }
+            for layer in 0..<4 {
+                let d=Float(layer)*0.075,w:Float=1.55+d,h:Float=4.0+d
+                for x in [-w,w] {body.box([x,2,Float(layer)*0.045],[0.18,4+d*2,0.14])}
+                for y in [-d,h] {body.box([0,y,Float(layer)*0.045],[w*2,0.18,0.14])}
+            }
+            for sign:Float in [-1,1] {
+                let x=sign*2.5
+                for y:Float in [0,1,2,3,4] {trim.tube([[sign*1.5,y,0],[x,y,1.3]],radius:0.035,segments:12)}
+                trim.tube([[x,0,1.3],[x,4,1.3]],radius:0.055,segments:12)
+                trim.tube([[sign*2,0,0.65],[sign*2,4,0.65]],radius:0.035,segments:12)
+            }
+            bodyColor=UIColor(hex:p.track_light);trimColor=UIColor(hex:p.accent_a)
         case .roomShell:
             for x:Float in [-5,5] { body.box([x,3,-2],[0.4,6,8]) }
             body.box([0,5.5,-5.8],[10,1,0.4]); for x:Float in [-3.5,3.5] { body.box([x,2.5,-5.8],[3,5,0.4]) }
@@ -126,8 +129,21 @@ extension UIColor {
             for x in [-width/2+0.1,width/2-0.1] { for z in [-depth/2+0.1,depth/2-0.1] { trim.box([x,0.35,z],[0.1,0.7,0.1]) } }
             if bed { sphere(&trim,[0,0.92,-0.8],[0.7,0.15,0.35]); body.box([0,0.85,0.4],[1.78,0.18,1.5]) }
         case .tree:
-            body.tube([[0,0,0],[0.15,2,0],[-0.15,3.7,0],[0.2,5,0]],radius:0.16)
-            for n in 0..<5 { let t=Float(n)*2.4, y=1.7+Float(n)*0.5; let end=SIMD3<Float>(cos(t)*1.7,y+1.5,sin(t)*1.2); body.tube([[0,y,0],end],radius:0.08); if palette != 5 && palette != 4 { sphere(&trim,end,[1.15,0.8,0.9]) } }
+            bodyColor=UIColor(hex:"#CFC2B3");trimColor=UIColor(hex:palette == 0 ? "#B7C6BD" : p.accent_b)
+            body.tube([[0,0,0],[0.12,1.5,0],[-0.07,2.8,0],[0.08,4.2,0]],radius:0.12,segments:16)
+            for n in 0..<9 {
+                let t=Float(n)*2.4,y=1.8+Float(n)*0.23,end=SIMD3<Float>(cos(t)*1.2,y+1,sin(t)*0.85)
+                body.tube([[0,y,0],end*SIMD3<Float>(0.55,0.9,0.55),end],radius:0.04,segments:12)
+                if palette != 5 && palette != 4 {
+                    for k in 0..<(lod == 2 ? 12 : 32) {
+                        let u=Float(k)*2.399,rad=sqrt(Float(k)/32)*0.75
+                        let center=end+SIMD3<Float>(cos(u)*rad,sin(Float(k)*1.7)*0.3,sin(u)*rad)
+                        trim.ellipsoid(center,[0.24,0.12,0.22],segments:12,rings:6)
+                    }
+                } else {
+                    for k in 0..<3 {let offset=SIMD3<Float>(cos(t+Float(k))*0.35,0.6,sin(t+Float(k))*0.3);body.tube([end,end+offset],radius:0.014,segments:8)}
+                }
+            }
         case .flower:
             body.tube([[0,0,0],[0.2,1.5,0],[0,3,0]],radius:0.07); bodyColor=UIColor(hex:"#829F89")
             for n in 0..<8 { let a=Float(n)*Float.pi/4; sphere(&trim,[cos(a)*0.65,3+sin(a)*0.65,0],[0.48,0.48,0.14]) }; sphere(&semantic,[0,3,0.15],[0.38,0.38,0.17]); semanticColor=UIColor(hex:"#E6CA8A")
@@ -137,9 +153,10 @@ extension UIColor {
             for n in 0..<7 { let t=Float(n)*2.4; sphere(&semantic,[cos(t)*0.65,2.05,sin(t)*0.65],[0.12,0.04,0.12]) }
         case .rock,.mountain:
             let count=id == .mountain ? 5 : 3
-            for n in 0..<count { let t=Float(n)*2.4; body.ellipsoid([cos(t)*0.5,0.5+Float(n)*0.15,sin(t)*0.4],[0.8, id == .mountain ? 2+Float(n)*0.4 : 0.7,0.85],segments:7,rings:4) }
+            for n in 0..<count { let t=Float(n)*2.4; body.ellipsoid([cos(t)*0.5,0.5+Float(n)*0.15,sin(t)*0.4],[0.8, id == .mountain ? 2+Float(n)*0.4 : 0.7,0.85],segments:max(16,segments),rings:max(8,segments/2)) }
         case .cloud:
-            for n in 0..<6 { let t=Float(n)*2.4; sphere(&body,[cos(t)*1.2,0.3+Float(n%3)*0.25,sin(t)*0.7],[1.1,0.7,0.9]) }; bodyColor=UIColor(hex:p.fog)
+            body.sculpt([([-1.2,0,0],[1.3,0.65,0.85]),([0,0.25,0],[1.1,1.0,1]),([1.15,0,0.1],[1.2,0.65,0.9]),([0.55,0.65,-0.05],[0.6,0.65,0.7])],min:[-2.7,-0.85,-1.2],max:[2.6,1.5,1.2],step:lod == 2 ? 0.18 : 0.105,blend:0.4,ripple:0.012)
+            bodyColor=UIColor(hex:p.fog)
         case .water:
             body.box([0,-0.05,0],[24,0.1,24]); bodyColor=UIColor(hex:p.accent_b)
             for n in 0..<8 { let z=Float(n)*3-10; trim.tube((0...10).map { [Float($0)*2-10,0.015,z+sin(Float($0))*0.1] },radius:0.015) }
@@ -191,8 +208,9 @@ extension UIColor {
             for z:Float in [-0.2,0.2] { sphere(&body,[1.8,3.05,z],[0.12,0.3,0.1]); sphere(&dark,[2.14,2.8,z*1.55],[0.06,0.06,0.04]) }
             if id == .zebra { for n in 0..<12 { let x=Float(n)*0.28-1.55; dark.tube((0...12).map { let t=Float($0)/12*Float.pi*2; return [x+0.08*sin(t*2),1.5+0.65*cos(t),0.605*sin(t)] },radius:0.065) } }
         case .rabbit:
-            sphere(&body,[0,0.38,0],[0.35,0.38,0.42]); sphere(&body,[0,0.69,0.2],[0.25,0.25,0.24])
-            for x:Float in [-0.13,0.13] { sphere(&body,[x,1.04,0.18],[0.085,0.33,0.07]); sphere(&trim,[x,1.06,0.235],[0.043,0.23,0.018]); sphere(&dark,[x,0.75,0.41],[0.026,0.035,0.02]) }; sphere(&body,[0,0.38,-0.42],[0.16,0.16,0.16]); bodyColor=UIColor(hex:"#EFE4E2"); trimColor=UIColor(hex:"#DDA3B7")
+            body.sculpt([([0,0.34,-0.04],[0.32,0.34,0.38]),([0,0.66,0.19],[0.23,0.24,0.23]),([-0.14,0.98,0.17],[0.075,0.32,0.065]),([0.13,1.02,0.16],[0.08,0.34,0.07]),([-0.21,0.08,0.18],[0.13,0.09,0.22]),([0.21,0.08,0.18],[0.13,0.09,0.22]),([0,0.3,-0.4],[0.15,0.15,0.15])],min:[-0.45,-0.03,-0.59],max:[0.45,1.42,0.51],step:lod == 0 ? 0.032 : 0.05,blend:0.1)
+            for x:Float in [-0.13,0.13] { sphere(&trim,[x,1.03,0.222],[0.035,0.22,0.012]); sphere(&dark,[x,0.73,0.382],[0.021,0.027,0.017]) }
+            sphere(&trim,[0,0.63,0.417],[0.035,0.021,0.017]);bodyColor=UIColor(hex:"#EFE7DC");trimColor=UIColor(hex:"#C8A1AA");darkColor=UIColor(hex:"#382E36")
         case .pig:
             bodyColor=UIColor(hex:"#E8ADB9"); trimColor=UIColor(hex:"#CE859B"); darkColor=UIColor(hex:"#51404B")
             sphere(&body,[0,0.4,0],[0.42,0.32,0.52]); sphere(&body,[0,0.52,0.38],[0.32,0.28,0.3]); sphere(&trim,[0,0.48,0.66],[0.21,0.14,0.09])
@@ -201,7 +219,7 @@ extension UIColor {
         }
         var count=0
         for (g,color) in [(body,bodyColor),(trim,trimColor),(dark,darkColor),(semantic,semanticColor)] where !g.positions.isEmpty {
-            do { let chosen:any Material = style == 7 ? UnlitMaterial(color:color) : material(color,style:style)
+            do { let chosen:any Material = material(color,style:style)
                 let entity=ModelEntity(mesh:try g.resource(),materials:[chosen]); root.addChild(entity); count += g.indices.count/3 }
             catch { assertionFailure("Procedural mesh \(id): \(error)") }
         }

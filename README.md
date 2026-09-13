@@ -62,3 +62,9 @@ R2 introduced initial forward speed **12.25 m/s** (1.75× the original 7 m/s), a
 New dreams use **R4**, retaining the faster runner and narrow tilt range while balls approach at **8 m/s**. Sports-ball rotation follows their actual travelled distance. They first become visible already rolling on a 60 m approach.
 
 The visible path continues roughly 6.1 km ahead using simplified distant geometry that blends into the sky. Detailed scenery and gameplay remain streamed nearby.
+
+### Visual slice and full-frame landscapes
+
+The September visual pass adds PBR material families, smooth runner/rabbit stand-ins, layered clouds, water, moulded windows, a seeded horizon landscape and density evolution. In a Debug build, open **Lab → cloud slice / aqua slice / void slice**. Previews are frozen for inspection and never earn rewards; **pause → ready** runs the preview. Starting a normal dream clears art overrides.
+
+See [the visual/art replacement contract](docs/VISUAL_ART_DIRECTION.md), actual images under `evidence/art-*.png`, and the latest verification section in `IMPLEMENTATION_STATUS.md`. The images are simulator captures; final authored asset polish and physical-device performance are not certified.

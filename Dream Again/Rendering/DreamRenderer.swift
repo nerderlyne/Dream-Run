@@ -8,56 +8,80 @@ import simd
     let anchor=AnchorEntity(world:.zero)
     let world=Entity(), runner=Entity(), camera=PerspectiveCamera(), headAttachment=Entity()
     let distantPath=DistantPathRenderer()
+    let art=DreamArtDirection()
     var chunks: [Int:Entity]=[:], hazards: [String:Entity]=[:], pickups: [String:Entity]=[:]
     var legs:[Entity]=[], arms:[Entity]=[], knees:[Entity]=[], elbows:[Entity]=[]
     var factory: PrefabFactory
+    var authoredRunner:AuthoredDreamRunner?
+    private(set) var authoredArtError:String?
+    var artPalette:Int?
     var palette = -1, base = -1.0, lastRun:UUID?, outfit="", lastVisual:VisualPhase = .ordinary
     var gallery:Entity?
     var renderEntities = 0
     var frozenFrame: UIImage?
-    var originalMaterials: [ObjectIdentifier:[SimpleMaterial]] = [:]
+    var originalMaterials: [ObjectIdentifier:[PhysicallyBasedMaterial]] = [:]
     init(palettes:[PaletteDefinition]) {
         factory=PrefabFactory(palettes:palettes)
         view=ARView(frame:.zero,cameraMode:.nonAR,automaticallyConfigureSession:false)
         view.renderOptions=[.disableMotionBlur,.disableDepthOfField,.disableCameraGrain]
-        let lightingImage=UIGraphicsImageRenderer(size:CGSize(width:512,height:256)).image { context in
-            let colors=[UIColor(hex:"#AAB7D0").cgColor,UIColor(hex:"#FFF0E2").cgColor,UIColor(hex:"#79748C").cgColor] as CFArray
-            if let gradient=CGGradient(colorsSpace:CGColorSpaceCreateDeviceRGB(),colors:colors,locations:[0,0.5,1]) {context.cgContext.drawLinearGradient(gradient,start:.zero,end:CGPoint(x:0,y:256),options:[])}
-        }
-        Task { [weak self] in
-            if let image=lightingImage.cgImage,let environment=try? await EnvironmentResource(equirectangular:image) {self?.view.environment.lighting.resource=environment;self?.view.environment.lighting.intensityExponent=0.3}
-        }
-        view.scene.addAnchor(anchor); anchor.addChild(world); anchor.addChild(runner); anchor.addChild(camera)
+        view.scene.addAnchor(anchor); anchor.addChild(world); anchor.addChild(runner); anchor.addChild(camera);anchor.addChild(art.skyDome)
         camera.camera.fieldOfViewInDegrees=62
         camera.camera.far=8000
-        let light=DirectionalLight(); light.light.intensity=2500; light.light.color=UIColor(hex:"#FFF0E4"); light.look(at:[0,0,0],from:[-6,10,8],relativeTo:nil); anchor.addChild(light)
+        let light=DirectionalLight(); light.light.intensity=4200; light.light.color=UIColor(hex:"#FFF0E4"); light.look(at:[0,0,0],from:[-6,10,8],relativeTo:nil); light.shadow = .init();anchor.addChild(light)
         let fill=PointLight(); fill.light.intensity=750; fill.light.attenuationRadius=80; fill.position=[4,9,8]; anchor.addChild(fill)
         buildAvatar()
+        if let url=Bundle.main.url(forResource:"DreamRunner",withExtension:"usdz") {
+            Task { [weak self] in
+                do {
+                    let art=try await AuthoredDreamRunner.load(url)
+                    guard let self else{return}
+                    for child in self.runner.children where child !== self.headAttachment {child.isEnabled=false}
+                    self.headAttachment.removeFromParent();self.headAttachment.position = .zero
+                    art.hatSocket.addChild(self.headAttachment);self.runner.addChild(art.entity);self.authoredRunner=art
+                } catch {self?.authoredArtError=String(describing:error)}
+            }
+        }
     }
     func piece(_ center:SIMD3<Float>,_ scale:SIMD3<Float>,color:UIColor) -> Entity {
-        var g=Geometry(); g.ellipsoid(center,scale,segments:14,rings:8)
+        var g=Geometry(); g.ellipsoid(center,scale,segments:40,rings:24)
         let entity=(try? ModelEntity(mesh:g.resource(),materials:[factory.material(color,style:0)])) ?? ModelEntity()
         if color == UIColor(hex:"#A6BAC0") {entity.name="avatar-body"}; return entity
     }
     func buildAvatar() {
-        let skin=UIColor(hex:"#E9DCCB"), suit=UIColor(hex:"#A6BAC0")
-        runner.addChild(piece([0,0.98,0],[0.24,0.32,0.15],color:suit))
-        runner.addChild(piece([0,1.37,0],[0.19,0.21,0.18],color:skin))
-        // Doll-like face faces travel (-Z); visible in wardrobe previews.
-        for x:Float in [-0.065,0.065] { runner.addChild(piece([x,1.4,-0.168],[0.02,0.025,0.01],color:UIColor(hex:"#59505E"))) }
+        // Tailored, long-legged stand-in. Replaceable named articulation, not final character art.
+        let skin=UIColor(hex:"#DCD1C1"),suit=UIColor(hex:"#A6BAC0"),hair=UIColor(hex:"#48464E")
+        func garment(_ profile:[SIMD4<Float>],color:UIColor)->Entity {
+            var g=Geometry();g.loft(profile)
+            let e=(try? ModelEntity(mesh:g.resource(),materials:[factory.material(color,style:3)])) ?? ModelEntity()
+            if color == suit {e.name="avatar-body"};return e
+        }
+        runner.addChild(garment([[0.87,0.12,0.095,0],[0.91,0.17,0.11,0],[1.05,0.155,0.10,0],[1.18,0.17,0.115,0],[1.37,0.235,0.125,0],[1.43,0.195,0.1,0],[1.47,0.085,0.065,0]],color:suit))
+        runner.addChild(piece([0,1.49,0],[0.064,0.085,0.065],color:skin))
+        runner.addChild(piece([0,1.67,-0.008],[0.132,0.168,0.123],color:skin))
+        runner.addChild(piece([0,1.72,0.035],[0.141,0.139,0.111],color:hair))
+        // Tapered nape and swept part are readable from the chase camera.
+        runner.addChild(garment([[1.51,0.045,0.03,0.084],[1.57,0.12,0.05,0.072],[1.7,0.14,0.065,0.057]],color:hair))
+        for x:Float in [-0.05,0.05] {runner.addChild(piece([x,1.685,-0.121],[0.012,0.014,0.007],color:hair))}
+        var seam=Geometry();seam.tube([[0,0.94,0.108],[0,1.15,0.116],[0,1.38,0.125]],radius:0.007,segments:10)
+        if let mesh=try? seam.resource() {runner.addChild(ModelEntity(mesh:mesh,materials:[factory.material(UIColor(hex:"#C8BD9F"),style:2)]))}
         for sign:Float in [-1,1] {
-            let leg=Entity(),knee=Entity();leg.position=[sign*0.12,0.75,0]
-            leg.addChild(piece([0,-0.17,0],[0.085,0.18,0.09],color:suit))
-            knee.position=[0,-0.34,0];knee.addChild(piece([0,-0.16,0],[0.075,0.17,0.08],color:suit))
-            knee.addChild(piece([0,-0.34,-0.055],[0.09,0.065,0.15],color:skin))
+            let leg=Entity(),knee=Entity();leg.name=sign < 0 ? "hip.L" : "hip.R";leg.position=[sign*0.105,0.94,0]
+            leg.addChild(garment([[-0.47,0.064,0.064,0],[-0.38,0.073,0.079,0],[-0.15,0.085,0.085,0],[0,0.085,0.092,0]],color:suit))
+            knee.addChild(piece([0,0,0],[0.064,0.064,0.064],color:suit))
+            knee.name=sign < 0 ? "knee.L" : "knee.R";knee.position=[0,-0.46,0]
+            knee.addChild(garment([[-0.39,0.045,0.055,0],[-0.25,0.06,0.067,0],[-0.1,0.068,0.071,0],[0.025,0.065,0.065,0]],color:suit))
+            knee.addChild(piece([0,-0.405,-0.055],[0.07,0.07,0.14],color:hair))
             leg.addChild(knee);runner.addChild(leg);legs.append(leg);knees.append(knee)
-            let arm=Entity(),elbow=Entity();arm.position=[sign*0.27,1.15,0]
-            arm.addChild(piece([0,-0.13,0],[0.065,0.14,0.07],color:skin))
-            elbow.position=[0,-0.25,0];elbow.addChild(piece([0,-0.11,0],[0.06,0.125,0.065],color:skin))
-            elbow.addChild(piece([0,-0.235,0],[0.065,0.065,0.065],color:skin))
+            let arm=Entity(),elbow=Entity();arm.name=sign < 0 ? "shoulder.L" : "shoulder.R";arm.position=[sign*0.228,1.38,0]
+            arm.addChild(garment([[-0.285,0.047,0.05,0],[-0.16,0.058,0.061,0],[0,0.066,0.071,0]],color:suit))
+            arm.addChild(piece([0,-0.01,0],[0.066,0.065,0.07],color:suit))
+            elbow.addChild(piece([0,0,0],[0.048,0.048,0.048],color:suit))
+            elbow.name=sign < 0 ? "elbow.L" : "elbow.R";elbow.position=[0,-0.275,0]
+            elbow.addChild(garment([[-0.235,0.032,0.036,0],[-0.13,0.045,0.048,0],[0.018,0.05,0.05,0]],color:suit))
+            elbow.addChild(piece([0,-0.275,0],[0.038,0.064,0.03],color:skin))
             arm.addChild(elbow);runner.addChild(arm);arms.append(arm);elbows.append(elbow)
         }
-        headAttachment.position=[0,1.56,0]; runner.addChild(headAttachment)
+        headAttachment.name="hat.socket";headAttachment.position=[0,1.84,0];runner.addChild(headAttachment)
     }
     func dress(_ equipped:[String:String]) {
         let signature=equipped.keys.sorted().map { "\($0):\(equipped[$0]!)" }.joined()
@@ -65,8 +89,8 @@ import simd
         headAttachment.children.removeAll()
         runner.children.filter{$0.name == "equipped-trail"}.forEach{$0.removeFromParent()}
         let colors=["pearl_body":"#E9E6E2","rose_body":"#CBA6B7","mint_body":"#ACCFBE"]
-        let bodyColor=UIColor(hex:colors[equipped["body_color"] ?? ""] ?? "#A6BAC0")
-        func tintBody(_ e:Entity) {if let model=e as? ModelEntity,e.name == "avatar-body" {model.model?.materials=[factory.material(bodyColor,style:0)]};for c in e.children {tintBody(c)}}
+        let bodyColor=UIColor(hex:colors[equipped["body_color"] ?? ""] ?? "#607A80")
+        func tintBody(_ e:Entity) {if let model=e as? ModelEntity,e.name == "avatar-body" {model.model?.materials=[factory.material(bodyColor,style:3)]};for c in e.children {tintBody(c)}}
         tintBody(runner)
         if equipped["trail"] != nil {
             var g=Geometry();g.tube([[0,0.5,0.2],[0.15,0.35,0.65],[-0.1,0.2,1.1]],radius:0.03)
@@ -92,12 +116,13 @@ import simd
         let visualDistance = run.distance + (cinematic ? min(45,run.endingElapsed)*2 + min(8,max(0,run.endingElapsed-45))*0.5 : 0)
         let generator=WorldGenerator(run.identity), newBase=floor(run.distance/192)*192, origin=generator.sample(newBase)
         var paletteRNG=run.identity.stream("palette",0)
-        let targetPalette=cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex
+        let targetPalette=artPalette ?? (cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex)
         if lastRun != run.id || newBase != base || palette != targetPalette || lastVisual != run.visual {
-            distantPath.reset()
+            distantPath.reset();art.resetHaze()
             world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
             view.environment.background = .color(UIColor(hex:factory.palettes[palette].sky))
         }
+        art.environment(palette:palette,definition:factory.palettes[palette],view:view,enabled:!cinematic && run.visual != .deepSparse)
         let active=Set(run.chunks.map(\.id))
         for (id,e) in chunks where !active.contains(id) { e.removeFromParent(); chunks.removeValue(forKey:id) }
         let sparse=run.visual == .deepSparse
@@ -123,29 +148,20 @@ import simd
                 let lower=SIMD3<Float>(0,-0.35,0)
                 deck.quad(a-rightA*2+lower,b-rightB*2+lower,b+rightB*2+lower,a+rightA*2+lower)
                 for x:Float in [-2.03,2.03] { let aa=a+rightA*x,bb=b+rightB*x;rim.tube([aa+[0,0.025,0],bb+[0,0.025,0]],radius:0.035,segments:4);deck.quad(aa,aa+lower,bb+lower,bb) }
-                if stair {deck.quad(a-rightA*2,a+rightA*2,a+rightA*2+[0,0.15,0],a-rightA*2+[0,0.15,0])}
+                if stair {deck.quad(a-rightA*2,a+rightA*2,a+rightA*2+[0,y-a.y,0],a-rightA*2+[0,y-a.y,0])}
             }
             for (g,color) in [(light,UIColor(hex:p.track_light)),(dark,UIColor(hex:p.track_dark)),(rim,UIColor(hex:p.accent_b)),(deck,UIColor(hex:p.fog))] where !g.positions.isEmpty {
-                if let mesh=try? g.resource() { root.addChild(ModelEntity(mesh:mesh,materials:[factory.material(color,style:0)])) }
+                if let mesh=try? g.resource() { root.addChild(ModelEntity(mesh:mesh,materials:[factory.material(color,style:4)])) }
             }
             if let drop=c.drop {
                 for s in [drop.departure-1,drop.departure-0.6] { var g=Geometry(); let pos=local(generator.sample(s),origin:origin); g.box(pos+[0,0.05,0],[4.2,0.05,0.1]); if let mesh=try? g.resource() { root.addChild(ModelEntity(mesh:mesh,materials:[UnlitMaterial(color:.white)])) } }
                 let landing=factory.build(.platform,palette:palette,lod:1); landing.scale=[1.25,1,0.18]; landing.position=local(generator.sample(drop.landing+2),origin:origin); root.addChild(landing)
             }
             let sceneAllowed = !sparse || c.id == Int(run.distance/24)+4
-            if sceneAllowed {
-                for placement in c.scenery.prefix(sparse || lowPower ? 1 : 2) {
-                    let e=factory.build(placement.asset,palette:palette,style:c.recipe%4,lod:lowPower ? 2 : 1)
-                    let bounds=e.visualBounds(relativeTo:e)
-                    let radius=Double(max(bounds.extents.x,bounds.extents.z))*placement.scale/2
-                    let clearance=(placement.lateral < 0 ? -1.0 : 1.0)*max(abs(placement.lateral),radius+8)
-                    e.scale=SIMD3(repeating:Float(placement.scale)); e.position=local(generator.sample(placement.distance),origin:origin,lateral:clearance)
-                    if placement.asset == .cloud { e.position.y -= 5 }; if placement.asset == .water { e.position.y -= 4; e.scale=[3,1,3] }
-                    e.name="scenery"; root.addChild(e)
-                }
-            }
+            if sceneAllowed {art.decorate(root,chunk:c,generator:generator,origin:origin,palette:palette,factory:factory,lowPower:lowPower)}
             chunks[c.id]=root; world.addChild(root)
         }
+        art.landscape(run:run,origin:origin,palette:palette,factory:factory,world:world,lowPower:lowPower)
         distantPath.update(run:run,origin:origin,palette:factory.palettes[palette],world:world)
         let activeHazards=Set(run.hazards.filter{ !$0.resolved }.map(\.id))
         for (id,e) in hazards where !activeHazards.contains(id) { e.removeFromParent(); hazards.removeValue(forKey:id) }
@@ -174,7 +190,7 @@ import simd
         let ids=Set(available.map(\.id))
         for (id,e) in pickups where !ids.contains(id) { e.removeFromParent(); pickups.removeValue(forKey:id) }
         for p in available where pickups[p.id] == nil {
-            let e=factory.build(.balloon,palette:palette,lod:1); e.position=local(generator.sample(p.distance),origin:origin,lateral:p.lateral)+[0,0.3,0]; world.addChild(e); pickups[p.id]=e
+            let e=factory.build(.balloon,palette:palette,style:1,lod:0); e.position=local(generator.sample(p.distance),origin:origin,lateral:p.lateral)+[0,0.3,0]; world.addChild(e); pickups[p.id]=e
         }
         let position=local(generator.sample(visualDistance),origin:origin,lateral:run.player.lateral)
         runner.position=position+[0,Float(run.player.height),0]; runner.isEnabled=true
@@ -192,7 +208,7 @@ import simd
         if slide {
             // Face upward, feet ahead (-Z), head behind. Centre the reclined body over the hitbox.
             runner.position += heading.act(SIMD3<Float>(0,0.24,-0.75))
-        } else if faint {runner.position.y += 0.2}
+        } else if faint {runner.position += heading.act(SIMD3<Float>(0,0.2,-0.75))}
         else if activeGait {runner.position.y += (0.04+0.07*abs(sin(t)))*(1-stumble)-0.12*stumble}
         for i in 0..<2 {
             let stride=sin(t+Float(i)*Float.pi)
@@ -203,6 +219,11 @@ import simd
             knees[i].orientation=simd_quatf(angle:kneeAngle,axis:[1,0,0])
             arms[i].orientation=simd_quatf(angle:armAngle,axis:[1,0,0])*simd_quatf(angle:(i == 0 ? -1 : 1)*(slide ? 0.08 : 0.45*stumble),axis:[0,0,1])
             elbows[i].orientation=simd_quatf(angle:slide ? 0.15 : activeGait ? 1.35 : 0,axis:[1,0,0])
+        }
+        if let authoredRunner {
+            runner.orientation=heading
+            let clip=faint ? "faint" : slide ? "slide" : stumble>0 ? "stumble" : run.phase == .safeDrop ? "fall" : run.player.height>0.05 ? "jump" : activeGait ? "run" : "idle"
+            authoredRunner.pose(clip,speed:clip == "run" ? Float(run.speed/12.25) : 1)
         }
         if cinematic && run.endingElapsed >= 45 {
             if gallery == nil { let pigs=Entity(); pigs.name="ending-pigs"; for i in 0..<3 { let e=factory.build(.pig,palette:7); e.position=position+[Float(i-1)*1.1,0,-6]; pigs.addChild(e) }; gallery=pigs; world.addChild(pigs) }
@@ -222,6 +243,7 @@ import simd
         let cameraPosition=local(generator.sample(visualDistance-4.8),origin:origin,lateral:run.player.lateral*0.2)+[0,2.8,0]
         let target=local(generator.sample(visualDistance+9),origin:origin)+[0,0.7,0]
         camera.look(at:target,from:cameraPosition,relativeTo:nil)
+        if !cinematic && palette != 5 {art.haze(world,camera:cameraPosition,color:UIColor(hex:factory.palettes[palette].fog))}
         if run.visual == .deepStripping || run.visual == .deepRebuilding {
             let cycle=run.seconds.truncatingRemainder(dividingBy:10800)
             let fraction=run.visual == .deepStripping ? max(0,1-cycle/240) : min(1,(cycle-300)/300)
@@ -232,28 +254,31 @@ import simd
     }
     func mix(_ a:UIColor,_ b:UIColor,_ t:CGFloat)->UIColor {
         var ar:CGFloat=0,ag:CGFloat=0,ab:CGFloat=0,aa:CGFloat=0,br:CGFloat=0,bg:CGFloat=0,bb:CGFloat=0,ba:CGFloat=0
-        a.getRed(&ar,green:&ag,blue:&ab,alpha:&aa);b.getRed(&br,green:&bg,blue:&bb,alpha:&ba)
+        a.artSRGB.getRed(&ar,green:&ag,blue:&ab,alpha:&aa);b.artSRGB.getRed(&br,green:&bg,blue:&bb,alpha:&ba)
         return UIColor(red:ar+(br-ar)*t,green:ag+(bg-ag)*t,blue:ab+(bb-ab)*t,alpha:1)
     }
     func whiten(_ entity:Entity,amount:CGFloat) {
         if entity.name == "ending-pigs" {return}
         if let model=entity as? ModelEntity, let component=model.model {
             let key=ObjectIdentifier(model)
-            if originalMaterials[key] == nil {originalMaterials[key]=component.materials.compactMap{$0 as? SimpleMaterial}}
+            if originalMaterials[key] == nil {originalMaterials[key]=component.materials.compactMap{$0 as? PhysicallyBasedMaterial}}
             if let originals=originalMaterials[key],!originals.isEmpty {
-                model.model?.materials=originals.map { original in var m=original;m.color.tint=mix(original.color.tint,UIColor(hex:"#F4F3EF"),amount);return m }
+                model.model?.materials=originals.map { original in var m=original;m.baseColor.tint=mix(original.baseColor.tint,UIColor(hex:"#F4F3EF"),amount);return m }
             }
         }
         for child in entity.children {whiten(child,amount:amount)}
     }
     func previewAvatar(equipped:[String:String]) {
+        art.skyDome.isEnabled=false
         world.children.removeAll();chunks.removeAll();hazards.removeAll();pickups.removeAll();lastRun=nil
         runner.isEnabled=true;runner.position = .zero;runner.orientation=simd_quatf(angle:0,axis:[0,1,0]);dress(equipped)
         for e in legs+arms+knees+elbows {e.orientation=simd_quatf(angle:0,axis:[1,0,0])}
+        authoredRunner?.pose("idle")
         camera.look(at:[0,1,0],from:[1.4,1.5,-3.3],relativeTo:nil)
         view.environment.background = .color(UIColor(hex:"#686378"))
     }
     func preview(_ id:AssetID,palette:Int,style:Int,lod:Int,colliders:Bool = false) {
+        art.skyDome.isEnabled=false
         world.children.removeAll(); chunks.removeAll(); hazards.removeAll(); pickups.removeAll(); gallery=nil; runner.isEnabled=false; lastRun=nil
         let e=factory.build(id,palette:palette,style:style,lod:lod); world.addChild(e); gallery=e
         let bounds=e.visualBounds(relativeTo:e), center=bounds.center, extent=max(bounds.extents.x,max(bounds.extents.y,bounds.extents.z))
