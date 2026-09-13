@@ -27,3 +27,5 @@ Signing identity, App Store Connect products, banking/storefront setup, ad/conse
 The wallet survives normal local relaunches and supports idempotent verified delivery, delta settlement and lot-aware refunds. It does **not** promise cross-device/reinstall restoration of remaining consumable currency. A future cloud ledger needs explicit reconciliation and recovery testing.
 
 The pause-loop follow-up caps simulation catch-up during rendering hitches instead of forcing a ready prompt. Sustained low frame rates can slow active gameplay time; no discarded wall time is credited to pig chances or records. Device profiling is still needed.
+
+Current device controls are tilt-only; earlier notes about an optional touch fallback are superseded. Drag steering is confined to Simulator builds. A sensor interruption pauses for recalibration without offering a mode choice.

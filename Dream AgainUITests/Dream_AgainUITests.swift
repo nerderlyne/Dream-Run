@@ -7,6 +7,7 @@ final class Dream_AgainUITests:XCTestCase {
         let unexpectedPause=XCTNSPredicateExpectation(predicate:NSPredicate(format:"exists == true"),object:app.buttons["ready"])
         unexpectedPause.isInverted=true;wait(for:[unexpectedPause],timeout:8)
         XCTAssertEqual(app.sliders.count,0)
+        XCTAssertFalse(app.switches["Drag steering instead of tilt"].exists)
         XCTAssertTrue(app.buttons["pause"].waitForExistence(timeout:5));app.buttons["pause"].tap()
         XCTAssertTrue(app.buttons["save & leave"].waitForExistence(timeout:5));app.buttons["save & leave"].tap()
         app.buttons["wardrobe"].tap();XCTAssertTrue(app.staticTexts["Paper hat"].waitForExistence(timeout:5))

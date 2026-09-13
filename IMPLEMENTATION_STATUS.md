@@ -113,3 +113,11 @@ Fixed the host timing policy that opened a modal pause whenever a frame required
 Removed the gameplay slider. Device defaults and legacy slider settings migrate to calibrated tilt; Simulator/unavailable motion uses drag steering. Vertical swipes jump/slide; existing action buttons remain accessible. Motion gets a one-second startup grace, then falls back to drag if unavailable. Audio interruption-ended notifications no longer pause again.
 
 PASS: focused Swift suite, 19 tests, zero failures, 4.399 seconds (`evidence/input-pause-tests.log`). Includes hitch recovery and legacy settings decoding. Debug app/UI test bundle compilation is recorded in `evidence/input-pause-build.log`. The UI regression checks eight seconds without an unexpected ready prompt and no gameplay slider; it is compiled, not executed because simulator access remains unavailable. Physical tilt/gesture feel remains unverified.
+
+## Follow-up: one player steering control
+
+Removed steering-mode switches from both pause/onboarding and Settings. Physical iPhone/iPad builds always use calibrated tilt; horizontal drag is a compile-time Simulator input adapter only. Removed persisted steering preferences, so older saved drag choices cannot override device controls. Existing JSON settings remain decodable because obsolete keys are ignored. A genuine motion interruption offers recalibration rather than changing steering modes. Vertical jump/slide gestures and the frame-hitch fix remain.
+
+Verification outputs: `evidence/tilt-only-tests.log` (focused package suite), `evidence/tilt-only-build.log` (Simulator test-bundle compilation), `evidence/tilt-only-device-build.log` (unsigned generic iOS Release compilation). No physical-device execution claimed.
+
+PASS: 18 focused Swift tests, zero failures, 4.558 seconds. PASS: Debug Simulator test-bundle build and unsigned generic iOS Release build. UI assertions were compiled but not executed.

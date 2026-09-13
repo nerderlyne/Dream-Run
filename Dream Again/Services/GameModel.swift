@@ -34,6 +34,14 @@ import UIKit
     var clock=FixedStepClock()
     var provider:any RewardedContinueProvider = DisabledRewardProvider()
     var active:Bool { screen == "gameplay" }
+    // Simulator has no motion sensor. This is a test-environment adapter, not a player setting.
+    var simulatorDragInput:Bool {
+        #if targetEnvironment(simulator)
+        return true
+        #else
+        return false
+        #endif
+    }
     var run:RunState { simulation.state }
     override init() {
         super.init()
@@ -49,13 +57,11 @@ import UIKit
             guard assets.count == 42, assets.last?.id == "pig" else { throw DreamError.corruptStore }
             let directory=try FileManager.default.url(for:.applicationSupportDirectory,in:.userDomainMask,appropriateFor:nil,create:true).appendingPathComponent("DreamAgain",isDirectory:true)
             let store=try ProfileStore(url:directory.appendingPathComponent("profile-v1.json")); self.store=store; profile=store.profile; settings=profile.settings
-            if settings.controlsVersion == nil { settings.touchSteering=false;settings.controlsVersion=2 }
-            if !motion.available {settings.touchSteering=true}
             if store.recoveredBackup { error="A damaged save was preserved and the last good backup was recovered. Progress since that backup may be missing." }
             commerce=BalloonStore(store:store); renderer=DreamRenderer(palettes:palettes)
             renderer?.render(run,equipped:profile.equipped,menu:true)
             #if DEBUG
-            if ProcessInfo.processInfo.arguments.contains("--ui-test") { settings.music=false; settings.effects=false; settings.touchSteering=true }
+            if ProcessInfo.processInfo.arguments.contains("--ui-test") { settings.music=false; settings.effects=false }
             #endif
         } catch { self.error=error.localizedDescription }
         link=CADisplayLink(target:self,selector:#selector(frame(_:))); link?.add(to:.main,forMode:.common)
@@ -85,8 +91,7 @@ import UIKit
     }
     func ready() {
         notice="";input=InputFrame()
-        if !motion.available {settings.touchSteering=true}
-        if !settings.touchSteering { motion.start(); motion.calibrate() }
+        if !simulatorDragInput { motion.start(); motion.calibrate() }
         simulation.resume(); previousTime=0; clock.reset(); persist()
     }
     func pause() { guard active else { return }; simulation.pause(); motion.stop(); audio.stop(); previousTime=0; clock.reset(); input=InputFrame(); persist() }
@@ -202,9 +207,9 @@ import UIKit
             return
         }
         guard let steps=clock.consume(delta) else {clock.reset();return}
-        if !settings.touchSteering {
+        if !simulatorDragInput {
             if let steering=motion.sample(settings:settings,now:now) {input.steering=steering}
-            else {settings.touchSteering=true;motion.stop();input.steering=0;notice="Tilt is unavailable. Drag left or right to steer."}
+            else {input.steering=0;notice="Tilt input was interrupted. Hold your device comfortably and tap ready to recalibrate.";pause();return}
         }
         for _ in 0..<steps {
             let events=simulation.step(input); input.jump=false; input.slide=false

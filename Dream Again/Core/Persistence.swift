@@ -21,8 +21,6 @@ public struct Bookmark: Codable, Identifiable, Sendable {
 }
 public struct ContinueGrant: Codable, Sendable { public var eventID: String; public var runID: UUID; public var consumed = false }
 public struct Settings: Codable, Sendable {
-    public var touchSteering = false
-    public var controlsVersion: Int? = 2
     public var sensitivity = 1.0
     public var deadzone = 1.5
     public var reducedMotion = false

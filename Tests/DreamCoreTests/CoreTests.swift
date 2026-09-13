@@ -17,13 +17,6 @@ final class CoreTests: XCTestCase {
         XCTAssertEqual(clock.consume(1.0/60),1)
         XCTAssertNil(clock.consume(.nan))
     }
-    func testLegacyControlsDecodeForTiltMigration() throws {
-        let encoder=JSONEncoder()
-        var object=try JSONSerialization.jsonObject(with:encoder.encode(Settings())) as! [String:Any]
-        object.removeValue(forKey:"controlsVersion");object["touchSteering"]=true
-        let legacy=try JSONDecoder().decode(Settings.self,from:JSONSerialization.data(withJSONObject:object))
-        XCTAssertNil(legacy.controlsVersion);XCTAssertFalse(Settings().touchSteering)
-    }
     func testHeldSlideCannotRemainLowForever() {
         var simulation=safe(),standing=0
         for _ in 0..<240 {_=simulation.step(InputFrame(slide:true));if simulation.state.player.slideTicks == 0 {standing += 1}}

@@ -88,13 +88,13 @@ struct ContentView:View {
                 .onChanged { value in
                     guard [.running,.safeDrop,.mirrorCrossing].contains(game.run.phase) else {return}
                     if swipeStarted == nil {swipeStarted=value.time}
-                    if game.settings.touchSteering {
+                    if game.simulatorDragInput {
                         let dx=value.translation.width,dy=value.translation.height
                         game.input.steering=abs(dx)>abs(dy) ? max(-1,min(1,Double(dx)/80)) : 0
                     }
                 }
                 .onEnded { value in
-                    defer {swipeStarted=nil;if game.settings.touchSteering {game.input.steering=0}}
+                    defer {swipeStarted=nil;if game.simulatorDragInput {game.input.steering=0}}
                     guard [.running,.safeDrop,.mirrorCrossing].contains(game.run.phase) else {return}
                     let dy=value.translation.height,dx=value.translation.width
                     guard abs(dy)>=34,abs(dy)>abs(dx)*1.4,value.time.timeIntervalSince(swipeStarted ?? value.time)<=0.45 else {return}
@@ -114,12 +114,11 @@ struct ContentView:View {
             }
             if [.ready,.paused].contains(game.run.phase) {
                 VStack(spacing:12){Text(game.run.phase == .ready ? "a little tilt.\na leap. a dream." : "paused").font(.largeTitle).multilineTextAlignment(.center)
-                    Text(game.settings.touchSteering ? "Drag left or right to steer. Swipe up to jump, down to slide." : "Tilt left or right to steer. Swipe up to jump, down to slide. Hold comfortably, then tap ready to calibrate.").font(.callout).multilineTextAlignment(.center)
+                    Text(game.simulatorDragInput ? "Drag left or right to steer. Swipe up to jump, down to slide." : "Tilt left or right to steer. Swipe up to jump, down to slide. Hold comfortably, then tap ready to calibrate.").font(.callout).multilineTextAlignment(.center)
                     if !game.notice.isEmpty {Text(game.notice).font(.caption)}
                     button("ready"){game.ready()}
                     button("save & leave"){game.leave()}
                     button("end this dream"){game.endRun()}
-                    Toggle("Drag steering instead of tilt",isOn:$game.settings.touchSteering).onChange(of:game.settings.touchSteering){_,_ in game.saveSettings()}
                 }.padding(28).background(.regularMaterial,in:RoundedRectangle(cornerRadius:28)).padding(25).frame(maxWidth:450).frame(maxHeight:.infinity)
             }
             if game.run.phase == .resuming {Text("breathe…").font(.largeTitle).frame(maxHeight:.infinity)}
@@ -192,7 +191,6 @@ struct ContentView:View {
     }
     var settings:some View {
         menu("settings") {
-            Toggle("Drag steering instead of tilt",isOn:$game.settings.touchSteering)
             VStack(alignment:.leading){Text("Tilt sensitivity");Slider(value:$game.settings.sensitivity,in:0.5...1.5);Text("Dead zone · \(game.settings.deadzone,specifier:"%.1f")°");Slider(value:$game.settings.deadzone,in:0.5...4)}
             Toggle("Reduced motion",isOn:$game.settings.reducedMotion);Toggle("Reduced flashes",isOn:$game.settings.reducedFlashes)
             Toggle("Music",isOn:$game.settings.music);Toggle("Effects",isOn:$game.settings.effects);Toggle("Haptics",isOn:$game.settings.haptics);Toggle("Lower visual detail",isOn:$game.settings.lowPower)

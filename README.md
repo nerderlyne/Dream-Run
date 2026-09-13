@@ -6,7 +6,7 @@ Native SwiftUI + non-AR RealityKit runner for iPhone and iPad, targeting iOS 18.
 
 1. Open `Dream Again.xcodeproj` in Xcode 26.6 or a compatible stable Xcode.
 2. Select the shared **Dream Again** scheme and an installed iOS Simulator. Run. The scheme attaches `DreamAgain.storekit` for local purchase testing.
-3. Tap **dream**, then **ready**. The first attempt is the introduction. Tilt left/right to steer and swipe up/down to jump/slide. On Simulator, drag left/right anywhere on the playfield; **jump ↑ / slide ↓** buttons remain available. Settings offers **Drag steering instead of tilt**. There is no gameplay slider.
+3. Tap **dream**, then **ready**. The first attempt is the introduction. Tilt left/right to steer and swipe up/down to jump/slide. On Simulator, drag left/right anywhere on the playfield; **jump ↑ / slide ↓** buttons remain available. Tilt is the fixed device control; there is no steering-mode setting or gameplay slider. Drag input exists only in Simulator builds.
 4. Pause for recalibration or **save & leave**. Resume keeps the attempt; a saved/imported dream starts from its beginning as **Revisit**.
 
 The existing owner's bundle identifier and team settings have been preserved. No signing, provisioning, live products, advertisements, or publishing were performed. Generic simulator builds disable signing.
