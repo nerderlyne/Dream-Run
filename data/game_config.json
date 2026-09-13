@@ -5,7 +5,7 @@
   "deployment_target_ios": "18.0",
   "versions": {
     "generator": 1,
-    "rules": 3,
+    "rules": 4,
     "content": 1,
     "save": 1
   },
@@ -54,7 +54,7 @@
     "min_telegraph_seconds": 2.0,
     "min_between_required_actions_seconds": 1.0,
     "min_after_blind_transition_seconds": 2.0,
-    "rolling_speed_towards_player_mps": 4.0,
+    "rolling_speed_towards_player_mps": 8.0,
     "max_candidate_retries": 8,
     "recent_asset_history": 12,
     "max_consecutive_same_chunk_family": 2,

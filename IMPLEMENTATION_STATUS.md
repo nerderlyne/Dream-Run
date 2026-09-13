@@ -151,3 +151,11 @@ The existing 25% speed drop and one-second recovery now drive a coordinated avat
 PASS: 24 focused Swift tests, zero failures, 8.460 seconds (`evidence/stumble-tests.log`). Tests directly hit all four sports balls, verify distance actually slows, verify once-only hits and snapshot recovery, test football-tip contact and retain the twelve-seed R3 opening checks. Native animation and haptic feel still require device execution. Build output: `evidence/stumble-build.log`.
 
 PASS: Debug app and native test-bundle compilation after the final feedback-priority change.
+
+## Follow-up: fast incoming rolling balls (R4)
+
+New dreams use R4: rolling encounters move toward the runner at 8 m/s instead of 4 m/s. Sports-ball meshes rotate about their centres using authoritative travelled distance divided by rolling radius; footballs rotate about their long lateral axis. Dormant encounters are hidden until their 60 m approach begins, removing the parked-ball presentation. At the 16 m/s player cap, the worst ordinary-ball closing speed is 24 m/s; the initial contact margin still exceeds two seconds. Earlier saved rule versions keep their original ball speed.
+
+Verification outputs: `evidence/rolling-balls-tests.log`, `evidence/rolling-balls-spec.log`, `evidence/rolling-balls-preflight.log`, `evidence/rolling-balls-build.log`. Tests cover movement/spin/start visibility and preview time, plus twelve R4 three-minute runs and tutorials through the authoritative certifier. Physical/simulator visual execution remains unrun.
+
+PASS: 25 focused Swift tests, zero failures, 8.424 seconds; 51 specification checks; release preflight; Debug Simulator test-bundle build. No six-hour R4 soak was performed.

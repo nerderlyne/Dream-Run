@@ -15,7 +15,7 @@ public struct RunRules:Codable,Equatable,Sendable {
         baseSpeed=try number(simulation,"base_speed_mps");maximumSpeed=try number(simulation,"max_speed_mps");speedTimeConstant=try number(simulation,"speed_time_constant_seconds")
         lateralLimit=try number(movement,"max_lateral_offset_m");lateralSpeed=try number(movement,"max_lateral_speed_mps");smoothing=try number(movement,"tilt_smoothing_seconds")
         jumpVelocity=try number(movement,"jump_velocity_mps");gravity=try number(movement,"gravity_mps2");slideTicks=Int((try number(movement,"slide_seconds")*60).rounded())
-        guard let versions=root["versions"] as? [String:Int],let version=versions["rules"], [1,2,3].contains(version),self == RunRules(version:UInt16(version)) else {throw DreamError.unsupportedVersion}
+        guard let versions=root["versions"] as? [String:Int],let version=versions["rules"], [1,2,3,4].contains(version),self == RunRules(version:UInt16(version)) else {throw DreamError.unsupportedVersion}
     }
 }
 

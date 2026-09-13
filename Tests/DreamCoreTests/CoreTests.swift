@@ -44,7 +44,7 @@ final class CoreTests: XCTestCase {
     func testIDsRejectBadInput() throws {
         for s in ["",String(repeating:"0",count:200),"DR2-G1-R1-C1-000000000001A-460B","DR1-G1-R1-C1-ZZZZZZZZZZZZZ-580X","DR1-G0-R1-C1-000000000001A-460B","DR1-G1-R1-C1-000000000001A-460C"] { XCTAssertThrowsError(try DreamIdentity.parse(s)) }
         XCTAssertEqual(try DreamIdentity.parse("  dr1-g1-r1-c1-OOOOOOOOOOO1a-46Ob  ").seed,42)
-        var future=DreamIdentity(seed:42); future.rulesVersion=4; XCTAssertThrowsError(try DreamIdentity.parse(future.code)); XCTAssertEqual(try DreamIdentity.parse(future.code,requireSupported:false),future)
+        var future=DreamIdentity(seed:42); future.rulesVersion=5; XCTAssertThrowsError(try DreamIdentity.parse(future.code)); XCTAssertEqual(try DreamIdentity.parse(future.code,requireSupported:false),future)
         XCTAssertThrowsError(try DreamFile.read(Data("{\"format\":1,\"dreamID\":\"a\",\"url\":\"x\"}".utf8)))
     }
     func testFasterRulesPreserveSavedDreams() throws {
@@ -137,6 +137,20 @@ final class CoreTests: XCTestCase {
             XCTAssertEqual(restored.state.stumbleWeight,simulation.state.stumbleWeight)
             for _ in 0..<59 {XCTAssertFalse(restored.step().contains(.stumble))}
             XCTAssertEqual(restored.state.stumbleWeight,0);XCTAssertEqual(restored.state.speed,restored.state.unhinderedSpeed)
+        }
+    }
+    func testFastRollingBallTravelSpinAndTelegraph() {
+        let generator=WorldGenerator(DreamIdentity.current(seed:42))
+        let balls=(0..<300).flatMap{generator.chunk($0).hazards}.filter(\.isRollingSportsBall)
+        XCTAssertFalse(balls.isEmpty)
+        for var ball in balls {
+            XCTAssertEqual(ball.speed,8)
+            XCTAssertGreaterThanOrEqual((60-ball.radius-0.28)/(16+ball.speed),2)
+            ball.spawnTick=100
+            XCTAssertFalse(ball.hasStartedMoving(at:99));XCTAssertEqual(ball.rollAngle(at:99),0)
+            XCTAssertTrue(ball.hasStartedMoving(at:100))
+            XCTAssertEqual(ball.distance-ball.position(at:160),8,accuracy:1e-10)
+            XCTAssertEqual(ball.rollAngle(at:160),(8/ball.rollingRadius).truncatingRemainder(dividingBy:2*Double.pi),accuracy:1e-10)
         }
     }
     func testVisibleFootballTipMakesContact() {

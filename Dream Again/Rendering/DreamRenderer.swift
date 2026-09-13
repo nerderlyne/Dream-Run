@@ -140,7 +140,13 @@ import simd
         for h in run.hazards where !h.resolved {
             let e:Entity
             if let existing=hazards[h.id] { e=existing } else {
-                e=factory.build(h.asset,palette:palette,lod:0)
+                if h.isRollingSportsBall {
+                    e=Entity()
+                    let pivot=Entity(),mesh=factory.build(h.asset,palette:palette,lod:0)
+                    pivot.name="rolling-ball";pivot.position.y=Float(h.rollingRadius)
+                    mesh.position.y = -0.45
+                    pivot.addChild(mesh);e.addChild(pivot)
+                } else {e=factory.build(h.asset,palette:palette,lod:0)}
                 if h.encounter == .jump { e.scale=[0.47,1,0.47]; e.orientation=simd_quatf(angle:.pi/2,axis:[0,0,1]) }
                 if h.pig?.clover == true { let clover=factory.build(.clover,palette:palette); clover.scale=[0.45,0.45,0.45]; clover.position=[0,0.7,0]; e.addChild(clover) }
                 world.addChild(e); hazards[h.id]=e
@@ -149,7 +155,8 @@ import simd
             e.position=local(routeSample,origin:origin,lateral:h.lateral)
             e.orientation=simd_quatf(angle:-Float(routeSample.yaw),axis:[0,1,0])
             if h.encounter == .jump {e.orientation *= simd_quatf(angle:.pi/2,axis:[0,0,1]);e.position += [Float(cos(routeSample.yaw))*2,0.225,Float(sin(routeSample.yaw))*2]}
-            e.isEnabled=run.pigs.count < 3 && (h.pig != nil || h.encounter == .mirror || h.position(at:run.activeTicks) >= run.safeUntilDistance)
+            if let pivot=e.findEntity(named:"rolling-ball") {pivot.orientation=simd_quatf(angle:Float(h.rollAngle(at:run.activeTicks)),axis:[1,0,0])}
+            e.isEnabled=h.hasStartedMoving(at:run.activeTicks) && run.pigs.count < 3 && (h.pig != nil || h.encounter == .mirror || h.position(at:run.activeTicks) >= run.safeUntilDistance)
         }
         let available=run.chunks.flatMap(\.pickups).filter { !run.collectedIDs.contains($0.id) }
         let ids=Set(available.map(\.id))

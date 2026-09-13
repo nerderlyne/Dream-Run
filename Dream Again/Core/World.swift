@@ -26,6 +26,13 @@ public struct HazardDescription: Codable, Equatable, Identifiable, Sendable {
     public var resolved = false
     public var pig: PigDecision? = nil
     public func position(at tick: UInt64) -> Double { distance - Double(tick >= spawnTick ? tick - spawnTick : 0) / 60 * speed }
+    public var isRollingSportsBall:Bool {speed > 0 && [.soccer,.eightBall,.softball,.americanFootball].contains(asset)}
+    public var rollingRadius:Double {asset == .americanFootball ? 0.35 : radius}
+    public func hasStartedMoving(at tick:UInt64)->Bool {speed == 0 || spawnTick <= tick}
+    public func rollAngle(at tick:UInt64)->Double {
+        guard isRollingSportsBall,rollingRadius > 0 else {return 0}
+        return ((distance-position(at:tick))/rollingRadius).truncatingRemainder(dividingBy:2*Double.pi)
+    }
     // Football mesh has a 0.65 m lateral semi-axis; its visible tips must make contact.
     public var contactHalfWidth:Double {asset == .americanFootball ? max(radius,0.65) : radius}
     public var fatal: Bool { asset == .rabbit || asset == .nazar || encounter == .slide }
@@ -87,7 +94,7 @@ public struct WorldGenerator: Sendable {
             if e == .gap {
                 result.gap = (anchor - 1.8)...(anchor + 1.8); result.routeFamily = .trackBroken
             } else if e != .breathing {
-                result.hazards.append(HazardDescription(id: "h:\(index)", asset: asset, encounter: e, distance: anchor, lateral: (e == .slide || e == .jump) ? 0 : (rng.below(2) == 0 ? -0.8 : 0.8), radius: asset == .nazar ? 0.7 : 0.45, height: e == .slide ? 2.4 : e == .jump ? 0.45 : asset == .rabbit ? 0.8 : 0.9, speed: e == .rolling ? 4 : 0))
+                result.hazards.append(HazardDescription(id: "h:\(index)", asset: asset, encounter: e, distance: anchor, lateral: (e == .slide || e == .jump) ? 0 : (rng.below(2) == 0 ? -0.8 : 0.8), radius: asset == .nazar ? 0.7 : 0.45, height: e == .slide ? 2.4 : e == .jump ? 0.45 : asset == .rabbit ? 0.8 : 0.9, speed: e == .rolling ? (identity.rulesVersion >= 4 ? 8 : 4) : 0))
             }
         }
         // Safe transitions own a wide, hazard-free horizon on either side.

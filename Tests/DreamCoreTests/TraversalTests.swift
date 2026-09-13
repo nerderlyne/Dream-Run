@@ -36,7 +36,7 @@ final class TraversalTests:XCTestCase {
     func testFastNarrowOpeningTwelveSeeds() {
         for seed in 0..<12 {
             var simulation=GameSimulation(identity:DreamIdentity.current(seed:UInt64(seed)));simulation.resume()
-            for _ in 0..<(180*60) {_=simulation.step(oracle(simulation.state));guard [.running,.safeDrop,.mirrorCrossing].contains(simulation.state.phase) else {return XCTFail("R3 seed \(seed) failed at \(simulation.state.seconds): \(simulation.state.cause)")}}
+            for _ in 0..<(180*60) {_=simulation.step(oracle(simulation.state));guard [.running,.safeDrop,.mirrorCrossing].contains(simulation.state.phase) else {return XCTFail("R4 seed \(seed) failed at \(simulation.state.seconds): \(simulation.state.cause)")}}
             XCTAssertGreaterThan(simulation.state.dropCount,0)
             var tutorial=GameSimulation(identity:DreamIdentity.current(seed:UInt64(seed)),mode:.tutorial);tutorial.resume()
             for _ in 0..<(55*60) {_=tutorial.step(oracle(tutorial.state))}
