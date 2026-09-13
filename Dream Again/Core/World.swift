@@ -26,6 +26,8 @@ public struct HazardDescription: Codable, Equatable, Identifiable, Sendable {
     public var resolved = false
     public var pig: PigDecision? = nil
     public func position(at tick: UInt64) -> Double { distance - Double(tick >= spawnTick ? tick - spawnTick : 0) / 60 * speed }
+    // Football mesh has a 0.65 m lateral semi-axis; its visible tips must make contact.
+    public var contactHalfWidth:Double {asset == .americanFootball ? max(radius,0.65) : radius}
     public var fatal: Bool { asset == .rabbit || asset == .nazar || encounter == .slide }
 }
 public struct PickupDescription: Codable, Equatable, Identifiable, Sendable {

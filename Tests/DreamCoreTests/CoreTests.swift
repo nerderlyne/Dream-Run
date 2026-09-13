@@ -118,6 +118,33 @@ final class CoreTests: XCTestCase {
         s=safe(); s.state.safeUntilDistance=0; s.state.hazards=[hazard("zebra",.zebra,.slide)]; _=s.step(InputFrame(slide:true)); XCTAssertEqual(s.state.phase,.running)
         for _ in 0..<65 { _=s.step() }; XCTAssertEqual(s.state.player.slideTicks,0)
     }
+    func testEverySportsBallStumblesSlowsAndRecovers() throws {
+        for asset:AssetID in [.soccer,.eightBall,.softball,.americanFootball] {
+            var simulation=GameSimulation(identity:DreamIdentity.current(seed:42));simulation.resume()
+            simulation.state.hazards=[HazardDescription(id:"contact",asset:asset,encounter:.rolling,distance:2,lateral:0,radius:0.45,height:0.9,speed:4)]
+            var hits=0
+            for _ in 0..<20 {
+                let events=simulation.step();hits += events.filter{$0 == .stumble}.count
+                if hits > 0 {break}
+            }
+            XCTAssertEqual(hits,1,"\(asset)");XCTAssertEqual(simulation.state.phase,.running)
+            XCTAssertEqual(simulation.state.stumbleWeight,1)
+            XCTAssertEqual(simulation.state.speed/simulation.state.unhinderedSpeed,0.75,accuracy:1e-12)
+            let previousDistance=simulation.state.distance
+            _=simulation.step()
+            XCTAssertEqual(simulation.state.distance-previousDistance,simulation.state.speed/60,accuracy:1e-10)
+            var restored=try GameSimulation(snapshot:JSONDecoder().decode(RunState.self,from:JSONEncoder().encode(simulation.state)))
+            XCTAssertEqual(restored.state.stumbleWeight,simulation.state.stumbleWeight)
+            for _ in 0..<59 {XCTAssertFalse(restored.step().contains(.stumble))}
+            XCTAssertEqual(restored.state.stumbleWeight,0);XCTAssertEqual(restored.state.speed,restored.state.unhinderedSpeed)
+        }
+    }
+    func testVisibleFootballTipMakesContact() {
+        var simulation=GameSimulation(identity:DreamIdentity.current(seed:42));simulation.resume()
+        simulation.state.hazards=[HazardDescription(id:"tip",asset:.americanFootball,encounter:.rolling,distance:0.1,lateral:0.8,radius:0.45,height:0.9)]
+        XCTAssertTrue(simulation.step().contains(.stumble))
+        XCTAssertEqual(simulation.state.instabilityUntil-simulation.state.activeTicks,300)
+    }
     func testPigCommitAndDeepNonterminal() throws {
         var s=safe(); s.state.activeTicks=46439; _=s.step(); XCTAssertEqual(s.state.pendingPig?.ordinal,1)
         let p=s.state.pendingPig; s.wake("test"); XCTAssertTrue(s.continueRun()); XCTAssertEqual(s.state.pendingPig,p)

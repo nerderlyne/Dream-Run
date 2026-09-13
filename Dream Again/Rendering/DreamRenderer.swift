@@ -160,10 +160,21 @@ import simd
         let position=local(generator.sample(visualDistance),origin:origin,lateral:run.player.lateral)
         runner.position=position+[0,Float(run.player.height),0]; runner.isEnabled=true
         let slide=run.player.slideTicks > 0, faint=run.pigs.count == 3 && run.endingElapsed > 51
-        runner.orientation=simd_quatf(angle:-Float(generator.sample(visualDistance).yaw),axis:[0,1,0])*simd_quatf(angle:faint ? .pi/2 : slide ? -1.15 : 0,axis:[1,0,0]); if slide { runner.position.y += 0.1 }
-        if faint { runner.position.y += 0.2 }
+        let stumble=cinematic ? Float(0) : Float(run.stumbleWeight)
+        let stumbleAge=Float(1-run.stumbleWeight)
+        let pitch:Float=faint ? .pi/2 : slide ? -1.15 : -0.55*stumble
+        let roll:Float=sin(stumbleAge*22)*0.12*stumble
+        runner.orientation=simd_quatf(angle:-Float(generator.sample(visualDistance).yaw),axis:[0,1,0])*simd_quatf(angle:pitch,axis:[1,0,0])*simd_quatf(angle:roll,axis:[0,0,1])
+        if slide {runner.position.y += 0.1} else if !faint {runner.position.y -= 0.12*stumble}
+        if faint {runner.position.y += 0.2}
         let t=Float(run.seconds)*10
-        for i in 0..<2 { legs[i].orientation=simd_quatf(angle:slide ? 0.6 : sin(t+Float(i)*Float.pi)*0.55,axis:[1,0,0]); arms[i].orientation=simd_quatf(angle:slide ? -0.5 : -sin(t+Float(i)*Float.pi)*0.5,axis:[1,0,0]) }
+        for i in 0..<2 {
+            let stride=sin(t+Float(i)*Float.pi)
+            let legAngle:Float=slide ? 0.6 : stride*0.55*(1-stumble)+(i == 0 ? -0.5 : 0.3)*stumble
+            let armAngle:Float=slide ? -0.5 : -stride*0.5*(1-stumble)-0.9*stumble
+            legs[i].orientation=simd_quatf(angle:legAngle,axis:[1,0,0])
+            arms[i].orientation=simd_quatf(angle:armAngle,axis:[1,0,0])*simd_quatf(angle:(i == 0 ? -0.45 : 0.45)*stumble,axis:[0,0,1])
+        }
         if cinematic && run.endingElapsed >= 45 {
             if gallery == nil { let pigs=Entity(); pigs.name="ending-pigs"; for i in 0..<3 { let e=factory.build(.pig,palette:7); e.position=position+[Float(i-1)*1.1,0,-6]; pigs.addChild(e) }; gallery=pigs; world.addChild(pigs) }
             for e in pickups.values { e.isEnabled=false }

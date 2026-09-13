@@ -26,7 +26,7 @@ public enum HorizonCertification {
         let hazards=pieces.flatMap(\.hazards)
         let gaps=pieces.compactMap(\.gap)
         // Serialize only geometry and motion that affect authority. No palette/seed cache key.
-        let key="R\(rulesVersion)|"+hazards.map{"\($0.fatal),\($0.encounter.rawValue),\($0.distance),\($0.lateral),\($0.radius),\($0.height),\($0.speed)"}.joined(separator:"|")+gaps.map{"g\($0.lowerBound),\($0.upperBound)"}.joined()+"end\(candidate.end-beginning)"
+        let key="R\(rulesVersion)|"+hazards.map{"\($0.fatal),\($0.contactHalfWidth),\($0.encounter.rawValue),\($0.distance),\($0.lateral),\($0.radius),\($0.height),\($0.speed)"}.joined(separator:"|")+gaps.map{"g\($0.lowerBound),\($0.upperBound)"}.joined()+"end\(candidate.end-beginning)"
         if let cached=CertificationMemo.shared.value(key) {return cached}
         if hazards.isEmpty && gaps.isEmpty {CertificationMemo.shared.set(key,true);return true}
         let result=certify(pieces:pieces,ending:candidate.end-beginning+56,rulesVersion:rulesVersion)

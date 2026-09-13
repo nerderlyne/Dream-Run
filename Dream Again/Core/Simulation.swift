@@ -62,7 +62,13 @@ public struct RunState: Codable, Sendable {
     public var lastDropBlock = -1
     public var cause = ""
     public var seconds: Double { Double(activeTicks) / 60 }
-    public var speed: Double { (rules.baseSpeed + (rules.maximumSpeed-rules.baseSpeed) * (1 - exp(-seconds / rules.speedTimeConstant))) * (activeTicks < lastSoftTick + 60 && lastSoftTick > 0 ? 0.75 + 0.25 * Double(activeTicks-lastSoftTick)/60 : 1) }
+    public var unhinderedSpeed:Double {rules.baseSpeed+(rules.maximumSpeed-rules.baseSpeed)*(1-exp(-seconds/rules.speedTimeConstant))}
+    /// The same authoritative recovery drives travel speed and the avatar's hit pose.
+    public var stumbleWeight:Double {
+        guard lastSoftTick > 0,activeTicks >= lastSoftTick,activeTicks-lastSoftTick < 60 else {return 0}
+        return 1-Double(activeTicks-lastSoftTick)/60
+    }
+    public var speed:Double {unhinderedSpeed*(1-0.25*stumbleWeight)}
     public var unbroken: Bool { mode == .fresh && continueCount == 0 }
     public var visual: VisualPhase { pigs.count == 3 ? .luckyWhite : .at(seconds: seconds) }
     public var paletteIndex: Int {
@@ -210,7 +216,7 @@ public struct GameSimulation: Sendable {
             let current = h.position(at: state.activeTicks), previous = current + h.speed*dt
             if h.pig == nil && h.encounter != .mirror && current < state.safeUntilDistance { continue }
             let wide = h.encounter == .slide || h.encounter == .jump || h.encounter == .mirror
-            guard let s = interval(oldDistance-previous,state.distance-current,-h.radius-0.28,h.radius+0.28), let x = interval(oldLateral,state.player.lateral,h.lateral-(wide ? 2 : h.radius+0.28),h.lateral+(wide ? 2 : h.radius+0.28)), max(s.0,x.0) <= min(s.1,x.1) else { continue }
+            guard let s = interval(oldDistance-previous,state.distance-current,-h.radius-0.28,h.radius+0.28), let x = interval(oldLateral,state.player.lateral,h.lateral-(wide ? 2 : h.contactHalfWidth+0.28),h.lateral+(wide ? 2 : h.contactHalfWidth+0.28)), max(s.0,x.0) <= min(s.1,x.1) else { continue }
             let t=max(s.0,x.0), feet=oldHeight+(state.player.height-oldHeight)*t
             if h.encounter == .slide && feet+state.player.bodyHeight < 0.85 { continue }
             if h.encounter != .slide && h.encounter != .mirror && feet > h.height { continue }

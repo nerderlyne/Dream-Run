@@ -105,6 +105,9 @@ struct ContentView:View {
                     Spacer();Button("pause"){game.pause()}.accessibilityIdentifier("pause")
                 }.padding(18).background(.black.opacity(0.2))
                 if game.run.mode != .fresh { Text(game.run.mode == .debug ? "DEVELOPER PREVIEW · NO REWARDS" : game.run.mode.rawValue.uppercased()).font(.caption2).padding(6).background(.black.opacity(0.4),in:Capsule()) }
+                if game.run.stumbleWeight > 0 && game.run.phase == .running {
+                    Text("stumbled").font(.callout.weight(.semibold)).padding(.horizontal,14).padding(.vertical,8).background(.black.opacity(0.5),in:Capsule()).allowsHitTesting(false)
+                }
                 if game.run.mode == .tutorial {Text(tutorialPrompt).font(.callout).padding().background(.ultraThinMaterial,in:Capsule())}
                 Spacer()
                 if [.luckyTransition,.whiteEnding,.waking].contains(game.run.phase) {Button("skip presentation"){let events=game.simulation.presentationStep(0,skip:true);if events.contains(.ending){game.finish();game.screen="results"}}.padding().disabled(game.run.endingElapsed < (game.run.pigs.count == 3 ? 5 : 0.35))}

@@ -143,3 +143,11 @@ New dreams constrain the avatar to ±0.9 m instead of ±1.25 m, reducing the eff
 Regression coverage: bounded movement/edge reversal within half a second, tighter snapshot validation, old-rule compatibility, collection versus bypass of a real scheduled clover pig, and twelve R3 three-minute openings plus tutorials. Logs: `evidence/narrow-steering-tests.log`, `evidence/narrow-steering-spec.log`, `evidence/narrow-steering-preflight.log`, `evidence/narrow-steering-build.log`. Physical tilt feel remains untested.
 
 PASS: 22 focused Swift tests, zero failures, 7.546 seconds; 51 specification checks; release preflight; Debug Simulator test-bundle compilation. No six-hour R3 soak or physical-device gesture test was run for this tuning change.
+
+## Follow-up: perceptible obstacle hits
+
+The existing 25% speed drop and one-second recovery now drive a coordinated avatar stagger: forward pitch, body dip, braced arms, uneven leg pose and a brief “stumbled” cue. The five-second instability/second-hit waking rule remains. Football lateral contact now reaches its mesh tips (0.65 m half-width) instead of using the smaller spherical-ball width; the certification cache distinguishes that geometry. Stumble/clover feedback takes priority over balloon feedback.
+
+PASS: 24 focused Swift tests, zero failures, 8.460 seconds (`evidence/stumble-tests.log`). Tests directly hit all four sports balls, verify distance actually slows, verify once-only hits and snapshot recovery, test football-tip contact and retain the twelve-seed R3 opening checks. Native animation and haptic feel still require device execution. Build output: `evidence/stumble-build.log`.
+
+PASS: Debug app and native test-bundle compilation after the final feedback-priority change.

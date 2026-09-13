@@ -51,7 +51,7 @@ import UIKit
     }
     func feedback(_ event:GameEvent,settings:Settings) {
         let now=ProcessInfo.processInfo.systemUptime
-        guard now-lastFeedback > 0.12 else { return }; lastFeedback=now
+        guard event == .stumble || event == .clover || now-lastFeedback > 0.12 else { return }; lastFeedback=now
         if settings.haptics { UIImpactFeedbackGenerator(style:event == .clover ? .medium : .soft).impactOccurred(intensity:event == .stumble ? 0.65 : 0.3) }
         // Original short tone, bounded to one effect node at a time via the system sound-free engine.
         guard settings.effects else { return }; if !engine.isRunning { do { try engine.start() } catch { return } }

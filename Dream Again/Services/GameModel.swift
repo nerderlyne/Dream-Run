@@ -213,9 +213,9 @@ import UIKit
         }
         for _ in 0..<steps {
             let events=simulation.step(input); input.jump=false; input.slide=false
-            if events.contains(.balloon) { audio.feedback(.balloon,settings:settings) }
             if events.contains(.stumble) { audio.feedback(.stumble,settings:settings) }
-            if events.contains(.clover) { audio.feedback(.clover,settings:settings) }
+            else if events.contains(.clover) { audio.feedback(.clover,settings:settings) }
+            else if events.contains(.balloon) { audio.feedback(.balloon,settings:settings) }
             if events.contains(.waking) { finish() }
             if run.mode.earns && (events.contains(.pigCommitted) || events.contains(.clover) || run.activeTicks%900 == 0) {
                 let snapshot=run
