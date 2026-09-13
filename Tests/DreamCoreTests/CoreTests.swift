@@ -44,7 +44,7 @@ final class CoreTests: XCTestCase {
     func testIDsRejectBadInput() throws {
         for s in ["",String(repeating:"0",count:200),"DR2-G1-R1-C1-000000000001A-460B","DR1-G1-R1-C1-ZZZZZZZZZZZZZ-580X","DR1-G0-R1-C1-000000000001A-460B","DR1-G1-R1-C1-000000000001A-460C"] { XCTAssertThrowsError(try DreamIdentity.parse(s)) }
         XCTAssertEqual(try DreamIdentity.parse("  dr1-g1-r1-c1-OOOOOOOOOOO1a-46Ob  ").seed,42)
-        var future=DreamIdentity(seed:42); future.rulesVersion=3; XCTAssertThrowsError(try DreamIdentity.parse(future.code)); XCTAssertEqual(try DreamIdentity.parse(future.code,requireSupported:false),future)
+        var future=DreamIdentity(seed:42); future.rulesVersion=4; XCTAssertThrowsError(try DreamIdentity.parse(future.code)); XCTAssertEqual(try DreamIdentity.parse(future.code,requireSupported:false),future)
         XCTAssertThrowsError(try DreamFile.read(Data("{\"format\":1,\"dreamID\":\"a\",\"url\":\"x\"}".utf8)))
     }
     func testFasterRulesPreserveSavedDreams() throws {
@@ -59,6 +59,37 @@ final class CoreTests: XCTestCase {
         }
         var mismatched=current.state;mismatched.rules=RunRules(version:1)
         XCTAssertThrowsError(try GameSimulation(snapshot:mismatched))
+    }
+    func testNarrowFastSteeringAndSnapshotBounds() throws {
+        var simulation=GameSimulation(identity:DreamIdentity.current(seed:7));simulation.resume()
+        XCTAssertEqual(simulation.state.rules.lateralLimit/RunRules().lateralLimit,0.72,accuracy:1e-12)
+        XCTAssertEqual(SteeringNormalizer.normalize(degrees:12,fullScaleDegrees:simulation.state.rules.tiltFullScaleDegrees),1)
+        simulation.state.player.lateral = -0.9
+        for _ in 0..<30 {
+            let previous=simulation.state.player.lateral
+            _=simulation.step(InputFrame(steering:1))
+            XCTAssertLessThanOrEqual(abs(simulation.state.player.lateral-previous),0.100001)
+            XCTAssertLessThanOrEqual(abs(simulation.state.player.lateral),0.9)
+        }
+        XCTAssertEqual(simulation.state.player.lateral,0.9,accuracy:0.002)
+        for _ in 0..<30 {_=simulation.step(InputFrame(steering:-1))}
+        XCTAssertEqual(simulation.state.player.lateral,-0.9,accuracy:0.002)
+        var invalid=simulation.state;invalid.player.lateral=1.1
+        XCTAssertThrowsError(try GameSimulation(snapshot:invalid))
+        var legacy=DreamIdentity(seed:7);legacy.rulesVersion=2
+        XCTAssertEqual(GameSimulation(identity:legacy).state.rules.lateralLimit,1.25)
+    }
+    func testNarrowRunCanBypassScheduledClover() {
+        var simulation=GameSimulation(identity:DreamIdentity.current(seed:0));simulation.resume()
+        // Locate a real deterministic clover, then commit its normal scheduled runway.
+        let ordinal=(1...100).first{PigDecision(identity:simulation.state.identity,ordinal:$0,continued:false).clover}!
+        simulation.state.activeTicks=UInt64(ordinal*46800-361)
+        _=simulation.step()
+        let pig=simulation.state.hazards.first{$0.pig?.clover == true}!
+        simulation.state.distance=pig.distance-0.1;simulation.state.player.lateral = -0.9
+        var collecting=simulation;collecting.state.player.lateral=pig.lateral
+        _=simulation.step(InputFrame(steering:-1));XCTAssertEqual(simulation.state.pigs.count,0)
+        _=collecting.step(InputFrame(steering:pig.lateral/0.9));XCTAssertEqual(collecting.state.pigs.count,1)
     }
     func testExactProbability() {
         var present=0, clean=0, continued=0

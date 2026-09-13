@@ -141,9 +141,9 @@ public struct FairnessValidator {
 
 /// Both adapters use the same normalized-angle mapping; no sensor reads enter the core.
 public enum SteeringNormalizer {
-    public static func normalize(degrees:Double,sensitivity:Double = 1,deadzone:Double = 1.5) -> Double {
-        guard degrees.isFinite, sensitivity.isFinite, deadzone.isFinite else { return 0 }
-        let zone=max(0,min(10,deadzone)),magnitude=max(0,abs(degrees)-zone)
-        return max(-1,min(1,(degrees < 0 ? -1 : 1)*magnitude/(18-zone)*max(0.5,min(1.5,sensitivity))))
+    public static func normalize(degrees:Double,sensitivity:Double = 1,deadzone:Double = 1.5,fullScaleDegrees:Double = 18) -> Double {
+        guard degrees.isFinite, sensitivity.isFinite, deadzone.isFinite, fullScaleDegrees.isFinite, fullScaleDegrees > 1 else { return 0 }
+        let zone=max(0,min(min(10,fullScaleDegrees-1),deadzone)),magnitude=max(0,abs(degrees)-zone)
+        return max(-1,min(1,(degrees < 0 ? -1 : 1)*magnitude/(fullScaleDegrees-zone)*max(0.5,min(1.5,sensitivity))))
     }
 }

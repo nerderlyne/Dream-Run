@@ -135,3 +135,11 @@ New dreams start at 12.25 m/s, 1.75× the original 7 m/s, and approach the exist
 Verification: `evidence/faster-start-tests.log` covers speed ratio, R1/R2 save compatibility, golden R1 fixtures, and twelve R2 seeds through their first three minutes plus each tutorial. `evidence/faster-start-spec.log`, `evidence/faster-start-preflight.log` and `evidence/faster-start-build.log` record contract checks and Debug test-bundle compilation. Physical play feel remains untested.
 
 PASS: 20 focused Swift tests, zero failures, 5.529 seconds; 51 specification checks; release preflight; Debug Simulator test-bundle build. The six-hour soak was not repeated for this opening-speed change; the new R2 test covers twelve three-minute runs and twelve tutorials.
+
+## Follow-up: narrower and quicker steering (R3)
+
+New dreams constrain the avatar to ±0.9 m instead of ±1.25 m, reducing the effective playable span from 2.5 m to 1.8 m (28%). Lateral movement cap is 6 m/s; smoothing is 40 ms; default full-scale tilt is 12 degrees. R1/R2 saved rules remain supported. The certifier now keys and simulates its witnesses by rules version and uses that version's entry bounds. R3 pig runway placement is offset 0.18 m to retain a bypass corridor with the existing pickup radius.
+
+Regression coverage: bounded movement/edge reversal within half a second, tighter snapshot validation, old-rule compatibility, collection versus bypass of a real scheduled clover pig, and twelve R3 three-minute openings plus tutorials. Logs: `evidence/narrow-steering-tests.log`, `evidence/narrow-steering-spec.log`, `evidence/narrow-steering-preflight.log`, `evidence/narrow-steering-build.log`. Physical tilt feel remains untested.
+
+PASS: 22 focused Swift tests, zero failures, 7.546 seconds; 51 specification checks; release preflight; Debug Simulator test-bundle compilation. No six-hour R3 soak or physical-device gesture test was run for this tuning change.

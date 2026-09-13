@@ -208,7 +208,7 @@ import UIKit
         }
         guard let steps=clock.consume(delta) else {clock.reset();return}
         if !simulatorDragInput {
-            if let steering=motion.sample(settings:settings,now:now) {input.steering=steering}
+            if let steering=motion.sample(settings:settings,now:now,fullScaleDegrees:run.rules.tiltFullScaleDegrees) {input.steering=steering}
             else {input.steering=0;notice="Tilt input was interrupted. Hold your device comfortably and tap ready to recalibrate.";pause();return}
         }
         for _ in 0..<steps {

@@ -12,7 +12,7 @@ public enum HorizonCertification {
     /// Samples continuous steering through the authoritative movement/collision engine.
     /// A passing trajectory is an existence witness, not a guarantee for arbitrary input.
     /// Width/clearance margins are those of the real capsule, not a point runner.
-    public static func validate(history:[ChunkDescription],candidate:ChunkDescription)->Bool {
+    public static func validate(history:[ChunkDescription],candidate:ChunkDescription,rulesVersion:UInt16 = 1)->Bool {
         guard FairnessValidator.validate(candidate) else {return false}
         let beginning=max(0,candidate.start-48)
         var pieces=Array(history.suffix(2))+[candidate]
@@ -26,20 +26,21 @@ public enum HorizonCertification {
         let hazards=pieces.flatMap(\.hazards)
         let gaps=pieces.compactMap(\.gap)
         // Serialize only geometry and motion that affect authority. No palette/seed cache key.
-        let key=hazards.map{"\($0.fatal),\($0.encounter.rawValue),\($0.distance),\($0.lateral),\($0.radius),\($0.height),\($0.speed)"}.joined(separator:"|")+gaps.map{"g\($0.lowerBound),\($0.upperBound)"}.joined()+"end\(candidate.end-beginning)"
+        let key="R\(rulesVersion)|"+hazards.map{"\($0.fatal),\($0.encounter.rawValue),\($0.distance),\($0.lateral),\($0.radius),\($0.height),\($0.speed)"}.joined(separator:"|")+gaps.map{"g\($0.lowerBound),\($0.upperBound)"}.joined()+"end\(candidate.end-beginning)"
         if let cached=CertificationMemo.shared.value(key) {return cached}
         if hazards.isEmpty && gaps.isEmpty {CertificationMemo.shared.set(key,true);return true}
-        let result=certify(pieces:pieces,ending:candidate.end-beginning+56)
+        let result=certify(pieces:pieces,ending:candidate.end-beginning+56,rulesVersion:rulesVersion)
         CertificationMemo.shared.set(key,result)
         return result
     }
-    private static func certify(pieces:[ChunkDescription],ending:Double)->Bool {
+    private static func certify(pieces:[ChunkDescription],ending:Double,rulesVersion:UInt16)->Bool {
         // Ordinary active route grades are bounded below .08 by the implemented analytic route.
         // Marked drops have a separate validated scripted contract, without competing hazards.
         for slope in [-0.08,0.08] {
-            for entry in [-1.25,0.0,1.25] {
+            for entry in [-RunRules(version:rulesVersion).lateralLimit,0,RunRules(version:rulesVersion).lateralLimit] {
                 for entryTicks:UInt64 in [0,18_000,5_184_000] {
-                    var state=RunState(identity:DreamIdentity(seed:0),mode:.reviewDemo)
+                    var identity=DreamIdentity(seed:0);identity.rulesVersion=rulesVersion
+                    var state=RunState(identity:identity,mode:.reviewDemo)
                     state.phase = .running;state.activeTicks=entryTicks;state.lastPigOrdinal=1000
                     state.chunks=pieces;state.player.lateral=entry
                     state.hazards=pieces.flatMap(\.hazards).map { original in

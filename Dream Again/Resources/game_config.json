@@ -5,7 +5,7 @@
   "deployment_target_ios": "18.0",
   "versions": {
     "generator": 1,
-    "rules": 2,
+    "rules": 3,
     "content": 1,
     "save": 1
   },
@@ -21,11 +21,11 @@
   "movement": {
     "track_width_m": 4.0,
     "min_track_width_m": 3.2,
-    "max_lateral_offset_m": 1.25,
-    "max_lateral_speed_mps": 4.5,
-    "tilt_full_scale_degrees": 18.0,
+    "max_lateral_offset_m": 0.9,
+    "max_lateral_speed_mps": 6.0,
+    "tilt_full_scale_degrees": 12.0,
     "tilt_deadzone_degrees": 1.5,
-    "tilt_smoothing_seconds": 0.075,
+    "tilt_smoothing_seconds": 0.04,
     "player_height_m": 1.55,
     "player_radius_m": 0.28,
     "slide_height_m": 0.58,

@@ -55,4 +55,6 @@ A `.dream` file contains only `format` and `dreamID`, is limited to 32 KiB and a
 
 Original app icon art is supplied in `Dream Again/Resources/DreamAgainIcon.png` with legacy bundle metadata. Production asset-catalogue renditions require validation after simulator access is available.
 
-New dreams use R2: initial forward speed **12.25 m/s** (1.75× the original 7 m/s), approaching the existing 16 m/s cap. Start a new dream to try this tuning. R1 saved codes and suspended runs retain their original speed and replay rules.
+R2 introduced initial forward speed **12.25 m/s** (1.75× the original 7 m/s), approaching the existing 16 m/s cap. Start a new dream to try this tuning. R1 saved codes and suspended runs retain their original speed and replay rules.
+
+New dreams now use **R3**: steering spans **±0.9 m** (28% narrower), with 6 m/s maximum lateral movement and 40 ms smoothing. Default full steering needs 12° of calibrated tilt. R3 retains the faster 12.25 m/s start; older saved dreams keep their own tuning.

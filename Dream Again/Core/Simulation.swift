@@ -79,7 +79,7 @@ public struct GameSimulation: Sendable {
     init(certification:RunState,slope:Double) {state=certification;certificationSlope=slope}
     public init(identity: DreamIdentity, mode: RunMode = .fresh, rules: RunRules? = nil) { state = RunState(identity: identity, mode: mode); if let rules {state.rules=rules}; streamChunks() }
     public init(snapshot: RunState) throws {
-        guard snapshot.schema == 1, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-46800, abs(snapshot.player.lateral) <= 1.2501, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules(version:snapshot.identity.rulesVersion) else { throw DreamError.corruptStore }
+        guard snapshot.schema == 1, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-46800, abs(snapshot.player.lateral) <= snapshot.rules.lateralLimit+0.0001, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules(version:snapshot.identity.rulesVersion) else { throw DreamError.corruptStore }
         state = snapshot
     }
     public mutating func resume() { if state.phase == .paused || state.phase == .ready { state.phase = state.resumePhase } }
@@ -124,7 +124,7 @@ public struct GameSimulation: Sendable {
             var certified=false
             for attempt in 1...8 {
                 chunk.candidateAttempts=attempt
-                if HorizonCertification.validate(history:state.chunks,candidate:chunk) {certified=true;break}
+                if HorizonCertification.validate(history:state.chunks,candidate:chunk,rulesVersion:state.identity.rulesVersion) {certified=true;break}
                 chunk=original
                 if let gap=chunk.gap {let length=max(1.8,(gap.upperBound-gap.lowerBound)-Double(attempt)*0.3);chunk.gap=gap.lowerBound...(gap.lowerBound+length)}
                 for h in chunk.hazards.indices where chunk.hazards[h].encounter == .dodge || chunk.hazards[h].encounter == .rolling {chunk.hazards[h].lateral=(attempt%2 == 0 ? -1 : 1)*0.9}
@@ -192,7 +192,7 @@ public struct GameSimulation: Sendable {
             state.hazards.removeAll { $0.position(at: state.activeTicks) > state.distance && $0.position(at: state.activeTicks) < state.safeUntilDistance }
             // Reserve the runway's support before rendering the promise.
             for i in state.chunks.indices where state.chunks[i].start < state.safeUntilDistance && state.chunks[i].end > state.distance { state.chunks[i].gap = nil }
-            if decision.present { state.hazards.append(HazardDescription(id: "pig:\(ordinal)", asset: .pig, encounter: .dodge, distance: state.distance + speed*6, lateral: 0, radius: decision.clover ? 0.65 : 0.38, height: 0.65, pig: decision)) }
+            if decision.present { state.hazards.append(HazardDescription(id: "pig:\(ordinal)", asset: .pig, encounter: .dodge, distance: state.distance + speed*6, lateral: state.identity.rulesVersion >= 3 ? 0.18 : 0, radius: decision.clover ? 0.65 : 0.38, height: 0.65, pig: decision)) }
             events.append(.pigCommitted)
         }
         for i in state.hazards.indices where state.hazards[i].speed > 0 && state.hazards[i].spawnTick == UInt64.max {
