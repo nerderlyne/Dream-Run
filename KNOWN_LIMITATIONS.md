@@ -32,3 +32,6 @@ Current device controls are tilt-only; earlier notes about an optional touch fal
 
 ### Wardrobe fit revision — September 13, 2026
 The procedural character now offers a free girl/dress/ponytail look and a trousers/separate-top look. Clothing is articulated geometry, not simulated cloth; the skirt has no cloth collision simulation. Physical-device appearance and the complete hat-by-action visual matrix remain untested. An optional authored USDZ must supply equivalent outfit variants before it can replace both procedural looks. Hat fitting now uses a 1.73 m brow/crown attachment line rather than the former 1.84 m top-of-head socket; authored assets must use that fitting convention.
+
+### Renderer performance correction — September 14, 2026
+Simulator CPU measurements now exercise 120 renderer updates after warm-up. They do not measure GPU presentation time, sustained device frame rate, thermal behaviour, or every palette transition. Initial material/sky generation and new scenery streaming still do work on the main actor. The measured periodic all-scenery haze burst was replaced with a four-model-per-frame budget; unchanged lighting resources and retained route meshes are reused. Device validation remains outstanding.

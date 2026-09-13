@@ -223,3 +223,10 @@ The visual pass is a tested implementation increment toward the references. It i
 - `evidence/wardrobe-spec.log`: 51 contract checks pass. `evidence/wardrobe-preflight.log`: release preflight passes. Core package suite was not rerun for this renderer/UI-only change; earlier results remain historical evidence.
 - Limitations: procedural character art, rigid skirt without cloth simulation, no physical-device/performance validation or exhaustive hat-by-action screenshot matrix. No authored USDZ outfit variants supplied.
 - Final wardrobe UI flow: **1 test, 0 failures, 35.381 seconds** (`evidence/wardrobe-ui-final.log`), including the persisted girl selection. Debug and Release simulator builds pass. Subsequent trouser-waist and dress stride geometry/pose refinements were rebuilt and visually reviewed; tests were not repeated for these numeric art adjustments.
+
+## Rendering hitch correction — September 14, 2026
+
+Implemented cached environment bindings, a four-model-per-frame atmospheric-material budget with cached bounds, retained mesh translation at 192 m rebases, and body reuse when changing hats. No speed/rules/seed/economy or world-density changes.
+
+The 120-update simulator CPU probe measured median / p95 / maximum of **1.797 / 107.572 / 167.758 ms before**, **0.399 / 5.837 / 38.858 ms on the first optimized run**, and **0.183 / 3.409 / 20.463 ms on the final run**. These are host-dependent CPU update timings, not GPU or physical-device FPS. Final native suite: **10 tests, 0 failures, 17.418 seconds**; verifies environment reuse, retained chunk identity and coordinate translation, distant mesh retention, hat/body reuse, assets, persistence and reward isolation. The initial new test's partial-distant-section assertion was corrected; the failed diagnostic run is retained, not reported as passing. Release simulator build, 51 specification checks and release preflight pass. See `evidence/PERFORMANCE_REVIEW.md` and `evidence/perf-*.log`.
+Final offline start/play/pause/wardrobe UI test also passes: **1 test, 0 failures, 35.747 seconds** (`perf-final-tests.log`, overall TEST SUCCEEDED).

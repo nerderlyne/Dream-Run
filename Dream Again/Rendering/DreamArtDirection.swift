@@ -5,6 +5,9 @@ import simd
 /// Presentation only. Does not consume gameplay RNG or add collision/reward objects.
 /// Every placed world object uses an existing AssetID; the sky is an environment material.
 @MainActor final class DreamArtDirection {
+    private var appliedEnvironment:String?
+    private(set) var environmentApplications=0
+    func invalidateEnvironment() {appliedEnvironment=nil}
     private var skyCache:[Int:EnvironmentResource]=[:]
     let skyDome=ModelEntity(mesh:.generateSphere(radius:6000),materials:[UnlitMaterial(color:.white)])
     private var skyTextures:[Int:TextureResource]=[:]
@@ -13,36 +16,57 @@ import simd
     private var horizonKey=""
     private var hazeOriginals:[ObjectIdentifier:[PhysicallyBasedMaterial]]=[:]
     private var lastHazePosition=SIMD3<Float>(repeating:Float.greatestFiniteMagnitude)
-    func resetHaze() {horizonKey="";hazeOriginals.removeAll();lastHazePosition=SIMD3(repeating:Float.greatestFiniteMagnitude)}
+    func resetHaze() {horizonKey="";hazeQueue.removeAll();hazeCursor=0;hazeCenters.removeAll();hazeAmounts.removeAll();hazeOriginals.removeAll();lastHazePosition=SIMD3(repeating:Float.greatestFiniteMagnitude)}
+    private var hazeQueue:[ModelEntity]=[]
+    private var hazeCursor=0
+    private var hazeCenters:[ObjectIdentifier:SIMD3<Float>]=[:]
+    private var hazeAmounts:[ObjectIdentifier:Float]=[:]
     func haze(_ world:Entity,camera:SIMD3<Float>,color:UIColor) {
-        guard simd_distance(camera,lastHazePosition)>2 else{return};lastHazePosition=camera
-        func visit(_ e:Entity,scenery:Bool) {
-            let enabled=scenery || e.name == "scenery"
-            if enabled,e.name != "atmosphere-cloud",let model=e as? ModelEntity,let component=model.model {
-                let key=ObjectIdentifier(e)
-                if hazeOriginals[key] == nil {hazeOriginals[key]=component.materials.compactMap{$0 as? PhysicallyBasedMaterial}}
-                let distance=simd_distance(e.visualBounds(relativeTo:nil).center,camera)
-                let t=max(0,min(0.88,1-exp(-max(0,distance-35)/155)))
-                if let original=hazeOriginals[key],!original.isEmpty {
-                    model.model?.materials=original.map {base in
-                        var m=base
-                        m.baseColor.tint=base.baseColor.tint.withAlphaComponent(1)
-                        m.emissiveColor = .init(color:color);m.emissiveIntensity=t*0.5
-                        m.metallic.scale *= 1-t;m.roughness.scale += (1-m.roughness.scale)*t
-                        // Desaturate and lift distant surfaces while retaining their lit form.
-                        var r:CGFloat=0,g:CGFloat=0,b:CGFloat=0,a:CGFloat=0,fr:CGFloat=0,fg:CGFloat=0,fb:CGFloat=0
-                        base.baseColor.tint.artSRGB.getRed(&r,green:&g,blue:&b,alpha:&a);color.artSRGB.getRed(&fr,green:&fg,blue:&fb,alpha:&a)
-                        let f=CGFloat(t)
-                        m.baseColor.tint=UIColor(red:r*(1-f)+fr*f,green:g*(1-f)+fg*f,blue:b*(1-f)+fb*f,alpha:1)
-                        return m
-                    }
-                }
+        if hazeCursor >= hazeQueue.count {
+            guard simd_distance(camera,lastHazePosition)>2 else{return}
+            lastHazePosition=camera;hazeQueue.removeAll(keepingCapacity:true);hazeCursor=0
+            func collect(_ e:Entity,scenery:Bool) {
+                let enabled=scenery || e.name == "scenery"
+                if enabled,e.name != "atmosphere-cloud",let model=e as? ModelEntity {hazeQueue.append(model)}
+                for child in e.children {collect(child,scenery:enabled)}
             }
-            for child in e.children {visit(child,scenery:enabled)}
+            collect(world,scenery:false)
+            let live=Set(hazeQueue.map{ObjectIdentifier($0)})
+            hazeOriginals=hazeOriginals.filter{live.contains($0.key)}
+            hazeCenters=hazeCenters.filter{live.contains($0.key)}
+            hazeAmounts=hazeAmounts.filter{live.contains($0.key)}
         }
-        visit(world,scenery:false)
+        // Bound CPU/material work per frame instead of updating the entire landscape in a burst.
+        for _ in 0..<4 where hazeCursor < hazeQueue.count {
+            let model=hazeQueue[hazeCursor];hazeCursor += 1
+            guard model.parent != nil,let component=model.model else {continue}
+            let key=ObjectIdentifier(model)
+            if hazeOriginals[key] == nil {hazeOriginals[key]=component.materials.compactMap{$0 as? PhysicallyBasedMaterial}}
+            guard let original=hazeOriginals[key],!original.isEmpty else {continue}
+            if hazeCenters[key] == nil {hazeCenters[key]=model.visualBounds(relativeTo:model).center}
+            let center=model.convert(position:hazeCenters[key]!,to:nil)
+            let distance=simd_distance(center,camera)
+            let t=max(0,min(0.88,1-exp(-max(0,distance-35)/155)))
+            if let previous=hazeAmounts[key],abs(previous-t)<0.015 {continue}
+            hazeAmounts[key]=t
+            var fr:CGFloat=0,fg:CGFloat=0,fb:CGFloat=0,a:CGFloat=0
+            color.artSRGB.getRed(&fr,green:&fg,blue:&fb,alpha:&a)
+            model.model?.materials=original.map {base in
+                var m=base
+                m.emissiveColor = .init(color:color);m.emissiveIntensity=t*0.5
+                m.metallic.scale *= 1-t;m.roughness.scale += (1-m.roughness.scale)*t
+                var r:CGFloat=0,g:CGFloat=0,b:CGFloat=0
+                base.baseColor.tint.artSRGB.getRed(&r,green:&g,blue:&b,alpha:&a)
+                let f=CGFloat(t)
+                m.baseColor.tint=UIColor(red:r*(1-f)+fr*f,green:g*(1-f)+fg*f,blue:b*(1-f)+fb*f,alpha:1)
+                return m
+            }
+        }
     }
     func environment(palette:Int,definition:PaletteDefinition,view:ARView,enabled:Bool) {
+        let key="\(palette)/\(enabled)"
+        guard appliedEnvironment != key else {return}
+        appliedEnvironment=key;environmentApplications += 1
         skyDome.isEnabled=enabled && palette != 5
         guard enabled && palette != 5 else {view.environment.background = .color(UIColor(hex:definition.sky));return}
         if let cached=skyCache[palette] {view.environment.background = .skybox(cached);view.environment.lighting.resource=cached;applySkyTexture(palette);return}
@@ -70,7 +94,7 @@ import simd
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("--art-review") {try? image.pngData()?.write(to:URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("sky-\(palette).png"))}
         #endif
-        guard let cg=image.cgImage,let environment=try? EnvironmentResource(equirectangular:cg) else{return}
+        guard let cg=image.cgImage,let environment=try? EnvironmentResource(equirectangular:cg) else{appliedEnvironment=nil;return}
         if skyCache.count>=4 {skyCache.removeAll();skyTextures.removeAll()};skyCache[palette]=environment
         skyTextures[palette]=try? TextureResource.generate(from:cg,options:.init(semantic:.color));applySkyTexture(palette)
         view.environment.background = .skybox(environment)

@@ -17,6 +17,8 @@ import simd
     private(set) var authoredArtError:String?
     var artPalette:Int?
     var palette = -1, base = -1.0, lastRun:UUID?, outfit="", lastVisual:VisualPhase = .ordinary
+    private var builtCharacter:Bool?
+    private var equippedCache:[String:String]?
     var gallery:Entity?
     var renderEntities = 0
     var frozenFrame: UIImage?
@@ -50,6 +52,7 @@ import simd
         if color == UIColor(hex:"#A6BAC0") {entity.name="avatar-body"}; return entity
     }
     func buildAvatar(feminine:Bool = false) {
+        builtCharacter=feminine
         legs.removeAll();knees.removeAll();arms.removeAll();elbows.removeAll()
         runner.children.removeAll()
         // Tailored, long-legged stand-in. Replaceable named articulation, not final character art.
@@ -105,10 +108,10 @@ import simd
         headAttachment.name="hat.socket";headAttachment.position=[0,1.73,0];runner.addChild(headAttachment)
     }
     func dress(_ equipped:[String:String]) {
-        let signature=equipped.keys.sorted().map { "\($0):\(equipped[$0]!)" }.joined()
-        guard signature != outfit else { return }; outfit=signature
+        guard equipped != equippedCache else {return};equippedCache=equipped
         let feminine=equipped["character"] == "girl"
-        if authoredRunner == nil {buildAvatar(feminine:feminine)}
+        if authoredRunner == nil && builtCharacter != feminine {buildAvatar(feminine:feminine)}
+        runner.findEntity(named:"hair-crown")?.isEnabled=true
         headAttachment.children.removeAll()
         runner.children.filter{$0.name == "equipped-trail"}.forEach{$0.removeFromParent()}
         let colors=["pearl_body":"#E9E6E2","rose_body":"#CBA6B7","mint_body":"#ACCFBE"]
@@ -136,10 +139,16 @@ import simd
         let generator=WorldGenerator(run.identity), newBase=floor(run.distance/192)*192, origin=generator.sample(newBase)
         var paletteRNG=run.identity.stream("palette",0)
         let targetPalette=artPalette ?? (cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex)
-        if lastRun != run.id || newBase != base || palette != targetPalette || lastVisual != run.visual {
-            distantPath.reset();art.resetHaze()
+        if lastRun != run.id || palette != targetPalette || lastVisual != run.visual {
+            distantPath.reset();art.resetHaze();art.invalidateEnvironment()
             world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
             view.environment.background = .color(UIColor(hex:factory.palettes[palette].sky))
+        } else if newBase != base {
+            // Translate retained meshes into the new local origin; do not regenerate them.
+            let shift=local(generator.sample(base),origin:origin)
+            for child in world.children where child !== distantPath.root && child !== art.horizon {child.position += shift}
+            distantPath.rebase(by:shift)
+            base=newBase
         }
         art.environment(palette:palette,definition:factory.palettes[palette],view:view,enabled:!cinematic && run.visual != .deepSparse)
         let active=Set(run.chunks.map(\.id))
@@ -289,7 +298,7 @@ import simd
     }
     func previewAvatar(equipped:[String:String],wardrobe:Bool = false) {
         wardrobeLight.isEnabled=true
-        art.skyDome.isEnabled=false
+        art.invalidateEnvironment();art.skyDome.isEnabled=false
         world.children.removeAll();chunks.removeAll();hazards.removeAll();pickups.removeAll();lastRun=nil
         runner.isEnabled=true;runner.position = .zero;runner.orientation=simd_quatf(angle:0,axis:[0,1,0]);dress(equipped)
         for e in legs+arms+knees+elbows {e.orientation=simd_quatf(angle:0,axis:[1,0,0])}
@@ -298,7 +307,7 @@ import simd
         view.environment.background = .color(UIColor(hex:"#686378"))
     }
     func preview(_ id:AssetID,palette:Int,style:Int,lod:Int,colliders:Bool = false) {
-        art.skyDome.isEnabled=false
+        art.invalidateEnvironment();art.skyDome.isEnabled=false
         world.children.removeAll(); chunks.removeAll(); hazards.removeAll(); pickups.removeAll(); gallery=nil; runner.isEnabled=false; lastRun=nil
         let e=factory.build(id,palette:palette,style:style,lod:lod); world.addChild(e); gallery=e
         let bounds=e.visualBounds(relativeTo:e), center=bounds.center, extent=max(bounds.extents.x,max(bounds.extents.y,bounds.extents.z))

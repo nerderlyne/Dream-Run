@@ -10,6 +10,9 @@ import simd
     private let sectionLength=384.0
     private let distanceAhead=6144.0
     func reset() {root.removeFromParent();root.children.removeAll();sections.removeAll()}
+    func rebase(by shift:SIMD3<Float>) {
+        for section in sections.values {section.entity.position += shift}
+    }
     func update(run:RunState,origin:RouteSample,palette:PaletteDefinition,world:Entity) {
         if root.parent == nil {world.addChild(root)}
         guard let nearEnd=run.chunks.map(\.end).max() else {return}

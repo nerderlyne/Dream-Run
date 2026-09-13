@@ -88,3 +88,51 @@ extension Dream_AgainTests {
         XCTAssertEqual(restored.equipped["character"],"girl")
     }
 }
+
+extension Dream_AgainTests {
+    @MainActor func testSteadyRendererFrameCost() throws {
+        let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
+        game.labArt(theme:0)
+        var run=game.run
+        let equipped=["character":"girl","hat":"bare_head"]
+        renderer.render(run,equipped:equipped)
+        var times:[Double]=[]
+        for _ in 0..<120 {
+            run.distance += 12.25/60
+            let start=CFAbsoluteTimeGetCurrent()
+            renderer.render(run,equipped:equipped)
+            times.append((CFAbsoluteTimeGetCurrent()-start)*1000)
+        }
+        times.sort()
+        print("RENDER_CPU_MS median=\(times[60]) p95=\(times[114]) max=\(times.last!)")
+    }
+}
+
+extension Dream_AgainTests {
+    @MainActor func testRenderingRetainsResourcesAcrossFramesAndRebase() throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        game.labArt(theme:0,distance:191.9)
+        let run=game.run,equipped=game.profile.equipped
+        let applications=r.art.environmentApplications
+        let oldChunks=r.chunks
+        let oldPositions=oldChunks.mapValues{$0.position}
+        let far=r.distantPath.root.children.dropFirst().first
+        for _ in 0..<5 {r.render(run,equipped:equipped)}
+        XCTAssertEqual(r.art.environmentApplications,applications)
+        let leg=r.legs[0]
+        var hat=equipped;hat["hat"]="bucket_hat";r.dress(hat)
+        XCTAssertTrue(r.legs[0] === leg,"Changing a hat must not rebuild the character")
+        game.simulation.state.distance=192.1;game.simulation.streamChunks()
+        r.render(game.run,equipped:hat)
+        let generator=WorldGenerator(run.identity)
+        let shift=r.local(generator.sample(0),origin:generator.sample(192))
+        let retained=Set(oldChunks.keys).intersection(r.chunks.keys)
+        XCTAssertFalse(retained.isEmpty)
+        for id in retained {
+            XCTAssertTrue(r.chunks[id] === oldChunks[id],"Rebasing must retain track meshes")
+            XCTAssertLessThan(simd_distance(r.chunks[id]!.position,oldPositions[id]!+shift),0.001)
+        }
+        XCTAssertTrue(r.distantPath.root.children.contains{$0 === far})
+        XCTAssertEqual(r.art.environmentApplications,applications)
+    }
+}
