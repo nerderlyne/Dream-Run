@@ -35,3 +35,6 @@ The procedural character now offers a free girl/dress/ponytail look and a trouse
 
 ### Renderer performance correction — September 14, 2026
 Simulator CPU measurements now exercise 120 renderer updates after warm-up. They do not measure GPU presentation time, sustained device frame rate, thermal behaviour, or every palette transition. Initial material/sky generation and new scenery streaming still do work on the main actor. The measured periodic all-scenery haze burst was replaced with a four-model-per-frame budget; unchanged lighting resources and retained route meshes are reused. Device validation remains outstanding.
+
+### Gradual palette evolution
+Sky evolution tints the retained procedural sky texture; it does not regenerate volumetric clouds or interpolate two full environment-lighting maps. Ordinary object colour changes take up to approximately 19 seconds, subject to the bounded material-update queue. Newly encountered scenery can still require synchronous mesh construction; the simulator boundary probe measured 33 ms including streaming, so a strict 60 FPS/device thermal guarantee remains unmet. The mirror's existing crossing presentation is retained; this change blends colours faster there rather than introducing a loading pause. Physical-device transition pacing and the full palette-pair visual matrix remain untested.

@@ -79,6 +79,11 @@ import UIKit
                 let distance=arguments.firstIndex(of:"--art-distance").flatMap{index in arguments.indices.contains(index+1) ? Double(arguments[index+1]) : nil} ?? 37.5
                 let pose=arguments.firstIndex(of:"--art-pose").flatMap{index in arguments.indices.contains(index+1) ? arguments[index+1] : nil} ?? "run"
                 labArt(theme:theme,distance:distance,pose:pose)
+                if let index=arguments.firstIndex(of:"--art-transition-to"),arguments.indices.contains(index+1),let target=Int(arguments[index+1]) {
+                    let elapsed=arguments.firstIndex(of:"--art-transition-time").flatMap {i in arguments.indices.contains(i+1) ? Double(arguments[i+1]) : nil} ?? 8
+                    labPaletteEvolution(to:target,elapsed:elapsed)
+                }
+
                 if arguments.contains("--wardrobe-review") {
                     let character=arguments.firstIndex(of:"--character").flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1] : nil} ?? "girl"
                     let hat=arguments.firstIndex(of:"--hat").flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1] : nil} ?? "bare_head"
@@ -274,6 +279,15 @@ import UIKit
         if pose == "jump" {simulation.state.player.height=1.1}
         if pose == "white" {simulation.state.pigs=[CollectedPig(ordinal:1,hue:0),CollectedPig(ordinal:2,hue:1),CollectedPig(ordinal:3,hue:2)];simulation.state.endingElapsed=53;simulation.state.phase = .whiteEnding}
         simulation.streamChunks();screen="gameplay";renderer?.render(run,equipped:profile.equipped)
+    }
+    func labPaletteEvolution(to target:Int,elapsed:Double) {
+        guard let renderer else{return}
+        artReview=true;simulation.state.mode = .debug
+        for _ in 0..<30 {renderer.render(run,equipped:profile.equipped)}
+        renderer.artPalette=max(0,min(palettes.count-1,target))
+        renderer.render(run,equipped:profile.equipped)
+        let frames=Int(max(0,min(25,elapsed.isFinite ? elapsed : 0))*60)
+        for _ in 0..<frames {simulation.state.activeTicks += 1;renderer.render(run,equipped:profile.equipped)}
     }
     func previewAsset() { renderer?.preview(AssetID(rawValue:labAsset)!,palette:labPalette,style:labStyle,lod:labLOD,colliders:labColliders) }
     func labWorld(_ code:String) {

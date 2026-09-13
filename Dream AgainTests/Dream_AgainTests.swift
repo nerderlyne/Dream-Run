@@ -136,3 +136,50 @@ extension Dream_AgainTests {
         XCTAssertEqual(r.art.environmentApplications,applications)
     }
 }
+
+extension Dream_AgainTests {
+    func testPaletteScheduleIsStaggeredAndUsesActiveTime() {
+        let t=PaletteTransition(from:0,to:1,started:100,accelerated:false)
+        XCTAssertEqual(t.fraction(at:100,order:0),0)
+        XCTAssertGreaterThan(t.fraction(at:105,order:0),0)
+        XCTAssertEqual(t.fraction(at:105,order:11),0)
+        XCTAssertEqual(t.fraction(at:120,order:11),1)
+        let mirror=PaletteTransition(from:0,to:2,started:100,accelerated:true)
+        XCTAssertLessThan(mirror.fraction(at:100.3,order:0),1)
+        XCTAssertEqual(mirror.fraction(at:102,order:11),1)
+    }
+    @MainActor func testPaletteBoundaryRetainsWorldAndChangesObjectsGradually() throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        game.labArt(theme:0,distance:431.9)
+        let equipped=game.profile.equipped
+        for _ in 0..<30 {r.render(game.run,equipped:equipped)}
+        let chunks=r.chunks,landmark=try XCTUnwrap(r.art.horizon.children.first)
+        let chunk=try XCTUnwrap(chunks[18])
+        let track=try XCTUnwrap(chunk.children.first(where:{$0.name == "palette:light"}) as? ModelEntity)
+        let before=try XCTUnwrap(track.model?.materials.first as? PhysicallyBasedMaterial).baseColor.tint
+        let apps=r.art.environmentApplications
+        r.artPalette=1
+        game.simulation.state.distance=432.1;game.simulation.streamChunks()
+        let start=game.run.activeTicks
+        let boundaryStart=CFAbsoluteTimeGetCurrent()
+        r.render(game.run,equipped:equipped)
+        print("PALETTE_BOUNDARY_CPU_MS \((CFAbsoluteTimeGetCurrent()-boundaryStart)*1000)")
+        XCTAssertEqual(r.art.environmentApplications,apps)
+        XCTAssertTrue(r.art.horizon.children.contains{$0 === landmark})
+        for id in Set(chunks.keys).intersection(r.chunks.keys) {XCTAssertTrue(r.chunks[id] === chunks[id])}
+        XCTAssertEqual((track.model?.materials.first as? PhysicallyBasedMaterial)?.baseColor.tint,before)
+        for tick in 1...1500 {
+            game.simulation.state.activeTicks=start+UInt64(tick)
+            r.render(game.run,equipped:equipped)
+            XCTAssertLessThanOrEqual(r.evolution.updatesLastFrame,4)
+        }
+        let after=try XCTUnwrap(track.model?.materials.first as? PhysicallyBasedMaterial).baseColor.tint
+        XCTAssertNotEqual(before,after)
+        XCTAssertEqual(r.art.environmentApplications,apps,"Palette animation must not regenerate the environment")
+        XCTAssertTrue(r.art.horizon.children.contains{$0 === landmark})
+        game.simulation.state.phase = .mirrorCrossing;r.artPalette=2
+        r.render(game.run,equipped:equipped)
+        XCTAssertEqual(r.evolution.transition?.accelerated,true)
+        XCTAssertTrue(r.chunks[18] === chunk)
+    }
+}

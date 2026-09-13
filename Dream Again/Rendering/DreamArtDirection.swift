@@ -14,6 +14,7 @@ import simd
     let cloudBanks=CloudBank()
     let horizon=Entity()
     private var horizonKey=""
+    private var landmarkDistances:[Int:Double]=[:]
     private var hazeOriginals:[ObjectIdentifier:[PhysicallyBasedMaterial]]=[:]
     private var lastHazePosition=SIMD3<Float>(repeating:Float.greatestFiniteMagnitude)
     func resetHaze() {horizonKey="";hazeQueue.removeAll();hazeCursor=0;hazeCenters.removeAll();hazeAmounts.removeAll();hazeOriginals.removeAll();lastHazePosition=SIMD3(repeating:Float.greatestFiniteMagnitude)}
@@ -21,7 +22,23 @@ import simd
     private var hazeCursor=0
     private var hazeCenters:[ObjectIdentifier:SIMD3<Float>]=[:]
     private var hazeAmounts:[ObjectIdentifier:Float]=[:]
+    private var hazeColor=UIColor.white
+    func replaceBaseMaterials(of model:ModelEntity,with materials:[PhysicallyBasedMaterial]) {
+        let key=ObjectIdentifier(model);hazeOriginals[key]=materials
+        // Preserve atmospheric depth during a colour update, without a bright un-hazed frame.
+        if let amount=hazeAmounts[key] {model.model?.materials=hazed(materials,amount:amount,color:hazeColor)}
+        else {model.model?.materials=materials}
+    }
+    func baseMaterials(of model:ModelEntity)->[PhysicallyBasedMaterial] {
+        hazeOriginals[ObjectIdentifier(model)] ?? model.model?.materials.compactMap{$0 as? PhysicallyBasedMaterial} ?? []
+    }
+    func tintSky(_ color:UIColor) {
+        guard var material=skyDome.model?.materials.first as? UnlitMaterial else{return}
+        material.color.tint=color;skyDome.model?.materials=[material]
+    }
+    func rebase(by shift:SIMD3<Float>) {for child in horizon.children {child.position += shift}}
     func haze(_ world:Entity,camera:SIMD3<Float>,color:UIColor) {
+        hazeColor=color
         if hazeCursor >= hazeQueue.count {
             guard simd_distance(camera,lastHazePosition)>2 else{return}
             lastHazePosition=camera;hazeQueue.removeAll(keepingCapacity:true);hazeCursor=0
@@ -49,19 +66,22 @@ import simd
             let t=max(0,min(0.88,1-exp(-max(0,distance-35)/155)))
             if let previous=hazeAmounts[key],abs(previous-t)<0.015 {continue}
             hazeAmounts[key]=t
+            model.model?.materials=hazed(original,amount:t,color:color)
+        }
+    }
+    private func hazed(_ materials:[PhysicallyBasedMaterial],amount:Float,color:UIColor)->[PhysicallyBasedMaterial] {
             var fr:CGFloat=0,fg:CGFloat=0,fb:CGFloat=0,a:CGFloat=0
             color.artSRGB.getRed(&fr,green:&fg,blue:&fb,alpha:&a)
-            model.model?.materials=original.map {base in
+            return materials.map {base in
                 var m=base
-                m.emissiveColor = .init(color:color);m.emissiveIntensity=t*0.5
-                m.metallic.scale *= 1-t;m.roughness.scale += (1-m.roughness.scale)*t
+                m.emissiveColor = .init(color:color);m.emissiveIntensity=amount*0.5
+                m.metallic.scale *= 1-amount;m.roughness.scale += (1-m.roughness.scale)*amount
                 var r:CGFloat=0,g:CGFloat=0,b:CGFloat=0
                 base.baseColor.tint.artSRGB.getRed(&r,green:&g,blue:&b,alpha:&a)
-                let f=CGFloat(t)
+                let f=CGFloat(amount)
                 m.baseColor.tint=UIColor(red:r*(1-f)+fr*f,green:g*(1-f)+fg*f,blue:b*(1-f)+fb*f,alpha:1)
                 return m
             }
-        }
     }
     func environment(palette:Int,definition:PaletteDefinition,view:ARView,enabled:Bool) {
         let key="\(palette)/\(enabled)"
@@ -155,20 +175,21 @@ import simd
 extension DreamArtDirection {
     /// Landscape layer beyond the collision stream. Bounded and separately cached.
     /// No extra world families, gameplay draws, spawn decisions, or collision entities.
-    func landscape(run:RunState,origin:RouteSample,palette:Int,factory:PrefabFactory,world:Entity,lowPower:Bool) {
+    func landscape(run:RunState,origin:RouteSample,palette:Int,factory:PrefabFactory,world:Entity,lowPower:Bool,evolution:PaletteEvolution) {
         let section=Int(run.distance/192),p=factory.palettes[palette]
-        let key="\(run.id)/\(section)/\(palette)/\(run.visual)/\(lowPower)"
+        let key="\(run.id)"
         if horizon.parent == nil {world.addChild(horizon)}
-        if key != horizonKey {
-            horizon.children.removeAll();horizonKey=key
+        if key != horizonKey {horizon.children.removeAll();landmarkDistances.removeAll();horizonKey=key}
+        let count=lowPower ? 14 : 26
+        // Keep landmarks in world space until they are behind the runner. Replace only one
+        // retired/empty slot per frame; palette or section changes never clear the skyline.
+        if let i=(0..<count).first(where:{landmarkDistances[$0] == nil || landmarkDistances[$0]! < run.distance-60}) {
+            horizon.children.first(where:{$0.name == "landmark:\(i)"})?.removeFromParent()
             let generator=WorldGenerator(run.identity)
-            // Different seeds compose different landscape rhythms; this local stream never
-            // touches the simulation's route, hazard, pickup, or pig streams.
-            var rng=run.identity.stream("landscape-art-v1",section)
-            let count=lowPower ? 14 : 26
-            for i in 0..<count {
+            var rng=run.identity.stream("landscape-art-v1",section*32+i)
                 let layer=i%3,depth=Double(160+layer*210)+Double(rng.below(190))
-                let sample=generator.sample(Double(section)*192+depth)
+                let placementDistance=run.distance+depth
+                let sample=generator.sample(placementDistance)
                 let sign:Float=i%2 == 0 ? -1 : 1
                 let family:AssetID
                 if palette == 5 {family=i%3 == 0 ? .tree : .moon}
@@ -181,8 +202,9 @@ extension DreamArtDirection {
                 let lateral=sign*(Float(depth)*0.16+Float(rng.below(25)))
                 e.position=[Float(sample.x-origin.x)+lateral,Float(sample.y-origin.y)+(family == .cloud ? Float(depth)*0.22+Float(rng.below(25)) : Float(depth)*0.1),Float(sample.z-origin.z)]
                 if family != .cloud {e.orientation=simd_quatf(angle:Float(rng.below(30))/100-0.15,axis:[0,1,0])}
-                horizon.addChild(e)
-            }
+                let holder=Entity();holder.name="landmark:\(i)";holder.addChild(e)
+                horizon.addChild(holder);landmarkDistances[i]=placementDistance
+                evolution.register(holder,palette:palette,palettes:factory.palettes,art:self)
         }
         // Density breathes, then follows the locked nonterminal three-hour transformation.
         let cycle=run.seconds.truncatingRemainder(dividingBy:10800)
@@ -191,7 +213,7 @@ extension DreamArtDirection {
         case .deepStripping: density=max(0,(1-cycle/240))
         case .deepSparse: density=0.04
         case .deepRebuilding: density=min(1,max(0,(cycle-300)/300))
-        default: density=palette == 5 ? 0.08 : 0.68+0.32*cos(run.seconds/190)
+        default: let void=evolution.voidWeight(seconds:run.seconds);density=(0.68+0.32*cos(run.seconds/190))*(1-void)+0.08*void
         }
         for (i,e) in horizon.children.enumerated() {e.isEnabled=Double(i)/Double(max(1,horizon.children.count)) < density && run.pigs.count < 3}
     }

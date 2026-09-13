@@ -9,6 +9,7 @@ import simd
     let world=Entity(), runner=Entity(), camera=PerspectiveCamera(), headAttachment=Entity()
     let distantPath=DistantPathRenderer()
     let art=DreamArtDirection()
+    let evolution=PaletteEvolution()
     let wardrobeLight=PointLight()
     var chunks: [Int:Entity]=[:], hazards: [String:Entity]=[:], pickups: [String:Entity]=[:]
     var legs:[Entity]=[], arms:[Entity]=[], knees:[Entity]=[], elbows:[Entity]=[]
@@ -139,18 +140,24 @@ import simd
         let generator=WorldGenerator(run.identity), newBase=floor(run.distance/192)*192, origin=generator.sample(newBase)
         var paletteRNG=run.identity.stream("palette",0)
         let targetPalette=artPalette ?? (cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex)
-        if lastRun != run.id || palette != targetPalette || lastVisual != run.visual {
+        if lastRun != run.id {
             distantPath.reset();art.resetHaze();art.invalidateEnvironment()
             world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
-            view.environment.background = .color(UIColor(hex:factory.palettes[palette].sky))
+            evolution.reset(palette:palette,definition:factory.palettes[palette])
+            // Create the sky once for this run. Palette changes tint the retained texture.
+            art.environment(palette:palette == 5 ? 0 : palette,definition:factory.palettes[palette == 5 ? 0 : palette],view:view,enabled:true)
+            if palette == 5 {art.tintSky(.black)}
         } else if newBase != base {
             // Translate retained meshes into the new local origin; do not regenerate them.
             let shift=local(generator.sample(base),origin:origin)
             for child in world.children where child !== distantPath.root && child !== art.horizon {child.position += shift}
-            distantPath.rebase(by:shift)
+            distantPath.rebase(by:shift);art.rebase(by:shift)
             base=newBase
         }
-        art.environment(palette:palette,definition:factory.palettes[palette],view:view,enabled:!cinematic && run.visual != .deepSparse)
+        evolution.request(targetPalette,seconds:run.seconds,accelerated:run.phase == .mirrorCrossing || run.phase == .safeDrop,palettes:factory.palettes,art:art)
+        if run.visual == .deepSparse && lastVisual != .deepSparse {view.environment.background = .color(.black)}
+        palette=targetPalette;lastVisual=run.visual
+        art.skyDome.isEnabled = !cinematic && run.visual != .deepSparse
         let active=Set(run.chunks.map(\.id))
         for (id,e) in chunks where !active.contains(id) { e.removeFromParent(); chunks.removeValue(forKey:id) }
         let sparse=run.visual == .deepSparse
@@ -178,8 +185,8 @@ import simd
                 for x:Float in [-2.03,2.03] { let aa=a+rightA*x,bb=b+rightB*x;rim.tube([aa+[0,0.025,0],bb+[0,0.025,0]],radius:0.035,segments:4);deck.quad(aa,aa+lower,bb+lower,bb) }
                 if stair {deck.quad(a-rightA*2,a+rightA*2,a+rightA*2+[0,y-a.y,0],a-rightA*2+[0,y-a.y,0])}
             }
-            for (g,color) in [(light,UIColor(hex:p.track_light)),(dark,UIColor(hex:p.track_dark)),(rim,UIColor(hex:p.accent_b)),(deck,UIColor(hex:p.fog))] where !g.positions.isEmpty {
-                if let mesh=try? g.resource() { root.addChild(ModelEntity(mesh:mesh,materials:[factory.material(color,style:4)])) }
+            for (g,color,role) in [(light,UIColor(hex:p.track_light),"light"),(dark,UIColor(hex:p.track_dark),"dark"),(rim,UIColor(hex:p.accent_b),"rim"),(deck,UIColor(hex:p.fog),"deck")] where !g.positions.isEmpty {
+                if let mesh=try? g.resource() { let model=ModelEntity(mesh:mesh,materials:[factory.material(color,style:4)]);model.name="palette:\(role)";root.addChild(model) }
             }
             if let drop=c.drop {
                 for s in [drop.departure-1,drop.departure-0.6] { var g=Geometry(); let pos=local(generator.sample(s),origin:origin); g.box(pos+[0,0.05,0],[4.2,0.05,0.1]); if let mesh=try? g.resource() { root.addChild(ModelEntity(mesh:mesh,materials:[UnlitMaterial(color:.white)])) } }
@@ -187,9 +194,9 @@ import simd
             }
             let sceneAllowed = !sparse || c.id == Int(run.distance/24)+4
             if sceneAllowed {art.decorate(root,chunk:c,generator:generator,origin:origin,palette:palette,factory:factory,lowPower:lowPower)}
-            chunks[c.id]=root; world.addChild(root)
+            chunks[c.id]=root; world.addChild(root);evolution.register(root,palette:palette,palettes:factory.palettes,art:art)
         }
-        art.landscape(run:run,origin:origin,palette:palette,factory:factory,world:world,lowPower:lowPower)
+        art.landscape(run:run,origin:origin,palette:palette,factory:factory,world:world,lowPower:lowPower,evolution:evolution)
         distantPath.update(run:run,origin:origin,palette:factory.palettes[palette],world:world)
         let activeHazards=Set(run.hazards.filter{ !$0.resolved }.map(\.id))
         for (id,e) in hazards where !activeHazards.contains(id) { e.removeFromParent(); hazards.removeValue(forKey:id) }
@@ -271,7 +278,10 @@ import simd
         let cameraPosition=local(generator.sample(visualDistance-4.8),origin:origin,lateral:run.player.lateral*0.2)+[0,2.8,0]
         let target=local(generator.sample(visualDistance+9),origin:origin)+[0,0.7,0]
         camera.look(at:target,from:cameraPosition,relativeTo:nil)
-        if !cinematic && palette != 5 {art.haze(world,camera:cameraPosition,color:UIColor(hex:factory.palettes[palette].fog))}
+        if !cinematic {
+            evolution.update(seconds:run.seconds,palettes:factory.palettes,art:art)
+            art.haze(world,camera:cameraPosition,color:evolution.fog)
+        }
         if run.visual == .deepStripping || run.visual == .deepRebuilding {
             let cycle=run.seconds.truncatingRemainder(dividingBy:10800)
             let fraction=run.visual == .deepStripping ? max(0,1-cycle/240) : min(1,(cycle-300)/300)
