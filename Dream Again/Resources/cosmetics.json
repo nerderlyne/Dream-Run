@@ -48,7 +48,7 @@
       "slot": "hat",
       "balloon_price": 800,
       "required_achievement": null,
-      "notes": "One small floating balloon fixed to head anchor."
+      "notes": "Small balloon on a fitted ribbon band."
     },
     {
       "id": "checker_cap",
@@ -56,7 +56,7 @@
       "slot": "hat",
       "balloon_price": 1000,
       "required_achievement": null,
-      "notes": "Checker pattern complements route."
+      "notes": "Soft checked beret with a fitted band; no baseball peak."
     },
     {
       "id": "eight_ball_hat",
@@ -64,7 +64,7 @@
       "slot": "hat",
       "balloon_price": 1200,
       "required_achievement": null,
-      "notes": "Small eight-ball on a cushion-like cap."
+      "notes": "Dark fitted cap with a small embroidered eight-ball badge."
     },
     {
       "id": "tiny_house_hat",
@@ -72,7 +72,7 @@
       "slot": "hat",
       "balloon_price": 1600,
       "required_achievement": null,
-      "notes": "Miniature world-house motif."
+      "notes": "Sage fitted cap with a miniature house applique."
     },
     {
       "id": "moon_hat",
@@ -80,7 +80,7 @@
       "slot": "hat",
       "balloon_price": 2000,
       "required_achievement": null,
-      "notes": "Small crescent, kept within cosmetic bounds."
+      "notes": "Small pearl crescent fixed to a head-fitting circlet."
     },
     {
       "id": "pearl_body",
@@ -120,7 +120,7 @@
       "slot": "hat",
       "balloon_price": null,
       "required_achievement": "lucky_dream",
-      "notes": "Three tiny pigs and a clover; never sold."
+      "notes": "Three pig charms and a clover on a fitted circlet; never sold."
     },
     {
       "id": "unbroken_clover",
@@ -136,7 +136,7 @@
       "slot": "hat",
       "balloon_price": null,
       "required_achievement": "still_dreaming",
-      "notes": "Minimal broken ring with three floating points; never sold."
+      "notes": "Fine fitted gold circlet with alternating points; never sold."
     },
     {
       "id": "void_ribbon",

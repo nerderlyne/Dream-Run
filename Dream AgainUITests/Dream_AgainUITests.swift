@@ -11,7 +11,11 @@ final class Dream_AgainUITests:XCTestCase {
         XCTAssertFalse(app.switches["Drag steering instead of tilt"].exists)
         XCTAssertTrue(app.buttons["pause"].waitForExistence(timeout:5));app.buttons["pause"].tap()
         XCTAssertTrue(app.buttons["save & leave"].waitForExistence(timeout:5));app.buttons["save & leave"].tap()
-        app.buttons["wardrobe"].tap();XCTAssertTrue(app.staticTexts["Paper hat"].waitForExistence(timeout:5))
+        app.buttons["wardrobe"].tap()
+        let girl=app.buttons["Girl · dress"]
+        if girl.waitForExistence(timeout:3) {girl.tap()}
+        XCTAssertTrue(app.buttons["Girl · wearing dress"].waitForExistence(timeout:5))
+        XCTAssertTrue(app.staticTexts["Paper hat"].waitForExistence(timeout:5))
         let attachment=XCTAttachment(screenshot:app.screenshot());attachment.name="Wardrobe";attachment.lifetime = .keepAlways;add(attachment)
     }
 }

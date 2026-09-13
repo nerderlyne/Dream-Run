@@ -1,0 +1,17 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "80DBBEEC-A752-43F6-A60E-2419BAE5B77E",
+        "deviceName" : "iPhone 16 Pro Max",
+        "exportedFileName" : "EBE14ED7-ABAC-4A59-9775-234E74DB5A38.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Wardrobe_0_BA583168-010D-4176-836E-F574E26FD45E.png",
+        "timestamp" : 1789317179.779
+      }
+    ],
+    "testIdentifier" : "Dream_AgainUITests/testOfflineStartPauseAndMenus()",
+    "testIdentifierURL" : "test://com.apple.xcode/Dream%20Again/Dream%20AgainUITests/Dream_AgainUITests/testOfflineStartPauseAndMenus"
+  }
+]

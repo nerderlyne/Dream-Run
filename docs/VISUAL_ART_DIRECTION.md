@@ -48,3 +48,10 @@ The tailored procedural runner is an improved **stand-in**, not a finished autho
 ## Remaining art and performance work
 
 The other animal builders and several furniture/rock families retain provisional procedural forms. They inherit better materials and smoother curves, but are not certified final assets. Further authored silhouette/animation work, deeper textures and composition review across many seeds are still required to reach the reference quality bar. Water is a lit normal-mapped surface, not a fluid or planar-reflection simulation. Impostor clouds are not volumetric and can expose their construction at unusual viewing angles. Device frame pacing, thermal behavior and memory still require physical iPhone/iPad profiling; simulator screenshots are visual evidence only.
+
+### Wearable revision
+Hats now use original, head-sized meshes in `FittedHats.swift`, with bands meeting the brow/crown line at 1.73 m. No world prefab is used as a hat. Novelty motifs are small appliques/charms on a cap or circlet. The checker cap is a beret, not a baseball cap. The default remains No hat; rounded skull-following hair replaces the previous brim-like nape shape.
+
+The wardrobe provides two free saved character looks: Girl · dress (rose A-line dress, sash, ponytail) and Runner · trousers (mint top, charcoal trousers). Existing colour cosmetics tint the garment. This uses the existing versioned profile's equipped dictionary, changes no wallet ownership or price, and has no effect on collision bounds, movement or rewards. No cloth simulation is claimed.
+
+DEBUG screenshots can use `--art-review --wardrobe-review --character girl --hat bucket_hat --art-pose portrait`; `run` and `slide` preserve the gameplay camera and pose. These visual overrides never alter the saved wardrobe and use a reward-ineligible debug run.

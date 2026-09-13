@@ -79,6 +79,14 @@ import UIKit
                 let distance=arguments.firstIndex(of:"--art-distance").flatMap{index in arguments.indices.contains(index+1) ? Double(arguments[index+1]) : nil} ?? 37.5
                 let pose=arguments.firstIndex(of:"--art-pose").flatMap{index in arguments.indices.contains(index+1) ? arguments[index+1] : nil} ?? "run"
                 labArt(theme:theme,distance:distance,pose:pose)
+                if arguments.contains("--wardrobe-review") {
+                    let character=arguments.firstIndex(of:"--character").flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1] : nil} ?? "girl"
+                    let hat=arguments.firstIndex(of:"--hat").flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1] : nil} ?? "bare_head"
+                    let equipped=["character":character,"hat":hat]
+                    renderer?.render(run,equipped:equipped)
+                    if pose == "portrait" {renderer?.previewAvatar(equipped:equipped)}
+                }
+
 
             }
 
@@ -183,6 +191,11 @@ import UIKit
         } catch { self.error=error.localizedDescription }
     }
     func buy(_ item:CosmeticDefinition) { transact { try $0.buy(item) } }
+    func chooseCharacter(_ character:String) {
+        guard ["girl","runner"].contains(character) else {return}
+        transact { $0.equipped["character"]=character }
+        renderer?.previewAvatar(equipped:profile.equipped,wardrobe:true)
+    }
     func equip(_ item:CosmeticDefinition) { guard profile.owned.contains(item.id) else { return }; transact { $0.equipped[item.slot]=item.id }; renderer?.dress(profile.equipped) }
     func saveSettings() { link?.preferredFramesPerSecond=settings.lowPower ? 30 : 60;transact { $0.settings=settings } }
     func time(_ ticks:UInt64)->String { let seconds=ticks/60; return String(format:"%02lld:%02lld:%02lld",seconds/3600,(seconds/60)%60,seconds%60) }

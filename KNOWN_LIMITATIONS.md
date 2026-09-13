@@ -29,3 +29,6 @@ The wallet survives normal local relaunches and supports idempotent verified del
 The pause-loop follow-up caps simulation catch-up during rendering hitches instead of forcing a ready prompt. Sustained low frame rates can slow active gameplay time; no discarded wall time is credited to pig chances or records. Device profiling is still needed.
 
 Current device controls are tilt-only; earlier notes about an optional touch fallback are superseded. Drag steering is confined to Simulator builds. A sensor interruption pauses for recalibration without offering a mode choice.
+
+### Wardrobe fit revision — September 13, 2026
+The procedural character now offers a free girl/dress/ponytail look and a trousers/separate-top look. Clothing is articulated geometry, not simulated cloth; the skirt has no cloth collision simulation. Physical-device appearance and the complete hat-by-action visual matrix remain untested. An optional authored USDZ must supply equivalent outfit variants before it can replace both procedural looks. Hat fitting now uses a 1.73 m brow/crown attachment line rather than the former 1.84 m top-of-head socket; authored assets must use that fitting convention.

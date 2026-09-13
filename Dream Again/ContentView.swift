@@ -15,7 +15,7 @@ struct ContentView:View {
     var body:some View {
         ZStack {
             if let renderer=game.renderer { DreamSceneView(renderer:renderer).ignoresSafeArea() }
-            if game.screen != "gameplay" && game.screen != "lab" { Color.black.opacity(game.screen == "results" && game.run.pigs.count == 3 ? 0 : game.screen == "home" || game.screen == "wardrobe" ? 0.25 : 0.7).ignoresSafeArea() }
+            if game.screen != "gameplay" && game.screen != "lab" && game.screen != "wardrobe" { Color.black.opacity(game.screen == "results" && game.run.pigs.count == 3 ? 0 : game.screen == "home" || game.screen == "wardrobe" ? 0.25 : 0.7).ignoresSafeArea() }
             switch game.screen {
             case "home": home
             case "gameplay": gameplay
@@ -51,7 +51,7 @@ struct ContentView:View {
         .sheet(isPresented:$game.sharing){ShareSheet(items:game.shareItems)}
         .fileImporter(isPresented:$showImport,allowedContentTypes:[.json,.data],allowsMultipleSelection:false){result in do { if let url=try result.get().first {game.importURL(url)} } catch {game.error=error.localizedDescription}}
         .onOpenURL{game.importURL($0)}
-        .onChange(of:game.screen){_,screen in if screen == "wardrobe" {game.renderer?.previewAvatar(equipped:game.profile.equipped)} else if screen == "home" {game.renderer?.render(game.run,equipped:game.profile.equipped)} }
+        .onChange(of:game.screen){_,screen in if screen == "wardrobe" {game.renderer?.previewAvatar(equipped:game.profile.equipped,wardrobe:true)} else if screen == "home" {game.renderer?.render(game.run,equipped:game.profile.equipped)} }
         .onChange(of:scenePhase){_,phase in if phase != .active {game.pause()} }
     }
     func button(_ title:String,_ action:@escaping ()->Void)->some View {
@@ -153,7 +153,14 @@ struct ContentView:View {
     }
     var wardrobe:some View {
         menu("wardrobe") {
-            Color.clear.frame(height:180).allowsHitTesting(false)
+            Color.clear.frame(height:220).allowsHitTesting(false)
+            Text("your character").font(.headline)
+            HStack {
+                Button(game.profile.equipped["character"] == "girl" ? "Girl · wearing dress" : "Girl · dress") {game.chooseCharacter("girl")}
+                Button(game.profile.equipped["character"] != "girl" ? "Runner · wearing trousers" : "Runner · trousers") {game.chooseCharacter("runner")}
+            }.buttonStyle(.bordered)
+            Text("Both looks are free. Hats and colours work with either.").font(.caption)
+            Button("No hat") {if let item=game.catalogue.first(where:{$0.id == "bare_head"}) {game.equip(item)}}
             Text("\(game.profile.balance) balloons").font(.title3)
             button("balloon packs"){game.screen="store"}
             ForEach(game.catalogue){item in

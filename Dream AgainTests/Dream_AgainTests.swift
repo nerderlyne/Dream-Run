@@ -58,3 +58,33 @@ extension Dream_AgainTests {
         XCTAssertNil(released)
     }
 }
+
+
+extension Dream_AgainTests {
+    @MainActor func testAllHatsFitBothCharactersWithoutChangingTheRun() throws {
+        let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
+        let originalRun=game.run, originalBalance=game.profile.balance
+        for character in ["girl","runner"] {
+            for item in game.catalogue where item.slot == "hat" {
+                renderer.dress(["character":character,"hat":item.id])
+                XCTAssertEqual(renderer.legs.count,2)
+                XCTAssertEqual(renderer.arms.count,2)
+                XCTAssertEqual(renderer.headAttachment.position.y,1.73,accuracy:0.001)
+                if item.id != "bare_head" {
+                    let hat=try XCTUnwrap(renderer.headAttachment.findEntity(named:"fitted-\(item.id)"))
+                    let bounds=hat.visualBounds(relativeTo:renderer.headAttachment)
+                    XCTAssertLessThan(bounds.min.y,0.025,"Hat must meet the head fitting line: \(item.id)")
+                    XCTAssertLessThan(bounds.extents.x,0.5,"Hat must stay head-sized: \(item.id)")
+                    XCTAssertTrue(bounds.extents.y.isFinite)
+                } else {XCTAssertTrue(renderer.headAttachment.children.isEmpty)}
+                XCTAssertEqual(renderer.runner.findEntity(named:"ponytail") != nil,character == "girl")
+            }
+        }
+        XCTAssertEqual(game.run.id,originalRun.id)
+        XCTAssertEqual(game.run.distance,originalRun.distance)
+        XCTAssertEqual(game.profile.balance,originalBalance)
+        var profile=Profile();profile.equipped["character"]="girl"
+        let restored=try JSONDecoder().decode(Profile.self,from:JSONEncoder().encode(profile))
+        XCTAssertEqual(restored.equipped["character"],"girl")
+    }
+}

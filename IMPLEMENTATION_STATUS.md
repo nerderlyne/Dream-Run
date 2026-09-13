@@ -213,3 +213,13 @@ Current screenshots on iPhone 16 Pro Max / iOS 26.5: cloud, aqua courtyard, void
 - **PASS:** `evidence/art-release-build.log` — final Release generic Simulator build (**BUILD SUCCEEDED**). Signing is disabled; no live services were provisioned or charged.
 
 The visual pass is a tested implementation increment toward the references. It is **not** a claim that the reference-level final-art acceptance bar or physical-device performance target has been achieved. The remaining art limitations are explicit in `KNOWN_LIMITATIONS.md` and `docs/VISUAL_ART_DIRECTION.md`.
+
+## Wardrobe and character revision — September 13, 2026
+
+- Implemented free, transactionally saved Girl · dress and Runner · trousers options in Wardrobe. The girl wears a rose A-line dress, waist sash and ponytail; the other look uses a mint top with separate charcoal trousers. Existing garment colour cosmetics work on either. Default is No hat; the old brim-like hair silhouette is removed.
+- Replaced all hat world-prefab scaling with purpose-built wearable geometry: fitted paper crown, ribbon band/bow, draped nightcap, circular bucket brim, beret, badge caps and circlets. Existing item IDs, prices, ownership and achievement locks remain intact. Bands intersect the 1.73 m head fitting line; novelty details are reduced to head-sized ornaments. No world-family or deterministic gameplay change.
+- Wardrobe has dedicated front lighting and framing. Character changes happen before animation posing. DEBUG wardrobe captures are isolated from persisted equipment and real rewards.
+- `evidence/wardrobe-tests-final.log`: actual iPhone 16 Pro Max / iOS 26.5 simulator execution; **8 tests, 0 failures, 10.987 seconds**. Includes all hats on both characters, attachment/bounds checks, profile round-trip and existing renderer/asset/reward-isolation checks. Final studio light/framing refinement was subsequently built and UI-tested.
+- `evidence/wardrobe-spec.log`: 51 contract checks pass. `evidence/wardrobe-preflight.log`: release preflight passes. Core package suite was not rerun for this renderer/UI-only change; earlier results remain historical evidence.
+- Limitations: procedural character art, rigid skirt without cloth simulation, no physical-device/performance validation or exhaustive hat-by-action screenshot matrix. No authored USDZ outfit variants supplied.
+- Final wardrobe UI flow: **1 test, 0 failures, 35.381 seconds** (`evidence/wardrobe-ui-final.log`), including the persisted girl selection. Debug and Release simulator builds pass. Subsequent trouser-waist and dress stride geometry/pose refinements were rebuilt and visually reviewed; tests were not repeated for these numeric art adjustments.
