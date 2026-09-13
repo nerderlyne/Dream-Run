@@ -121,3 +121,9 @@ Removed steering-mode switches from both pause/onboarding and Settings. Physical
 Verification outputs: `evidence/tilt-only-tests.log` (focused package suite), `evidence/tilt-only-build.log` (Simulator test-bundle compilation), `evidence/tilt-only-device-build.log` (unsigned generic iOS Release compilation). No physical-device execution claimed.
 
 PASS: 18 focused Swift tests, zero failures, 4.558 seconds. PASS: Debug Simulator test-bundle build and unsigned generic iOS Release build. UI assertions were compiled but not executed.
+
+## Follow-up: swipe-only jump and slide
+
+Removed both gameplay action buttons. The existing playfield gesture handles swipe up for jump and swipe down for slide; tutorial prompts now explicitly teach those gestures. Tilt remains the only device steering control. This supersedes earlier notes about action buttons. Build output: `evidence/swipe-only-build.log`. No physical gesture execution claimed.
+
+PASS: Debug generic iOS Simulator build after action-button removal.

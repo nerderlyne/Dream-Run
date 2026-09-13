@@ -107,9 +107,6 @@ struct ContentView:View {
                 if game.run.mode != .fresh { Text(game.run.mode == .debug ? "DEVELOPER PREVIEW · NO REWARDS" : game.run.mode.rawValue.uppercased()).font(.caption2).padding(6).background(.black.opacity(0.4),in:Capsule()) }
                 if game.run.mode == .tutorial {Text(tutorialPrompt).font(.callout).padding().background(.ultraThinMaterial,in:Capsule())}
                 Spacer()
-                if [.running,.safeDrop,.mirrorCrossing].contains(game.run.phase) {
-                    HStack(spacing:50){button("slide ↓"){game.input.slide=true};button("jump ↑"){game.input.jump=true}}.padding(.horizontal,24).padding(.bottom,12)
-                }
                 if [.luckyTransition,.whiteEnding,.waking].contains(game.run.phase) {Button("skip presentation"){let events=game.simulation.presentationStep(0,skip:true);if events.contains(.ending){game.finish();game.screen="results"}}.padding().disabled(game.run.endingElapsed < (game.run.pigs.count == 3 ? 5 : 0.35))}
             }
             if [.ready,.paused].contains(game.run.phase) {
@@ -125,7 +122,7 @@ struct ContentView:View {
         }
     }
     var tutorialPrompt:String {
-        switch game.run.distance {case ..<80:"steer gently toward the balloons";case ..<155:"jump ↑ across the open gap";case ..<255:"slide ↓ beneath the zebra";case ..<345:"cute, but keep clear of the rabbit";default:"follow the dream. you’re ready."}
+        switch game.run.distance {case ..<80:"steer gently toward the balloons";case ..<155:"swipe up to jump across the gap";case ..<255:"swipe down to slide beneath the zebra";case ..<345:"cute, but keep clear of the rabbit";default:"follow the dream. you’re ready."}
     }
     var results:some View {
         VStack(spacing:14){Spacer();Text(game.run.pigs.count == 3 ? "Lucky Dream" : "you woke up.").font(.system(size:42,weight:.light,design:.serif));if game.run.pigs.count == 3 {Text("You were very lucky.")}
