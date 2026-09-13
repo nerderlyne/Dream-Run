@@ -9,7 +9,7 @@ import simd
     let world=Entity(), runner=Entity(), camera=PerspectiveCamera(), headAttachment=Entity()
     let distantPath=DistantPathRenderer()
     var chunks: [Int:Entity]=[:], hazards: [String:Entity]=[:], pickups: [String:Entity]=[:]
-    var legs:[Entity]=[], arms:[Entity]=[]
+    var legs:[Entity]=[], arms:[Entity]=[], knees:[Entity]=[], elbows:[Entity]=[]
     var factory: PrefabFactory
     var palette = -1, base = -1.0, lastRun:UUID?, outfit="", lastVisual:VisualPhase = .ordinary
     var gallery:Entity?
@@ -46,8 +46,16 @@ import simd
         // Doll-like face faces travel (-Z); visible in wardrobe previews.
         for x:Float in [-0.065,0.065] { runner.addChild(piece([x,1.4,-0.168],[0.02,0.025,0.01],color:UIColor(hex:"#59505E"))) }
         for sign:Float in [-1,1] {
-            let leg=Entity(); leg.position=[sign*0.12,0.75,0]; leg.addChild(piece([0,-0.32,0],[0.085,0.32,0.09],color:suit)); leg.addChild(piece([0,-0.65,-0.055],[0.09,0.065,0.15],color:skin)); runner.addChild(leg); legs.append(leg)
-            let arm=Entity(); arm.position=[sign*0.27,1.15,0]; arm.addChild(piece([0,-0.23,0],[0.065,0.25,0.07],color:skin)); runner.addChild(arm); arms.append(arm)
+            let leg=Entity(),knee=Entity();leg.position=[sign*0.12,0.75,0]
+            leg.addChild(piece([0,-0.17,0],[0.085,0.18,0.09],color:suit))
+            knee.position=[0,-0.34,0];knee.addChild(piece([0,-0.16,0],[0.075,0.17,0.08],color:suit))
+            knee.addChild(piece([0,-0.34,-0.055],[0.09,0.065,0.15],color:skin))
+            leg.addChild(knee);runner.addChild(leg);legs.append(leg);knees.append(knee)
+            let arm=Entity(),elbow=Entity();arm.position=[sign*0.27,1.15,0]
+            arm.addChild(piece([0,-0.13,0],[0.065,0.14,0.07],color:skin))
+            elbow.position=[0,-0.25,0];elbow.addChild(piece([0,-0.11,0],[0.06,0.125,0.065],color:skin))
+            elbow.addChild(piece([0,-0.235,0],[0.065,0.065,0.065],color:skin))
+            arm.addChild(elbow);runner.addChild(arm);arms.append(arm);elbows.append(elbow)
         }
         headAttachment.position=[0,1.56,0]; runner.addChild(headAttachment)
     }
@@ -173,18 +181,28 @@ import simd
         let slide=run.player.slideTicks > 0, faint=run.pigs.count == 3 && run.endingElapsed > 51
         let stumble=cinematic ? Float(0) : Float(run.stumbleWeight)
         let stumbleAge=Float(1-run.stumbleWeight)
-        let pitch:Float=faint ? .pi/2 : slide ? -1.15 : -0.55*stumble
-        let roll:Float=sin(stumbleAge*22)*0.12*stumble
-        runner.orientation=simd_quatf(angle:-Float(generator.sample(visualDistance).yaw),axis:[0,1,0])*simd_quatf(angle:pitch,axis:[1,0,0])*simd_quatf(angle:roll,axis:[0,0,1])
-        if slide {runner.position.y += 0.1} else if !faint {runner.position.y -= 0.12*stumble}
-        if faint {runner.position.y += 0.2}
-        let t=Float(run.seconds)*10
+        let heading=simd_quatf(angle:-Float(generator.sample(visualDistance).yaw),axis:[0,1,0])
+        let activeGait = !menu && !faint && run.phase != .ready && run.phase != .finished
+        // A six-metre full stride gives about four footfalls/second at the starting run speed.
+        // Distance-based phase naturally slows the limbs during an obstacle hit.
+        let t=Float(visualDistance.truncatingRemainder(dividingBy:6)/6)*2*Float.pi
+        let pitch:Float=faint ? .pi/2 : slide ? .pi/2 : activeGait ? -0.14-0.45*stumble : 0
+        let roll:Float=slide || faint ? 0 : sin(stumbleAge*22)*0.12*stumble
+        runner.orientation=heading*simd_quatf(angle:pitch,axis:[1,0,0])*simd_quatf(angle:roll,axis:[0,0,1])
+        if slide {
+            // Face upward, feet ahead (-Z), head behind. Centre the reclined body over the hitbox.
+            runner.position += heading.act(SIMD3<Float>(0,0.24,-0.75))
+        } else if faint {runner.position.y += 0.2}
+        else if activeGait {runner.position.y += (0.04+0.07*abs(sin(t)))*(1-stumble)-0.12*stumble}
         for i in 0..<2 {
             let stride=sin(t+Float(i)*Float.pi)
-            let legAngle:Float=slide ? 0.6 : stride*0.55*(1-stumble)+(i == 0 ? -0.5 : 0.3)*stumble
-            let armAngle:Float=slide ? -0.5 : -stride*0.5*(1-stumble)-0.9*stumble
+            let legAngle:Float=slide ? 0.1 : activeGait ? stride*0.95*(1-stumble)+(i == 0 ? -0.5 : 0.3)*stumble : 0
+            let kneeAngle:Float=slide ? -0.12 : activeGait ? -(0.2+max(0,-stride)*1.35)*(1-stumble)-0.35*stumble : 0
+            let armAngle:Float=slide ? 0 : activeGait ? -stride*0.75*(1-stumble)-0.9*stumble : 0
             legs[i].orientation=simd_quatf(angle:legAngle,axis:[1,0,0])
-            arms[i].orientation=simd_quatf(angle:armAngle,axis:[1,0,0])*simd_quatf(angle:(i == 0 ? -0.45 : 0.45)*stumble,axis:[0,0,1])
+            knees[i].orientation=simd_quatf(angle:kneeAngle,axis:[1,0,0])
+            arms[i].orientation=simd_quatf(angle:armAngle,axis:[1,0,0])*simd_quatf(angle:(i == 0 ? -1 : 1)*(slide ? 0.08 : 0.45*stumble),axis:[0,0,1])
+            elbows[i].orientation=simd_quatf(angle:slide ? 0.15 : activeGait ? 1.35 : 0,axis:[1,0,0])
         }
         if cinematic && run.endingElapsed >= 45 {
             if gallery == nil { let pigs=Entity(); pigs.name="ending-pigs"; for i in 0..<3 { let e=factory.build(.pig,palette:7); e.position=position+[Float(i-1)*1.1,0,-6]; pigs.addChild(e) }; gallery=pigs; world.addChild(pigs) }
@@ -231,7 +249,7 @@ import simd
     func previewAvatar(equipped:[String:String]) {
         world.children.removeAll();chunks.removeAll();hazards.removeAll();pickups.removeAll();lastRun=nil
         runner.isEnabled=true;runner.position = .zero;runner.orientation=simd_quatf(angle:0,axis:[0,1,0]);dress(equipped)
-        for e in legs+arms {e.orientation=simd_quatf(angle:0,axis:[1,0,0])}
+        for e in legs+arms+knees+elbows {e.orientation=simd_quatf(angle:0,axis:[1,0,0])}
         camera.look(at:[0,1,0],from:[1.4,1.5,-3.3],relativeTo:nil)
         view.environment.background = .color(UIColor(hex:"#686378"))
     }

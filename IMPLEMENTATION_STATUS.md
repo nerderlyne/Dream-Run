@@ -167,3 +167,11 @@ Added a render-only route continuation roughly 6.1 km ahead, beyond the existing
 Build evidence: `evidence/horizon-build.log`. Actual horizon composition, transition appearance and device performance remain unverified without simulator/device execution.
 
 PASS: Debug generic iOS Simulator build, including the distant-path white-ending fade. No new core tests were needed for this renderer-only change.
+
+## Follow-up: back slide and running gait
+
+The slide now rotates the avatar face-up with feet leading and the head behind, centred low over the slide hitbox. Replaced rigid limbs with articulated knees/elbows. Running now has a forward lean, stronger hip swing, rear-leg recovery, bent-elbow arm pumping and a small vertical bounce. Gait phase follows distance travelled (six metres per full stride), so the initial 12.25 m/s run gives roughly four footfalls per second and stumbling naturally slows cadence. Wardrobe resets every joint. Gameplay speed, slide duration and collision dimensions are unchanged.
+
+Build evidence: `evidence/avatar-motion-build.log`. Visual animation and underpass clearance still need device execution; no live screenshot evidence is claimed.
+
+PASS: Debug generic iOS Simulator build after the final pose update. This is a renderer-only change; core tests were not repeated.
