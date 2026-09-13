@@ -105,3 +105,11 @@ PASS below means the named automated/source/build check was performed. NOT RUN m
 ## Owner work
 
 See `docs/OWNER_SETUP.md` for signing, actual StoreKit product IDs, local and sandbox purchase testing, optional pinned Google/UMP SDK integration and consent UI, Game Center categories, owned Universal Link domain and cloud reconciliation. No live credentials/products/accounts were created, no money spent, no ads served and nothing published.
+
+## Follow-up: pause loop and steering controls
+
+Fixed the host timing policy that opened a modal pause whenever a frame required more than four simulation steps (about 67 ms). Slow presentation frames now advance at most four fixed steps; stalls beyond 250 ms discard elapsed time without opening a modal or banking score. Explicit pause/background/interruption-began still suspend. This supersedes the earlier stall-to-pause policy.
+
+Removed the gameplay slider. Device defaults and legacy slider settings migrate to calibrated tilt; Simulator/unavailable motion uses drag steering. Vertical swipes jump/slide; existing action buttons remain accessible. Motion gets a one-second startup grace, then falls back to drag if unavailable. Audio interruption-ended notifications no longer pause again.
+
+PASS: focused Swift suite, 19 tests, zero failures, 4.399 seconds (`evidence/input-pause-tests.log`). Includes hitch recovery and legacy settings decoding. Debug app/UI test bundle compilation is recorded in `evidence/input-pause-build.log`. The UI regression checks eight seconds without an unexpected ready prompt and no gameplay slider; it is compiled, not executed because simulator access remains unavailable. Physical tilt/gesture feel remains unverified.

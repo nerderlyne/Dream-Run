@@ -3,7 +3,26 @@ import XCTest
 final class CoreTests: XCTestCase {
     func testFramePacingAndStall() {
         for rate in [30,60,120] {var clock=FixedStepClock(),ticks=0;for _ in 0..<rate*10 {ticks += clock.consume(1/Double(rate)) ?? 0};XCTAssertEqual(ticks,600)}
-        var clock=FixedStepClock();XCTAssertNil(clock.consume(0.1));XCTAssertNil(clock.consume(0.3));XCTAssertEqual(clock.consume(1.0/60),1)
+        var clock=FixedStepClock();XCTAssertEqual(clock.consume(0.1),4);XCTAssertEqual(clock.consume(0.3),0);XCTAssertEqual(clock.consume(1.0/60),1)
+    }
+    func testRenderingHitchesDoNotPauseOrBankTime() {
+        var clock=FixedStepClock(),simulation=safe()
+        for delta in [0.1,0.08,0.4,1.2,0.07,0.2] {
+            let ticks=clock.consume(delta)
+            XCTAssertNotNil(ticks);XCTAssertLessThanOrEqual(ticks ?? 0,4)
+            for _ in 0..<(ticks ?? 0) {_=simulation.step()}
+            XCTAssertEqual(simulation.state.phase,.running)
+        }
+        XCTAssertEqual(simulation.state.activeTicks,16)
+        XCTAssertEqual(clock.consume(1.0/60),1)
+        XCTAssertNil(clock.consume(.nan))
+    }
+    func testLegacyControlsDecodeForTiltMigration() throws {
+        let encoder=JSONEncoder()
+        var object=try JSONSerialization.jsonObject(with:encoder.encode(Settings())) as! [String:Any]
+        object.removeValue(forKey:"controlsVersion");object["touchSteering"]=true
+        let legacy=try JSONDecoder().decode(Settings.self,from:JSONSerialization.data(withJSONObject:object))
+        XCTAssertNil(legacy.controlsVersion);XCTAssertFalse(Settings().touchSteering)
     }
     func testHeldSlideCannotRemainLowForever() {
         var simulation=safe(),standing=0

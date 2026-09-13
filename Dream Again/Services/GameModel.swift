@@ -49,6 +49,8 @@ import UIKit
             guard assets.count == 42, assets.last?.id == "pig" else { throw DreamError.corruptStore }
             let directory=try FileManager.default.url(for:.applicationSupportDirectory,in:.userDomainMask,appropriateFor:nil,create:true).appendingPathComponent("DreamAgain",isDirectory:true)
             let store=try ProfileStore(url:directory.appendingPathComponent("profile-v1.json")); self.store=store; profile=store.profile; settings=profile.settings
+            if settings.controlsVersion == nil { settings.touchSteering=false;settings.controlsVersion=2 }
+            if !motion.available {settings.touchSteering=true}
             if store.recoveredBackup { error="A damaged save was preserved and the last good backup was recovered. Progress since that backup may be missing." }
             commerce=BalloonStore(store:store); renderer=DreamRenderer(palettes:palettes)
             renderer?.render(run,equipped:profile.equipped,menu:true)
@@ -57,9 +59,12 @@ import UIKit
             #endif
         } catch { self.error=error.localizedDescription }
         link=CADisplayLink(target:self,selector:#selector(frame(_:))); link?.add(to:.main,forMode:.common)
-        NotificationCenter.default.addObserver(self,selector:#selector(interrupted),name:AVAudioSession.interruptionNotification,object:nil)
+        NotificationCenter.default.addObserver(self,selector:#selector(interrupted(_:)),name:AVAudioSession.interruptionNotification,object:nil)
     }
-    @objc func interrupted() { pause() }
+    @objc func interrupted(_ notification:Notification) {
+        guard let type=notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt, type == AVAudioSession.InterruptionType.began.rawValue else {return}
+        pause()
+    }
     func refresh() { if let store { profile=store.profile } }
     func transact(_ action:(inout Profile)throws->Void) {
         guard let store else { error="Storage is unavailable. Retry after resolving the saved profile error."; return }
@@ -79,10 +84,12 @@ import UIKit
         renderer?.render(run,equipped:profile.equipped); persist()
     }
     func ready() {
+        notice="";input=InputFrame()
+        if !motion.available {settings.touchSteering=true}
         if !settings.touchSteering { motion.start(); motion.calibrate() }
         simulation.resume(); previousTime=0; clock.reset(); persist()
     }
-    func pause() { guard active else { return }; simulation.pause(); motion.stop(); audio.stop(); previousTime=0; clock.reset(); persist() }
+    func pause() { guard active else { return }; simulation.pause(); motion.stop(); audio.stop(); previousTime=0; clock.reset(); input=InputFrame(); persist() }
     func persist() {
         guard run.mode.earns else {return}
         let snapshot=run
@@ -194,10 +201,10 @@ import UIKit
             if events.contains(.ending) { finish(); screen="results" }
             return
         }
-        if delta > 0.25 { notice="The dream paused after an interruption."; pause(); return }
-        guard let steps=clock.consume(delta) else {notice="The dream paused to keep the next obstacle fair.";pause();return}
+        guard let steps=clock.consume(delta) else {clock.reset();return}
         if !settings.touchSteering {
-            guard let steering=motion.sample(settings:settings,now:now) else { notice="Motion is unavailable. Choose touch steering or recalibrate."; pause(); return }; input.steering=steering
+            if let steering=motion.sample(settings:settings,now:now) {input.steering=steering}
+            else {settings.touchSteering=true;motion.stop();input.steering=0;notice="Tilt is unavailable. Drag left or right to steer."}
         }
         for _ in 0..<steps {
             let events=simulation.step(input); input.jump=false; input.slide=false

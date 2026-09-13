@@ -84,6 +84,22 @@ struct ContentView:View {
             if game.run.phase == .waking { GeometryReader{g in Color.black.frame(height:g.size.height*min(1,game.run.endingElapsed/1.25)).frame(maxHeight:.infinity,alignment:.bottom)}.ignoresSafeArea() }
             if game.run.instabilityUntil > game.run.activeTicks && game.run.phase == .running { LinearGradient(colors:[.clear,.black.opacity(0.45)],startPoint:.center,endPoint:.bottom).ignoresSafeArea().allowsHitTesting(false) }
 
+            Color.clear.contentShape(Rectangle()).gesture(DragGesture(minimumDistance:8)
+                .onChanged { value in
+                    guard [.running,.safeDrop,.mirrorCrossing].contains(game.run.phase) else {return}
+                    if swipeStarted == nil {swipeStarted=value.time}
+                    if game.settings.touchSteering {
+                        let dx=value.translation.width,dy=value.translation.height
+                        game.input.steering=abs(dx)>abs(dy) ? max(-1,min(1,Double(dx)/80)) : 0
+                    }
+                }
+                .onEnded { value in
+                    defer {swipeStarted=nil;if game.settings.touchSteering {game.input.steering=0}}
+                    guard [.running,.safeDrop,.mirrorCrossing].contains(game.run.phase) else {return}
+                    let dy=value.translation.height,dx=value.translation.width
+                    guard abs(dy)>=34,abs(dy)>abs(dx)*1.4,value.time.timeIntervalSince(swipeStarted ?? value.time)<=0.45 else {return}
+                    if dy < 0 {game.input.jump=true} else {game.input.slide=true}
+                })
             VStack {
                 HStack(alignment:.top){VStack(alignment:.leading){Text(game.time(game.run.activeTicks)).monospacedDigit();Text("\(game.run.balloons) balloons").font(.caption);if !game.run.pigs.isEmpty {Text(String(repeating:"♧ ",count:game.run.pigs.count)).accessibilityLabel("\(game.run.pigs.count) clover pigs")}}
                     Spacer();Button("pause"){game.pause()}.accessibilityIdentifier("pause")
@@ -92,25 +108,22 @@ struct ContentView:View {
                 if game.run.mode == .tutorial {Text(tutorialPrompt).font(.callout).padding().background(.ultraThinMaterial,in:Capsule())}
                 Spacer()
                 if [.running,.safeDrop,.mirrorCrossing].contains(game.run.phase) {
-                    if game.settings.touchSteering {
-                        Slider(value:Binding(get:{game.input.steering},set:{game.input.steering=$0}),in:-1...1,onEditingChanged:{editing in if !editing {game.input.steering=0}}).accessibilityLabel("Continuous left and right steering").padding(.horizontal,32)
-                    }
                     HStack(spacing:50){button("slide ↓"){game.input.slide=true};button("jump ↑"){game.input.jump=true}}.padding(.horizontal,24).padding(.bottom,12)
                 }
                 if [.luckyTransition,.whiteEnding,.waking].contains(game.run.phase) {Button("skip presentation"){let events=game.simulation.presentationStep(0,skip:true);if events.contains(.ending){game.finish();game.screen="results"}}.padding().disabled(game.run.endingElapsed < (game.run.pigs.count == 3 ? 5 : 0.35))}
             }
             if [.ready,.paused].contains(game.run.phase) {
-                VStack(spacing:12){Text(game.run.phase == .ready ? "a little tilt.\na leap. a dream." : "still here.").font(.largeTitle).multilineTextAlignment(.center)
-                    Text(game.settings.touchSteering ? "Steer with the slider. Swipe up to jump, down to slide. Buttons work too." : "Hold your device comfortably. Ready calibrates your tilt.").font(.callout).multilineTextAlignment(.center)
+                VStack(spacing:12){Text(game.run.phase == .ready ? "a little tilt.\na leap. a dream." : "paused").font(.largeTitle).multilineTextAlignment(.center)
+                    Text(game.settings.touchSteering ? "Drag left or right to steer. Swipe up to jump, down to slide." : "Tilt left or right to steer. Swipe up to jump, down to slide. Hold comfortably, then tap ready to calibrate.").font(.callout).multilineTextAlignment(.center)
                     if !game.notice.isEmpty {Text(game.notice).font(.caption)}
                     button("ready"){game.ready()}
                     button("save & leave"){game.leave()}
                     button("end this dream"){game.endRun()}
-                    Toggle("Touch steering",isOn:$game.settings.touchSteering).onChange(of:game.settings.touchSteering){_,_ in game.saveSettings()}
+                    Toggle("Drag steering instead of tilt",isOn:$game.settings.touchSteering).onChange(of:game.settings.touchSteering){_,_ in game.saveSettings()}
                 }.padding(28).background(.regularMaterial,in:RoundedRectangle(cornerRadius:28)).padding(25).frame(maxWidth:450).frame(maxHeight:.infinity)
             }
             if game.run.phase == .resuming {Text("breathe…").font(.largeTitle).frame(maxHeight:.infinity)}
-        }.simultaneousGesture(DragGesture(minimumDistance:0).onChanged{value in if swipeStarted == nil {swipeStarted=value.time}}.onEnded{value in defer{swipeStarted=nil};let dy=value.translation.height,dx=value.translation.width;guard abs(dy)>=34,abs(dy)>abs(dx)*1.4,value.time.timeIntervalSince(swipeStarted ?? value.time)<=0.45 else{return};if dy < 0 {game.input.jump=true}else{game.input.slide=true}})
+        }
     }
     var tutorialPrompt:String {
         switch game.run.distance {case ..<80:"steer gently toward the balloons";case ..<155:"jump ↑ across the open gap";case ..<255:"slide ↓ beneath the zebra";case ..<345:"cute, but keep clear of the rabbit";default:"follow the dream. you’re ready."}
@@ -179,7 +192,7 @@ struct ContentView:View {
     }
     var settings:some View {
         menu("settings") {
-            Toggle("Touch steering",isOn:$game.settings.touchSteering)
+            Toggle("Drag steering instead of tilt",isOn:$game.settings.touchSteering)
             VStack(alignment:.leading){Text("Tilt sensitivity");Slider(value:$game.settings.sensitivity,in:0.5...1.5);Text("Dead zone · \(game.settings.deadzone,specifier:"%.1f")°");Slider(value:$game.settings.deadzone,in:0.5...4)}
             Toggle("Reduced motion",isOn:$game.settings.reducedMotion);Toggle("Reduced flashes",isOn:$game.settings.reducedFlashes)
             Toggle("Music",isOn:$game.settings.music);Toggle("Effects",isOn:$game.settings.effects);Toggle("Haptics",isOn:$game.settings.haptics);Toggle("Lower visual detail",isOn:$game.settings.lowPower)

@@ -22,12 +22,14 @@ public struct RunRules:Codable,Equatable,Sendable {
 public struct FixedStepClock:Sendable {
     public private(set) var remainder=0.0
     public init() {}
-    /// nil asks the host to pause. No excess time is silently converted to score.
+    /// Bound catch-up work without turning rendering hitches into modal pauses.
+    /// Long stalls discard elapsed time; lifecycle interruptions pause in the host.
     public mutating func consume(_ seconds:Double)->Int? {
-        guard seconds.isFinite,seconds >= 0,seconds <= 0.25 else {remainder=0;return nil}
+        guard seconds.isFinite,seconds >= 0 else {remainder=0;return nil}
+        guard seconds <= 0.25 else {remainder=0;return 0}
         remainder += seconds
         let ticks=Int(floor(remainder*60+1e-9))
-        guard ticks <= 4 else {remainder=0;return nil}
+        if ticks > 4 {remainder=0;return 4}
         remainder=max(0,remainder-Double(ticks)/60)
         return ticks
     }

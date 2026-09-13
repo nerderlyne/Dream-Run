@@ -10,11 +10,13 @@ import UIKit
     private var lastSample=0.0
     var value=0.0
     var failed=false
-    func start() { guard manager.isDeviceMotionAvailable else { failed=true; return }; failed=false; calibrating=true; manager.deviceMotionUpdateInterval=1.0/60; manager.startDeviceMotionUpdates() }
+    var available:Bool { manager.isDeviceMotionAvailable }
+    private var startedAt=0.0
+    func start() { guard manager.isDeviceMotionAvailable else { failed=true; return }; failed=false; calibrating=true; startedAt=ProcessInfo.processInfo.systemUptime; manager.deviceMotionUpdateInterval=1.0/60; manager.startDeviceMotionUpdates() }
     func stop() { manager.stopDeviceMotionUpdates(); value=0 }
     func calibrate() { calibrating=true }
     func sample(settings:Settings,now:Double) -> Double? {
-        guard let motion=manager.deviceMotion else { return nil }
+        guard let motion=manager.deviceMotion else { return ProcessInfo.processInfo.systemUptime-startedAt < 1 ? 0 : nil }
         let angle=atan2(motion.gravity.x,-motion.gravity.y)
         if calibrating { reference=angle; calibrating=false; lastSample=now }
         guard motion.timestamp > 0 else { return nil }

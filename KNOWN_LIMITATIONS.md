@@ -25,3 +25,5 @@ No simulator screenshot or device-performance evidence is fabricated. `evidence/
 Signing identity, App Store Connect products, banking/storefront setup, ad/consent IDs, privacy/support URLs, Game Center IDs, an owned Universal Links domain and cloud accounts remain external. Release sales/ads and remote services are disabled by default. Offline gameplay does not depend on them. See `docs/OWNER_SETUP.md`.
 
 The wallet survives normal local relaunches and supports idempotent verified delivery, delta settlement and lot-aware refunds. It does **not** promise cross-device/reinstall restoration of remaining consumable currency. A future cloud ledger needs explicit reconciliation and recovery testing.
+
+The pause-loop follow-up caps simulation catch-up during rendering hitches instead of forcing a ready prompt. Sustained low frame rates can slow active gameplay time; no discarded wall time is credited to pig chances or records. Device profiling is still needed.
