@@ -7,6 +7,7 @@ import simd
     let view: ARView
     let anchor=AnchorEntity(world:.zero)
     let world=Entity(), runner=Entity(), camera=PerspectiveCamera(), headAttachment=Entity()
+    let distantPath=DistantPathRenderer()
     var chunks: [Int:Entity]=[:], hazards: [String:Entity]=[:], pickups: [String:Entity]=[:]
     var legs:[Entity]=[], arms:[Entity]=[]
     var factory: PrefabFactory
@@ -28,6 +29,7 @@ import simd
         }
         view.scene.addAnchor(anchor); anchor.addChild(world); anchor.addChild(runner); anchor.addChild(camera)
         camera.camera.fieldOfViewInDegrees=62
+        camera.camera.far=8000
         let light=DirectionalLight(); light.light.intensity=2500; light.light.color=UIColor(hex:"#FFF0E4"); light.look(at:[0,0,0],from:[-6,10,8],relativeTo:nil); anchor.addChild(light)
         let fill=PointLight(); fill.light.intensity=750; fill.light.attenuationRadius=80; fill.position=[4,9,8]; anchor.addChild(fill)
         buildAvatar()
@@ -84,6 +86,7 @@ import simd
         var paletteRNG=run.identity.stream("palette",0)
         let targetPalette=cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex
         if lastRun != run.id || newBase != base || palette != targetPalette || lastVisual != run.visual {
+            distantPath.reset()
             world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
             view.environment.background = .color(UIColor(hex:factory.palettes[palette].sky))
         }
@@ -135,6 +138,7 @@ import simd
             }
             chunks[c.id]=root; world.addChild(root)
         }
+        distantPath.update(run:run,origin:origin,palette:factory.palettes[palette],world:world)
         let activeHazards=Set(run.hazards.filter{ !$0.resolved }.map(\.id))
         for (id,e) in hazards where !activeHazards.contains(id) { e.removeFromParent(); hazards.removeValue(forKey:id) }
         for h in run.hazards where !h.resolved {

@@ -60,3 +60,5 @@ R2 introduced initial forward speed **12.25 m/s** (1.75× the original 7 m/s), a
 **R3** narrowed steering to **±0.9 m** (28% narrower), with 6 m/s maximum lateral movement and 40 ms smoothing. Default full steering needs 12° of calibrated tilt. R3 retains the faster 12.25 m/s start; older saved dreams keep their own tuning.
 
 New dreams use **R4**, retaining the faster runner and narrow tilt range while balls approach at **8 m/s**. Sports-ball rotation follows their actual travelled distance. They first become visible already rolling on a 60 m approach.
+
+The visible path continues roughly 6.1 km ahead using simplified distant geometry that blends into the sky. Detailed scenery and gameplay remain streamed nearby.

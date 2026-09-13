@@ -159,3 +159,11 @@ New dreams use R4: rolling encounters move toward the runner at 8 m/s instead of
 Verification outputs: `evidence/rolling-balls-tests.log`, `evidence/rolling-balls-spec.log`, `evidence/rolling-balls-preflight.log`, `evidence/rolling-balls-build.log`. Tests cover movement/spin/start visibility and preview time, plus twelve R4 three-minute runs and tutorials through the authoritative certifier. Physical/simulator visual execution remains unrun.
 
 PASS: 25 focused Swift tests, zero failures, 8.424 seconds; 51 specification checks; release preflight; Debug Simulator test-bundle build. No six-hour R4 soak was performed.
+
+## Follow-up: path to the horizon
+
+Added a render-only route continuation roughly 6.1 km ahead, beyond the existing detailed gameplay window, and extended camera far clipping to 8 km. The continuation follows the same analytic curves/helical stairs and omits generated gaps/marked-drop spans. Four-metre samples and cached 384 m sections keep geometry bounded; distant checker detail becomes an averaged surface color and the far end blends into the sky. Rebase/palette/run changes reset the cache. No extra world family, hazard, pickup or simulation RNG state is introduced.
+
+Build evidence: `evidence/horizon-build.log`. Actual horizon composition, transition appearance and device performance remain unverified without simulator/device execution.
+
+PASS: Debug generic iOS Simulator build, including the distant-path white-ending fade. No new core tests were needed for this renderer-only change.
