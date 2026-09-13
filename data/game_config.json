@@ -5,7 +5,7 @@
   "deployment_target_ios": "18.0",
   "versions": {
     "generator": 1,
-    "rules": 1,
+    "rules": 2,
     "content": 1,
     "save": 1
   },
@@ -13,10 +13,10 @@
     "ticks_per_second": 60,
     "max_catchup_steps": 4,
     "stall_pause_seconds": 0.25,
-    "base_speed_mps": 7.0,
+    "base_speed_mps": 12.25,
     "max_speed_mps": 16.0,
     "speed_time_constant_seconds": 300.0,
-    "speed_model": "v(t)=7+9*(1-exp(-t/300)); t is active gameplay seconds"
+    "speed_model": "v(t)=12.25+3.75*(1-exp(-t/300)); t is active gameplay seconds; R1 retains 7+9*(1-exp(-t/300))"
   },
   "movement": {
     "track_width_m": 4.0,

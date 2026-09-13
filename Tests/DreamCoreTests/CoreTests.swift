@@ -44,8 +44,21 @@ final class CoreTests: XCTestCase {
     func testIDsRejectBadInput() throws {
         for s in ["",String(repeating:"0",count:200),"DR2-G1-R1-C1-000000000001A-460B","DR1-G1-R1-C1-ZZZZZZZZZZZZZ-580X","DR1-G0-R1-C1-000000000001A-460B","DR1-G1-R1-C1-000000000001A-460C"] { XCTAssertThrowsError(try DreamIdentity.parse(s)) }
         XCTAssertEqual(try DreamIdentity.parse("  dr1-g1-r1-c1-OOOOOOOOOOO1a-46Ob  ").seed,42)
-        var future=DreamIdentity(seed:42); future.rulesVersion=2; XCTAssertThrowsError(try DreamIdentity.parse(future.code)); XCTAssertEqual(try DreamIdentity.parse(future.code,requireSupported:false),future)
+        var future=DreamIdentity(seed:42); future.rulesVersion=3; XCTAssertThrowsError(try DreamIdentity.parse(future.code)); XCTAssertEqual(try DreamIdentity.parse(future.code,requireSupported:false),future)
         XCTAssertThrowsError(try DreamFile.read(Data("{\"format\":1,\"dreamID\":\"a\",\"url\":\"x\"}".utf8)))
+    }
+    func testFasterRulesPreserveSavedDreams() throws {
+        let old=GameSimulation(identity:DreamIdentity(seed:42))
+        let current=GameSimulation(identity:DreamIdentity.current(seed:42))
+        XCTAssertEqual(current.state.speed,old.state.speed*1.75,accuracy:1e-12)
+        XCTAssertEqual(current.state.rules.maximumSpeed,old.state.rules.maximumSpeed)
+        XCTAssertEqual(try DreamIdentity.parse(current.state.identity.code),current.state.identity)
+        for original in [old,current] {
+            let saved=try JSONDecoder().decode(RunState.self,from:JSONEncoder().encode(original.state))
+            XCTAssertEqual(try GameSimulation(snapshot:saved).state.speed,original.state.speed)
+        }
+        var mismatched=current.state;mismatched.rules=RunRules(version:1)
+        XCTAssertThrowsError(try GameSimulation(snapshot:mismatched))
     }
     func testExactProbability() {
         var present=0, clean=0, continued=0

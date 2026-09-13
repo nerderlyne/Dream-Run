@@ -38,7 +38,8 @@ public struct DreamIdentity: Codable, Hashable, Sendable {
     public var contentVersion: UInt16 = 1
     public var seed: UInt64
     public init(seed: UInt64) { self.seed = seed }
-    public var supported: Bool { generatorVersion == 1 && rulesVersion == 1 && contentVersion == 1 }
+    public static func current(seed:UInt64) -> Self {var identity=Self(seed:seed);identity.rulesVersion=2;return identity}
+    public var supported: Bool { generatorVersion == 1 && [1,2].contains(rulesVersion) && contentVersion == 1 }
     public func stream(_ domain: String, _ index: Int) -> SplitMix64 {
         SplitMix64(SplitMix64.fnv("DR1|G\(generatorVersion)|R\(rulesVersion)|C\(contentVersion)|\(String(format: "%016llX", seed))|\(domain)|\(index)"))
     }

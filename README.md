@@ -54,3 +54,5 @@ Snapshots occur every 15 active seconds and on pause, rare-event commitment/coll
 A `.dream` file contains only `format` and `dreamID`, is limited to 32 KiB and always imports as Revisit. The custom URL is `dreamagain://dream/<code>`; no owned HTTPS domain or universal association is claimed.
 
 Original app icon art is supplied in `Dream Again/Resources/DreamAgainIcon.png` with legacy bundle metadata. Production asset-catalogue renditions require validation after simulator access is available.
+
+New dreams use R2: initial forward speed **12.25 m/s** (1.75× the original 7 m/s), approaching the existing 16 m/s cap. Start a new dream to try this tuning. R1 saved codes and suspended runs retain their original speed and replay rules.

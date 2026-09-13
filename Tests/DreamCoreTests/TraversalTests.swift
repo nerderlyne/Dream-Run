@@ -33,6 +33,16 @@ final class TraversalTests:XCTestCase {
         if let gap=s.chunks.compactMap(\.gap).first(where:{$0.upperBound > s.distance && $0.lowerBound-s.distance < s.speed*0.16}) { frame.jump=s.distance < gap.lowerBound && s.player.grounded }
         return frame
     }
+    func testFasterOpeningTwelveSeeds() {
+        for seed in 0..<12 {
+            var simulation=GameSimulation(identity:DreamIdentity.current(seed:UInt64(seed)));simulation.resume()
+            for _ in 0..<(180*60) {_=simulation.step(oracle(simulation.state));guard [.running,.safeDrop,.mirrorCrossing].contains(simulation.state.phase) else {return XCTFail("R2 seed \(seed) failed at \(simulation.state.seconds): \(simulation.state.cause)")}}
+            XCTAssertGreaterThan(simulation.state.dropCount,0)
+            var tutorial=GameSimulation(identity:DreamIdentity.current(seed:UInt64(seed)),mode:.tutorial);tutorial.resume()
+            for _ in 0..<(55*60) {_=tutorial.step(oracle(tutorial.state))}
+            XCTAssertEqual(tutorial.state.cause,"tutorial complete")
+        }
+    }
     func testOracleSixHoursTwentySeeds() throws {
         var maximumChunks=0,maximumHazards=0,maximumPickups=0
         for seed in 0..<20 {

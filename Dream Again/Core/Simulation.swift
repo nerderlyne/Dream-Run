@@ -71,15 +71,15 @@ public struct RunState: Codable, Sendable {
         var palette=identity.stream("palette",0)
         return (Int(palette.below(7)) + Int(distance / 432) + mirrorCount * 2) % 7
     }
-    public init(identity: DreamIdentity, mode: RunMode, id: UUID = UUID()) { self.identity = identity; self.mode = mode; self.id = id }
+    public init(identity: DreamIdentity, mode: RunMode, id: UUID = UUID()) { self.identity = identity; self.mode = mode; self.id = id; self.rules=RunRules(version:identity.rulesVersion) }
 }
 public struct GameSimulation: Sendable {
     public var state: RunState
     private var certificationSlope:Double?
     init(certification:RunState,slope:Double) {state=certification;certificationSlope=slope}
-    public init(identity: DreamIdentity, mode: RunMode = .fresh, rules: RunRules = RunRules()) { state = RunState(identity: identity, mode: mode); state.rules=rules; streamChunks() }
+    public init(identity: DreamIdentity, mode: RunMode = .fresh, rules: RunRules? = nil) { state = RunState(identity: identity, mode: mode); if let rules {state.rules=rules}; streamChunks() }
     public init(snapshot: RunState) throws {
-        guard snapshot.schema == 1, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-46800, abs(snapshot.player.lateral) <= 1.2501, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
+        guard snapshot.schema == 1, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-46800, abs(snapshot.player.lateral) <= 1.2501, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules(version:snapshot.identity.rulesVersion) else { throw DreamError.corruptStore }
         state = snapshot
     }
     public mutating func resume() { if state.phase == .paused || state.phase == .ready { state.phase = state.resumePhase } }

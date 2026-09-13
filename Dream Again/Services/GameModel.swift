@@ -85,7 +85,7 @@ import UIKit
             transact {$0.settle(abandoned,finished:true,catalogue:achievements);$0.snapshot=nil}
             if error != nil {return}
         }
-        simulation=GameSimulation(identity:identity ?? DreamIdentity(seed:UInt64.random(in:UInt64.min...UInt64.max)),mode:selectedMode,rules:rules)
+        simulation=GameSimulation(identity:identity ?? DreamIdentity.current(seed:UInt64.random(in:UInt64.min...UInt64.max)),mode:selectedMode)
         screen="gameplay"; input=InputFrame(); previousTime=0; clock.reset()
         renderer?.render(run,equipped:profile.equipped); persist()
     }

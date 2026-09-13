@@ -127,3 +127,11 @@ PASS: 18 focused Swift tests, zero failures, 4.558 seconds. PASS: Debug Simulato
 Removed both gameplay action buttons. The existing playfield gesture handles swipe up for jump and swipe down for slide; tutorial prompts now explicitly teach those gestures. Tilt remains the only device steering control. This supersedes earlier notes about action buttons. Build output: `evidence/swipe-only-build.log`. No physical gesture execution claimed.
 
 PASS: Debug generic iOS Simulator build after action-button removal.
+
+## Follow-up: faster opening pace (R2)
+
+New dreams start at 12.25 m/s, 1.75× the original 7 m/s, and approach the existing 16 m/s cap with the same 300-second time constant. Versioned R1 codes/suspensions retain their original rules; R2 codes and snapshots use the faster start. Pig intervals/odds, jump/slide physics and rewards are unchanged. The bundled and source configuration both declare R2.
+
+Verification: `evidence/faster-start-tests.log` covers speed ratio, R1/R2 save compatibility, golden R1 fixtures, and twelve R2 seeds through their first three minutes plus each tutorial. `evidence/faster-start-spec.log`, `evidence/faster-start-preflight.log` and `evidence/faster-start-build.log` record contract checks and Debug test-bundle compilation. Physical play feel remains untested.
+
+PASS: 20 focused Swift tests, zero failures, 5.529 seconds; 51 specification checks; release preflight; Debug Simulator test-bundle build. The six-hour soak was not repeated for this opening-speed change; the new R2 test covers twelve three-minute runs and twelve tutorials.
