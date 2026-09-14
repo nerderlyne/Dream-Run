@@ -8,6 +8,17 @@
 
 > Run through a beautiful, unpredictable dream. Your movement is deliberately simple. The world is not. Collect balloons, avoid waking, save places you loved, and discover what the dream can become.
 
+## Creator-approved gameplay update — 14 September 2026
+
+These later creator decisions supersede the original tuning and scenery-only roles below:
+- One current prerelease ruleset; no compatibility code for discarded development builds.
+- Active-time speed: 12.25 m/s initially, 16 at 120 seconds, 19 at 300 seconds, capped at 22 from 600 seconds.
+- Tilt-only steering on physical devices, ±0.9 m over ±12 degrees, 6 m/s lateral limit and 40 ms smoothing. Swipe up/down for jump/slide; no action buttons. Simulator drag is an input test adapter.
+- Denser encounters include oversized stair jumps, broken floors, exposed bridges, descending window underpasses, swinging moons, collapsing tiles, sleeping furniture, rolling-ball volleys and lightning. Use existing semantic families; the registry stays at 42.
+- Lightning has a fixed visible warning target for at least two active seconds, then a 0.4-second fatal strike; pausing freezes its clock.
+- A ball causes a soft stumble and outward knockback. Falling off an exposed edge is fatal. Ordinary stairs and consistently marked safe drops retain their original behavior.
+- Pig probabilities, the continue penalty, cosmetic-only balloon economy and nonterminal three-hour evolution are unchanged.
+
 ## 0. Authority, scope, and how to use this specification
 
 Read this document completely before implementing. Read the supplied reference images and data files, then execute the build in the order in §25. `AGENTS.md` is a short project instruction file, not a substitute for this document. OpenAI documents `AGENTS.md` as a source of project instructions; keeping it concise and explicitly pointing to the specification avoids burying the requirements in an oversized instruction file. [S12]

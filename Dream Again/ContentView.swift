@@ -125,7 +125,8 @@ struct ContentView:View {
                     HStack {
                         Button("Lab"){game.artReview=false;game.collageMotion=false;game.screen="lab";game.previewAsset()}
                         Button(game.collageMotion ? "freeze":"run"){game.collageMotion.toggle()}
-                        Button("dream \(index+1)/5 →"){game.labCollage(index:index+1)}
+                        if let obstacle=game.obstacleReview {Button("again"){game.labObstacle(obstacle)}}
+                        else {Button("dream \(index+1)/5 →"){game.labCollage(index:index+1)}}
                     }.font(.caption).padding(12).background(.regularMaterial,in:Capsule())
                 }
                 #endif
@@ -236,6 +237,7 @@ struct ContentView:View {
                 HStack {Text("Collage kit");ForEach(0..<5,id:\.self){i in Button("\(i+1)"){game.labCollage(index:i)}}}.font(.caption)
                 HStack {Text("Straw doll");ForEach(0..<5,id:\.self){i in Button("\(i+1)"){game.labDesign(theme:i,variant:i,sky:DreamCollageKit.skyIDs[i])}}}.font(.caption)
                 HStack {ForEach(["idle","run","jump","slide"],id:\.self){pose in Button(pose){game.labDesign(theme:0,pose:pose)}}}.font(.caption)
+                ScrollView(.horizontal){HStack{ForEach(DreamObstacle.allCases,id:\.self){kind in Button(kind.title){game.labObstacle(kind)}}}}.font(.caption)
                 Toggle("Show role bounds",isOn:$game.labColliders).onChange(of:game.labColliders){_,_ in game.previewAsset()}
                 HStack{TextField("Dream ID for world preview",text:$code).font(.caption).textFieldStyle(.roundedBorder);Button("preview"){game.labWorld(code)};Button("+24m"){game.labStep()}}
                 ScrollView(.horizontal){HStack{ForEach(["Rabbit","Nazar","Zebra","Ball","Mirror","Drop","Ordinary pig","Clover pig","Lucky Dream","Three hours","Sparse","Beyond","Void","Waking"],id:\.self){event in Button(event){game.labEvent(event)}.buttonStyle(.bordered)}}}

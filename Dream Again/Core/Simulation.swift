@@ -12,6 +12,7 @@ public struct InputFrame: Codable, Equatable, Sendable {
 public struct PlayerState: Codable, Equatable, Sendable {
     public var lateral = 0.0
     public var height = 0.0
+    public var knockbackVelocity=0.0
     public var velocityY = 0.0
     public var grounded = true
     public var slideTicks = 0
@@ -22,7 +23,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
     public var coyote = 5
     public var bodyHeight: Double { slideTicks > 0 ? 0.58 : 1.55 }
 }
-public enum GameEvent: Equatable, Sendable { case balloon, stumble, waking, clover, pigCommitted, mirror, drop, mastery, tutorialComplete, ending }
+public enum GameEvent: Equatable, Sendable { case balloon, stumble, thunder, waking, clover, pigCommitted, mirror, drop, mastery, tutorialComplete, ending }
 public struct CollectedPig: Codable, Equatable, Sendable { public var ordinal: Int; public var hue: Int }
 public struct RunState: Codable, Sendable {
     public var schema = 1
@@ -62,13 +63,15 @@ public struct RunState: Codable, Sendable {
     public var lastDropBlock = -1
     public var cause = ""
     public var seconds: Double { Double(activeTicks) / 60 }
-    public var unhinderedSpeed:Double {rules.baseSpeed+(rules.maximumSpeed-rules.baseSpeed)*(1-exp(-seconds/rules.speedTimeConstant))}
+    public var unhinderedSpeed:Double {DreamDifficulty.speed(seconds:seconds)}
     /// The same authoritative recovery drives travel speed and the avatar's hit pose.
     public var stumbleWeight:Double {
         guard lastSoftTick > 0,activeTicks >= lastSoftTick,activeTicks-lastSoftTick < 60 else {return 0}
         return 1-Double(activeTicks-lastSoftTick)/60
     }
     public var speed:Double {unhinderedSpeed*(1-0.25*stumbleWeight)}
+    public func floorHeight(at distance:Double)->Double {chunks.reduce(0){$0+($1.step?.height(at:distance) ?? 0)}}
+    public func halfWidth(at distance:Double)->Double {chunks.first{$0.start<=distance && $0.end>distance}?.halfWidth ?? 2}
     public var unbroken: Bool { mode == .fresh && continueCount == 0 }
     public var visual: VisualPhase { pigs.count == 3 ? .luckyWhite : .at(seconds: seconds) }
     public var paletteIndex: Int {
@@ -77,7 +80,7 @@ public struct RunState: Codable, Sendable {
         var palette=identity.stream("palette",0)
         return (Int(palette.below(7)) + Int(distance / 432) + mirrorCount * 2) % 7
     }
-    public init(identity: DreamIdentity, mode: RunMode, id: UUID = UUID()) { self.identity = identity; self.mode = mode; self.id = id; self.rules=RunRules(version:identity.rulesVersion) }
+    public init(identity: DreamIdentity, mode: RunMode, id: UUID = UUID()) { self.identity = identity; self.mode = mode; self.id = id; self.rules=RunRules() }
 }
 public struct GameSimulation: Sendable {
     public var state: RunState
@@ -85,7 +88,7 @@ public struct GameSimulation: Sendable {
     init(certification:RunState,slope:Double) {state=certification;certificationSlope=slope}
     public init(identity: DreamIdentity, mode: RunMode = .fresh, rules: RunRules? = nil) { state = RunState(identity: identity, mode: mode); if let rules {state.rules=rules}; streamChunks() }
     public init(snapshot: RunState) throws {
-        guard snapshot.schema == 1, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-46800, abs(snapshot.player.lateral) <= snapshot.rules.lateralLimit+0.0001, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules(version:snapshot.identity.rulesVersion) else { throw DreamError.corruptStore }
+        guard snapshot.schema == 1, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-46800, snapshot.player.lateral.isFinite, abs(snapshot.player.lateral) <= 2.5, snapshot.player.knockbackVelocity.isFinite, abs(snapshot.player.knockbackVelocity)<=8, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
         state = snapshot
     }
     public mutating func resume() { if state.phase == .paused || state.phase == .ready { state.phase = state.resumePhase } }
@@ -103,6 +106,10 @@ public struct GameSimulation: Sendable {
         while !g.supported(state.distance, tutorial: state.mode == .tutorial) { state.distance += 0.5 }
         state.safeUntilDistance = state.distance + state.speed * 2 + 4
         state.hazards.removeAll { $0.position(at: state.activeTicks) <= state.safeUntilDistance }
+        for i in state.chunks.indices where state.chunks[i].end > state.distance && state.chunks[i].start < state.safeUntilDistance {
+            state.chunks[i].gap=nil;state.chunks[i].step=nil;state.chunks[i].collapsing=false;state.chunks[i].halfWidth=2
+            state.chunks[i].hazards=[]
+        }
         state.player = PlayerState(); state.instabilityUntil = 0; state.softImmunityUntil = 0
         return true
     }
@@ -135,8 +142,8 @@ public struct GameSimulation: Sendable {
                 if let gap=chunk.gap {let length=max(1.8,(gap.upperBound-gap.lowerBound)-Double(attempt)*0.3);chunk.gap=gap.lowerBound...(gap.lowerBound+length)}
                 for h in chunk.hazards.indices where chunk.hazards[h].encounter == .dodge || chunk.hazards[h].encounter == .rolling {chunk.hazards[h].lateral=(attempt%2 == 0 ? -1 : 1)*0.9}
             }
-            if !certified {chunk.hazards=[];chunk.gap=nil;chunk.routeFamily = .trackStraight;chunk.candidateAttempts=8;chunk.fallbackReason="no certified horizon trajectory"}
-            if chunk.start < state.safeUntilDistance && chunk.end > state.distance { chunk.hazards=[]; chunk.gap=nil }
+            if !certified {chunk.hazards=[];chunk.gap=nil;chunk.step=nil;chunk.collapsing=false;chunk.halfWidth=2;chunk.routeFamily = .trackStraight;chunk.candidateAttempts=8;chunk.fallbackReason="no certified horizon trajectory"}
+            if chunk.start < state.safeUntilDistance && chunk.end > state.distance { chunk.hazards=[]; chunk.gap=nil;chunk.step=nil;chunk.collapsing=false;chunk.halfWidth=2 }
             state.chunks.append(chunk)
             state.recentAssets=Array((state.recentAssets+chunk.scenery.map(\.asset)).suffix(12))
             state.recentRoutes=Array((state.recentRoutes+[chunk.routeFamily]).suffix(2))
@@ -144,7 +151,7 @@ public struct GameSimulation: Sendable {
             if state.recentRecipes.last != chunk.recipe {state.recentRecipes=Array((state.recentRecipes+[chunk.recipe]).suffix(3))}
             for var hazard in chunk.hazards {
                 hazard.spawnTick = state.activeTicks
-                // Arm the ball from a 60 m visible approach; never let an ahead-streamed ball
+                // Arm the ball from a 72 m visible approach; never let an ahead-streamed ball
                 // roll backwards through earlier mandatory actions before the player arrives.
                 if hazard.speed > 0 { hazard.distance += 12; hazard.spawnTick = UInt64.max }
                 state.hazards.append(hazard)
@@ -164,7 +171,8 @@ public struct GameSimulation: Sendable {
         state.distance += speed*dt
         let desired = max(-1, min(1, input.steering.isFinite ? input.steering : 0))*state.rules.lateralLimit
         let filtered = (desired-state.player.lateral)*(1-exp(-dt/state.rules.smoothing))
-        state.player.lateral += max(-state.rules.lateralSpeed*dt,min(state.rules.lateralSpeed*dt,filtered))
+        state.player.lateral += max(-state.rules.lateralSpeed*dt,min(state.rules.lateralSpeed*dt,filtered))+state.player.knockbackVelocity*dt
+        state.player.knockbackVelocity *= exp(-dt/0.18)
         if input.jump { state.player.jumpBuffer = 8 }
         if input.slide { state.player.slideBuffer = 8 }
         state.player.slideCooldown=max(0,state.player.slideCooldown-1)
@@ -182,6 +190,7 @@ public struct GameSimulation: Sendable {
         if !state.player.grounded {
             let route=WorldGenerator(state.identity)
             state.player.height -= certificationSlope.map{$0*(state.distance-oldDistance)} ?? (route.sample(state.distance).y-route.sample(oldDistance).y)
+            state.player.height -= state.floorHeight(at:state.distance)-state.floorHeight(at:oldDistance)
             state.player.height += state.player.velocityY*dt; state.player.velocityY -= state.rules.gravity*dt
             if supported && state.player.height <= 0 && state.player.velocityY <= 0 {
                 if oldHeight < -0.35 { wake("gap"); return [.waking] }
@@ -197,13 +206,20 @@ public struct GameSimulation: Sendable {
             state.safeUntilDistance = state.distance + speed*10
             state.hazards.removeAll { $0.position(at: state.activeTicks) > state.distance && $0.position(at: state.activeTicks) < state.safeUntilDistance }
             // Reserve the runway's support before rendering the promise.
-            for i in state.chunks.indices where state.chunks[i].start < state.safeUntilDistance && state.chunks[i].end > state.distance { state.chunks[i].gap = nil }
-            if decision.present { state.hazards.append(HazardDescription(id: "pig:\(ordinal)", asset: .pig, encounter: .dodge, distance: state.distance + speed*6, lateral: state.identity.rulesVersion >= 3 ? 0.18 : 0, radius: decision.clover ? 0.65 : 0.38, height: 0.65, pig: decision)) }
+            for i in state.chunks.indices where state.chunks[i].start < state.safeUntilDistance && state.chunks[i].end > state.distance { state.chunks[i].gap = nil;state.chunks[i].step=nil;state.chunks[i].collapsing=false;state.chunks[i].halfWidth=2 }
+            if decision.present { state.hazards.append(HazardDescription(id: "pig:\(ordinal)", asset: .pig, encounter: .dodge, distance: state.distance + speed*6, lateral: 0.18, radius: decision.clover ? 0.65 : 0.38, height: 0.65, pig: decision)) }
             events.append(.pigCommitted)
         }
         for i in state.hazards.indices where state.hazards[i].speed > 0 && state.hazards[i].spawnTick == UInt64.max {
-            if state.hazards[i].distance-state.distance <= 60 { state.hazards[i].spawnTick=state.activeTicks }
+            if state.hazards[i].distance-state.distance <= 72 { state.hazards[i].spawnTick=state.activeTicks }
         }
+        for i in state.hazards.indices where state.hazards[i].encounter == .lightning && state.hazards[i].strikeTick == UInt64.max {
+            let remaining=state.hazards[i].distance-state.distance
+            if remaining<=70 {
+                state.hazards[i].strikeTick=state.activeTicks+UInt64(max(120,remaining/state.unhinderedSpeed*60))
+            }
+        }
+        if state.hazards.contains(where:{$0.encounter == .lightning && $0.strikeTick == state.activeTicks}) {events.append(.thunder)}
         // Swept route-space slab intersection; sorted impact times implement tie precedence.
         struct Contact { var t: Double; var priority: Int; var hazard: Int?; var pickup: PickupDescription? }
         var contacts: [Contact] = []
@@ -215,11 +231,13 @@ public struct GameSimulation: Sendable {
             let h = state.hazards[i]; if h.resolved { continue }
             let current = h.position(at: state.activeTicks), previous = current + h.speed*dt
             if h.pig == nil && h.encounter != .mirror && current < state.safeUntilDistance { continue }
-            let wide = h.encounter == .slide || h.encounter == .jump || h.encounter == .mirror
-            guard let s = interval(oldDistance-previous,state.distance-current,-h.radius-0.28,h.radius+0.28), let x = interval(oldLateral,state.player.lateral,h.lateral-(wide ? 2 : h.contactHalfWidth+0.28),h.lateral+(wide ? 2 : h.contactHalfWidth+0.28)), max(s.0,x.0) <= min(s.1,x.1) else { continue }
+            if h.encounter == .lightning && !h.striking(at:state.activeTicks) {continue}
+            let wide = h.encounter == .slide || h.requiresJump || h.encounter == .mirror
+            let currentX=h.lateral(at:state.activeTicks),previousX=h.lateral(at:state.activeTicks-1)
+            guard let s = interval(oldDistance-previous,state.distance-current,-h.radius-0.28,h.radius+0.28), let x = interval(oldLateral-previousX,state.player.lateral-currentX,-(wide ? 2 : h.contactHalfWidth+0.28),(wide ? 2 : h.contactHalfWidth+0.28)), max(s.0,x.0) <= min(s.1,x.1) else { continue }
             let t=max(s.0,x.0), feet=oldHeight+(state.player.height-oldHeight)*t
             if h.encounter == .slide && feet+state.player.bodyHeight < 0.85 { continue }
-            if h.encounter != .slide && h.encounter != .mirror && feet > h.height { continue }
+            if h.encounter != .slide && h.encounter != .mirror && h.encounter != .lightning && feet > h.height { continue }
             contacts.append(Contact(t:t,priority:h.encounter == .mirror ? 5 : h.pig?.clover == true ? 3 : h.fatal ? 0 : 2,hazard:i))
         }
         for p in state.chunks.flatMap(\.pickups) where !state.collectedIDs.contains(p.id) {
@@ -234,11 +252,17 @@ public struct GameSimulation: Sendable {
             else if let pig=h.pig, pig.clover {
                 state.pigs.append(CollectedPig(ordinal:pig.ordinal,hue:Int(pig.cloverDraw))); events.append(.clover)
                 if state.pigs.count == 3 { state.phase = .luckyTransition; state.endingElapsed = 0; state.distance = oldDistance+(state.distance-oldDistance)*c.t; break }
-            } else if h.fatal { wake(h.asset == .rabbit ? "rabbit" : h.asset == .nazar ? "nazar" : "underpass"); events.append(.waking); break }
+            } else if h.fatal { wake(h.asset == .rabbit ? "rabbit" : h.asset == .nazar ? "nazar" : h.encounter == .lightning ? "lightning" : h.encounter == .swing ? "swinging moon" : h.requiresJump ? "missed jump" : "underpass"); events.append(.waking); break }
             else if state.activeTicks >= state.softImmunityUntil {
                 if state.activeTicks < state.instabilityUntil { wake("second stumble"); events.append(.waking); break }
-                state.lastSoftTick=state.activeTicks; state.instabilityUntil=state.activeTicks+300; state.softImmunityUntil=state.activeTicks+48; events.append(.stumble)
+                state.lastSoftTick=state.activeTicks; state.instabilityUntil=state.activeTicks+300; state.softImmunityUntil=state.activeTicks+48
+                let direction=state.player.lateral >= h.lateral(at:state.activeTicks) ? 1.0:-1.0
+                state.player.lateral += direction*0.18;state.player.knockbackVelocity=direction*4
+                events.append(.stumble)
             }
+        }
+        if abs(state.player.lateral)+0.28>state.halfWidth(at:state.distance) && state.player.height<0.1 && state.phase == .running {
+            wake("fell from edge");events.append(.waking)
         }
         if state.phase == .mirrorCrossing && state.activeTicks >= state.mirrorUntilTick { state.phase = .running }
         let block=Int(state.distance/1800), local=state.distance.truncatingRemainder(dividingBy:1800)

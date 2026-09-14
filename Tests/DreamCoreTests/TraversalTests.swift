@@ -21,22 +21,11 @@ final class TraversalTests:XCTestCase {
         XCTAssertTrue(tutorial.state.hazards.contains{$0.id == "tutorial:slide"})
         print("CERTIFIED manifest: \(encounters.count) encounter kinds, \(gaps) gaps, \(fallbacks)/300 fallbacks")
     }
-    func oracle(_ s:RunState) -> InputFrame {
-        let upcoming=s.hazards.filter{!$0.resolved && $0.position(at:s.activeTicks) > s.distance-1 && $0.position(at:s.activeTicks) < s.distance+55}.sorted{$0.position(at:s.activeTicks)<$1.position(at:s.activeTicks)}
-        var frame=InputFrame()
-        if let h=upcoming.first {
-            let distance=h.position(at:s.activeTicks)-s.distance
-            if h.encounter == .slide { frame.slide=distance < max(s.speed*0.3,h.radius+0.28+s.speed/60+0.15) && distance > 0 && s.player.slideTicks == 0 }
-            else if h.encounter == .jump { frame.jump=distance < s.speed*0.23 && distance > 0 && s.player.grounded }
-            else if h.encounter != .mirror { frame.steering=h.lateral >= 0 ? -1 : 1 }
-        }
-        if let gap=s.chunks.compactMap(\.gap).first(where:{$0.upperBound > s.distance && $0.lowerBound-s.distance < s.speed*0.16}) { frame.jump=s.distance < gap.lowerBound && s.player.grounded }
-        return frame
-    }
+    func oracle(_ s:RunState)->InputFrame {EncounterOracle.input(s)}
     func testFastNarrowOpeningTwelveSeeds() {
         for seed in 0..<12 {
             var simulation=GameSimulation(identity:DreamIdentity.current(seed:UInt64(seed)));simulation.resume()
-            for _ in 0..<(180*60) {_=simulation.step(oracle(simulation.state));guard [.running,.safeDrop,.mirrorCrossing].contains(simulation.state.phase) else {return XCTFail("R4 seed \(seed) failed at \(simulation.state.seconds): \(simulation.state.cause)")}}
+            for _ in 0..<(180*60) {_=simulation.step(oracle(simulation.state));guard [.running,.safeDrop,.mirrorCrossing].contains(simulation.state.phase) else {return XCTFail("Current seed \(seed) failed at \(simulation.state.seconds): \(simulation.state.cause)")}}
             XCTAssertGreaterThan(simulation.state.dropCount,0)
             var tutorial=GameSimulation(identity:DreamIdentity.current(seed:UInt64(seed)),mode:.tutorial);tutorial.resume()
             for _ in 0..<(55*60) {_=tutorial.step(oracle(tutorial.state))}

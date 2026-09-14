@@ -47,22 +47,21 @@ final class CoreTests: XCTestCase {
         var future=DreamIdentity(seed:42); future.rulesVersion=5; XCTAssertThrowsError(try DreamIdentity.parse(future.code)); XCTAssertEqual(try DreamIdentity.parse(future.code,requireSupported:false),future)
         XCTAssertThrowsError(try DreamFile.read(Data("{\"format\":1,\"dreamID\":\"a\",\"url\":\"x\"}".utf8)))
     }
-    func testFasterRulesPreserveSavedDreams() throws {
-        let old=GameSimulation(identity:DreamIdentity(seed:42))
-        let current=GameSimulation(identity:DreamIdentity.current(seed:42))
-        XCTAssertEqual(current.state.speed,old.state.speed*1.75,accuracy:1e-12)
-        XCTAssertEqual(current.state.rules.maximumSpeed,old.state.rules.maximumSpeed)
-        XCTAssertEqual(try DreamIdentity.parse(current.state.identity.code),current.state.identity)
-        for original in [old,current] {
-            let saved=try JSONDecoder().decode(RunState.self,from:JSONEncoder().encode(original.state))
-            XCTAssertEqual(try GameSimulation(snapshot:saved).state.speed,original.state.speed)
-        }
-        var mismatched=current.state;mismatched.rules=RunRules(version:1)
-        XCTAssertThrowsError(try GameSimulation(snapshot:mismatched))
+    func testCurrentSpeedCurveAndSnapshot() throws {
+        XCTAssertEqual(DreamDifficulty.speed(seconds:0),12.25)
+        XCTAssertEqual(DreamDifficulty.speed(seconds:120),16)
+        XCTAssertEqual(DreamDifficulty.speed(seconds:300),19)
+        XCTAssertEqual(DreamDifficulty.speed(seconds:600),22)
+        XCTAssertEqual(DreamDifficulty.speed(seconds:10800),22)
+        let current=GameSimulation(identity:.current(seed:42))
+        let saved=try JSONDecoder().decode(RunState.self,from:JSONEncoder().encode(current.state))
+        XCTAssertEqual(try GameSimulation(snapshot:saved).state.speed,current.state.speed)
+        var invalid=current.state;invalid.rules.maximumSpeed=16
+        XCTAssertThrowsError(try GameSimulation(snapshot:invalid))
     }
     func testNarrowFastSteeringAndSnapshotBounds() throws {
         var simulation=GameSimulation(identity:DreamIdentity.current(seed:7));simulation.resume()
-        XCTAssertEqual(simulation.state.rules.lateralLimit/RunRules().lateralLimit,0.72,accuracy:1e-12)
+        XCTAssertEqual(simulation.state.rules.lateralLimit/1.25,0.72,accuracy:1e-12)
         XCTAssertEqual(SteeringNormalizer.normalize(degrees:12,fullScaleDegrees:simulation.state.rules.tiltFullScaleDegrees),1)
         simulation.state.player.lateral = -0.9
         for _ in 0..<30 {
@@ -74,10 +73,8 @@ final class CoreTests: XCTestCase {
         XCTAssertEqual(simulation.state.player.lateral,0.9,accuracy:0.002)
         for _ in 0..<30 {_=simulation.step(InputFrame(steering:-1))}
         XCTAssertEqual(simulation.state.player.lateral,-0.9,accuracy:0.002)
-        var invalid=simulation.state;invalid.player.lateral=1.1
+        var invalid=simulation.state;invalid.player.lateral=3
         XCTAssertThrowsError(try GameSimulation(snapshot:invalid))
-        var legacy=DreamIdentity(seed:7);legacy.rulesVersion=2
-        XCTAssertEqual(GameSimulation(identity:legacy).state.rules.lateralLimit,1.25)
     }
     func testNarrowRunCanBypassScheduledClover() {
         var simulation=GameSimulation(identity:DreamIdentity.current(seed:0));simulation.resume()
@@ -101,7 +98,7 @@ final class CoreTests: XCTestCase {
     }
     func safe() -> GameSimulation { var s=GameSimulation(identity:DreamIdentity(seed:42)); s.state.phase = .running; s.state.safeUntilDistance=1e9; return s }
     func testMovementAndPauseSnapshot() throws {
-        var s=safe(); for _ in 0..<90 { _=s.step(InputFrame(steering:1)) }; XCTAssertEqual(s.state.player.lateral,1.25,accuracy:0.0001)
+        var s=safe(); for _ in 0..<90 { _=s.step(InputFrame(steering:1)) }; XCTAssertEqual(s.state.player.lateral,0.9,accuracy:0.0001)
         _=s.step(InputFrame(jump:true)); XCTAssertGreaterThan(s.state.player.height,0)
         let bytes=try JSONEncoder().encode(s.state), restored=try JSONDecoder().decode(RunState.self,from:bytes)
         var r=try GameSimulation(snapshot:restored)
@@ -144,13 +141,13 @@ final class CoreTests: XCTestCase {
         let balls=(0..<300).flatMap{generator.chunk($0).hazards}.filter(\.isRollingSportsBall)
         XCTAssertFalse(balls.isEmpty)
         for var ball in balls {
-            XCTAssertEqual(ball.speed,8)
-            XCTAssertGreaterThanOrEqual((60-ball.radius-0.28)/(16+ball.speed),2)
+            XCTAssertTrue([8.0,10.0].contains(ball.speed))
+            XCTAssertGreaterThanOrEqual((72-ball.radius-0.28)/(22+ball.speed),2)
             ball.spawnTick=100
             XCTAssertFalse(ball.hasStartedMoving(at:99));XCTAssertEqual(ball.rollAngle(at:99),0)
             XCTAssertTrue(ball.hasStartedMoving(at:100))
-            XCTAssertEqual(ball.distance-ball.position(at:160),8,accuracy:1e-10)
-            XCTAssertEqual(ball.rollAngle(at:160),(8/ball.rollingRadius).truncatingRemainder(dividingBy:2*Double.pi),accuracy:1e-10)
+            XCTAssertEqual(ball.distance-ball.position(at:160),ball.speed,accuracy:1e-10)
+            XCTAssertEqual(ball.rollAngle(at:160),(ball.speed/ball.rollingRadius).truncatingRemainder(dividingBy:2*Double.pi),accuracy:1e-10)
         }
     }
     func testVisibleFootballTipMakesContact() {

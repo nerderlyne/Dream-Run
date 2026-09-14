@@ -32,6 +32,7 @@ import UIKit
     var rules=RunRules()
     var renderer:DreamRenderer?
     #if DEBUG
+    @Published var obstacleReview:DreamObstacle?
     @Published var collageMotion=false
     @Published var collageSceneIndex:Int?
     var artEquipped:[String:String]?
@@ -49,6 +50,7 @@ import UIKit
     var artReview=false
     var previousTime=0.0
     var clock=FixedStepClock()
+    private let horizonWarmup=HorizonWarmup()
     var provider:any RewardedContinueProvider = DisabledRewardProvider()
     var active:Bool { screen == "gameplay" }
     // Simulator has no motion sensor. This is a test-environment adapter, not a player setting.
@@ -79,7 +81,7 @@ import UIKit
                 directory=FileManager.default.temporaryDirectory.appendingPathComponent("DreamReview-\(UUID().uuidString)",isDirectory:true)
             }
             #endif
-            let store=try ProfileStore(url:directory.appendingPathComponent("profile-v1.json")); self.store=store; profile=store.profile; settings=profile.settings
+            let store=try ProfileStore(url:directory.appendingPathComponent("profile.json")); self.store=store; profile=store.profile; settings=profile.settings
             if store.recoveredBackup { error="A damaged save was preserved and the last good backup was recovered. Progress since that backup may be missing." }
             commerce=BalloonStore(store:store); renderer=DreamRenderer(palettes:palettes)
             renderer?.render(run,equipped:profile.equipped,menu:true)
@@ -111,6 +113,7 @@ import UIKit
                 if arguments.contains("--design-review") {
                     func arg(_ key:String,_ fallback:String)->String {arguments.firstIndex(of:key).flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1]:nil} ?? fallback}
                     labDesign(theme:theme,pose:pose,variant:Int(arg("--variant","0")) ?? 0,sky:arg("--sky","sky_cosmos"),pattern:TrackPattern(rawValue:arg("--pattern","checker")) ?? .checker,mirror:arguments.contains("--design-mirror"),contrast:arguments.contains("--design-contrast"))
+                    if let kind=DreamObstacle(rawValue:arg("--obstacle","")) {labObstacle(kind,striking:arguments.contains("--strike"))}
                     collageMotion=arguments.contains("--collage-moving")
                 }
 
@@ -135,7 +138,7 @@ import UIKit
     func start(identity:DreamIdentity? = nil,mode:RunMode? = nil) {
         artReview=false;renderer?.artPalette=nil;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
         #if DEBUG
-        artEquipped=nil;artIdle=false
+        artEquipped=nil;artIdle=false;obstacleReview=nil
         #endif
         guard store != nil, renderer != nil else { error="The game resources or profile could not be loaded."; return }
         if let identity, !identity.supported { error=DreamError.unsupportedVersion.localizedDescription; return }
@@ -259,8 +262,8 @@ import UIKit
                 if previousTime>0 {
                     for _ in 0..<(clock.consume(now-previousTime) ?? 0) {
                         // Review run uses the real simulation at normal speed; no rewards.
-                        simulation.state.safeUntilDistance=simulation.state.distance+1000
-                        _=simulation.step(input);input.jump=false;input.slide=false
+                        if obstacleReview == nil {simulation.state.safeUntilDistance=simulation.state.distance+1000}
+                        _=simulation.step(input);_=simulation.presentationStep(1.0/60);input.jump=false;input.slide=false
                     }
                 }
                 previousTime=now
@@ -288,6 +291,7 @@ import UIKit
             previousTime=0;return
         }
         guard active, renderer != nil else { previousTime=0; return }
+        horizonWarmup.request(run)
         let now=display.timestamp
         if previousTime == 0 { previousTime=now; return }
         let delta=now-previousTime; previousTime=now
@@ -305,6 +309,7 @@ import UIKit
         }
         for _ in 0..<steps {
             let events=simulation.step(input); input.jump=false; input.slide=false
+            if events.contains(.thunder) {audio.feedback(.thunder,settings:settings)}
             if events.contains(.stumble) { audio.feedback(.stumble,settings:settings) }
             else if events.contains(.clover) { audio.feedback(.clover,settings:settings) }
             else if events.contains(.balloon) { audio.feedback(.balloon,settings:settings) }
@@ -319,6 +324,23 @@ import UIKit
         audio.update(active:true,palette:run.paletteIndex,settings:settings)
     }
     #if DEBUG
+    func labObstacle(_ kind:DreamObstacle,striking:Bool=false) {
+        labCollage(index:0);obstacleReview=kind
+        simulation.state.safeUntilDistance=0;simulation.state.activeTicks=36000
+        simulation.state.distance=kind == .lightning ? (striking ? 118:72):90
+        let generator=WorldGenerator(simulation.state.identity)
+        simulation.state.chunks=(0...14).map {i in
+            ChunkDescription(id:i,routeFamily:.trackStraight,start:Double(i)*24,hazards:[],pickups:[],scenery:[],recipe:0)
+        }
+        let chunk=generator.encounterChunk(kind == .lightning ? 5:4,kind:kind,tier:2)
+        simulation.state.chunks[chunk.id]=chunk
+        simulation.state.hazards=chunk.hazards.map {h in
+            var h=h;h.spawnTick=simulation.state.activeTicks
+            if h.encounter == .lightning {h.strikeTick=simulation.state.activeTicks+(striking ? 0:164)}
+            return h
+        }
+        renderer?.lastRun=nil;renderer?.render(run,equipped:profile.equipped)
+    }
     func labDesign(theme:Int,pose:String="run",variant:Int=0,sky:String="sky_cosmos",pattern:TrackPattern = .checker,mirror:Bool=false,contrast:Bool=false) {
         labCollage(index:0)
         renderer?.artPalette=max(0,min(palettes.count-1,theme));renderer?.artPattern=pattern
@@ -340,8 +362,9 @@ import UIKit
         renderer?.render(run,equipped:artEquipped ?? [:],menu:artIdle)
     }
     func labCollage(index:Int) {
+        obstacleReview=nil
         artEquipped=nil;artIdle=false;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
-        artReview=true;renderer?.artPalette=nil
+        artReview=true;renderer?.artPalette=[0,2,4,6,1][((index%5)+5)%5]
         collageSceneIndex=((index%5)+5)%5;collageMotion=false
         let seed=DreamCollageComposition.proofSeeds[((index%5)+5)%5]
         simulation=GameSimulation(identity:.current(seed:seed),mode:.debug)

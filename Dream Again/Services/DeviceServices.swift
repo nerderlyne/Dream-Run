@@ -55,11 +55,11 @@ import UIKit
         if settings.haptics { UIImpactFeedbackGenerator(style:event == .clover ? .medium : .soft).impactOccurred(intensity:event == .stumble ? 0.65 : 0.3) }
         // Original short tone, bounded to one effect node at a time via the system sound-free engine.
         guard settings.effects else { return }; if !engine.isRunning { do { try engine.start() } catch { return } }
-        let rate=22050.0, count=2205
+        let rate=22050.0, count=event == .thunder ? 13230:2205
         guard let format=AVAudioFormat(standardFormatWithSampleRate:rate,channels:1), let buffer=AVAudioPCMBuffer(pcmFormat:format,frameCapacity:AVAudioFrameCount(count)), let samples=buffer.floatChannelData?[0] else { return }
         buffer.frameLength=AVAudioFrameCount(count)
-        let frequency=event == .clover ? 880.0 : event == .stumble ? 130.0 : 660.0
-        for i in 0..<count { let t=Double(i)/rate, envelope=sin(Double.pi*Double(i)/Double(count))*exp(-t*25); samples[i]=Float(sin(2*Double.pi*frequency*t)*envelope*0.09) }
+        let frequency=event == .clover ? 880.0 : event == .thunder ? 55.0 : event == .stumble ? 130.0 : 660.0
+        for i in 0..<count { let t=Double(i)/rate, envelope=sin(Double.pi*Double(i)/Double(count))*exp(-t*(event == .thunder ? 5:25)); let rumble=sin(2*Double.pi*frequency*t)+sin(2*Double.pi*83*t)*0.5+sin(2*Double.pi*127*t)*0.2; samples[i]=Float((event == .thunder ? rumble:sin(2*Double.pi*frequency*t))*envelope*0.09) }
         effect.stop(); effect.scheduleBuffer(buffer); effect.play()
     }
     func stop() { player.pause(); effect.stop(); engine.pause(); running=false }

@@ -33,7 +33,7 @@ public struct DreamConceptDefinition:Sendable {
 }
 public enum DreamRepresentationRegistry {
     public static let concepts:[DreamConceptDefinition] = AssetID.allCases.map { id in
-        let interactive:Set<AssetID>=[.trackStraight,.trackCurve,.trackRamp,.stairsStraight,.stairsCurve,.stairsSpiral,.platform,.trackBroken,.column,.mirror,.balloon,.soccer,.eightBall,.softball,.americanFootball,.nazar,.clover,.horse,.zebra,.rabbit,.pig]
+        let interactive:Set<AssetID>=[.trackStraight,.trackCurve,.trackRamp,.stairsStraight,.stairsCurve,.stairsSpiral,.platform,.trackBroken,.column,.mirror,.window,.bed,.chair,.moon,.cloud,.balloon,.soccer,.eightBall,.softball,.americanFootball,.nazar,.clover,.horse,.zebra,.rabbit,.pig]
         return .init(semanticID:id,requiresGameplay3D:interactive.contains(id),representations:DreamCollageKit.assets.filter{$0.concept == id})
     }
     public static func definition(for id:AssetID)->DreamConceptDefinition {concepts[id.rawValue-1]}

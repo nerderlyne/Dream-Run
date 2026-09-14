@@ -5,7 +5,7 @@
   "deployment_target_ios": "18.0",
   "versions": {
     "generator": 1,
-    "rules": 4,
+    "rules": 1,
     "content": 1,
     "save": 1
   },
@@ -14,9 +14,8 @@
     "max_catchup_steps": 4,
     "stall_pause_seconds": 0.25,
     "base_speed_mps": 12.25,
-    "max_speed_mps": 16.0,
-    "speed_time_constant_seconds": 300.0,
-    "speed_model": "v(t)=12.25+3.75*(1-exp(-t/300)); t is active gameplay seconds; R1 retains 7+9*(1-exp(-t/300))"
+    "max_speed_mps": 22.0,
+    "speed_model": "Active-time linear stages: 12.25 at 0s, 16 at 120s, 19 at 300s, 22 at 600s; capped thereafter"
   },
   "movement": {
     "track_width_m": 4.0,
@@ -64,7 +63,8 @@
       90,
       210
     ],
-    "safe_drop_max_seconds": 3.0
+    "safe_drop_max_seconds": 3.0,
+    "min_track_width_m": 2.4
   },
   "stumble": {
     "immunity_to_soft_hits_seconds": 0.8,

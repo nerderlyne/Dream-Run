@@ -3,8 +3,11 @@
 - Physical iPhone/iPad tilt, frame pacing, GPU memory, thermals and sustained rendering have not
   been measured in this pass. Simulator CPU timing is not device performance evidence; the
   native test process emitted CAMetalLayer drawable-allocation warnings despite passing assertions.
-- The six-hour/20-seed core traversal oracle was not rerun in this pass. The bounded traversal,
-  RNG, seed, pig, persistence and current renderer tests were run.
+- The six-hour/20-seed core oracle passed. It establishes safe simulated trajectories, not human
+  reaction-time/playability approval. The new difficulty curve needs physical-device playtesting.
+- Horizon warmup reduces cold certification work on the display thread; a cache miss still uses
+  synchronous validation. A palette-boundary CPU sample reached 19.514 ms. Hitch-free physical
+  gameplay is not yet verified.
 - Straw-doll structural reference images mentioned in the request were not supplied. The model
   follows the written reed/twine construction. Cloth and straw use articulated geometry, not physics.
 - Selected runtime screenshots are visual evidence, not approval of every asset/material/LOD,
@@ -21,8 +24,7 @@
 
 Acceptance gaps: A03/A04 (complete screens/error states and device-size matrix), B03 (physical
 tilt), C02–C06 (full silhouette/material/mood/semantic-contrast and render-budget review),
-E09 (full gallery/share flow), G06/G07 (StoreKit and actual rewarded-ad scenarios), H01
-(six-hour oracle not rerun), H02 (physical render soak), and H04 (device interruptions and
+E09 (full gallery/share flow), G06/G07 (StoreKit and actual rewarded-ad scenarios), H02 (physical render soak), and H04 (device interruptions and
 storage faults). The static contrast scene partly occludes the zebra behind the horse and
 the pig behind a balloon; it is not complete moving-encounter visibility evidence.
 No simulator screenshot establishes physical-device or store readiness.

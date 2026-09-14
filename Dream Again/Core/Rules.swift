@@ -1,21 +1,21 @@
 import Foundation
-/// Versioned tuning preserves saved dreams. R3 narrows and quickens steering.
+/// Current prerelease tuning; obsolete development tuning is not retained.
 public struct RunRules:Codable,Equatable,Sendable {
-    public var baseSpeed=7.0,maximumSpeed=16.0,speedTimeConstant=300.0
-    public var lateralLimit=1.25,lateralSpeed=4.5,smoothing=0.075
+    public var baseSpeed=12.25,maximumSpeed=22.0
+    public var lateralLimit=0.9,lateralSpeed=6.0,smoothing=0.04
     public var jumpVelocity=8.0,gravity=22.0
     public var slideTicks=51
-    public var tiltFullScaleDegrees:Double {lateralLimit < 1 ? 12 : 18}
-    public init(version:UInt16 = 1) {if version >= 2 {baseSpeed=12.25};if version >= 3 {lateralLimit=0.9;lateralSpeed=6;smoothing=0.04}}
+    public var tiltFullScaleDegrees:Double {12}
+    public init() {}
     public init(configData:Data) throws {
         self.init()
         guard let root=try JSONSerialization.jsonObject(with:configData) as? [String:Any],let simulation=root["simulation"] as? [String:Any],let movement=root["movement"] as? [String:Any],let pigs=root["pigs"] as? [String:Any],let deep=root["deep_dream"] as? [String:Any] else {throw DreamError.corruptStore}
         func number(_ object:[String:Any],_ key:String)throws->Double {guard let number=object[key] as? NSNumber,number.doubleValue.isFinite else {throw DreamError.corruptStore};return number.doubleValue}
         guard try number(pigs,"checkpoint_seconds") == 780,try number(pigs,"presence_denominator") == 2,try number(pigs,"clover_given_pig_denominator") == 3,try number(pigs,"after_continue_clover_given_pig_denominator") == 6,pigs["pity_system"] as? Bool == false,deep["end_run"] as? Bool == false else {throw DreamError.unsupportedVersion}
-        baseSpeed=try number(simulation,"base_speed_mps");maximumSpeed=try number(simulation,"max_speed_mps");speedTimeConstant=try number(simulation,"speed_time_constant_seconds")
+        baseSpeed=try number(simulation,"base_speed_mps");maximumSpeed=try number(simulation,"max_speed_mps")
         lateralLimit=try number(movement,"max_lateral_offset_m");lateralSpeed=try number(movement,"max_lateral_speed_mps");smoothing=try number(movement,"tilt_smoothing_seconds")
         jumpVelocity=try number(movement,"jump_velocity_mps");gravity=try number(movement,"gravity_mps2");slideTicks=Int((try number(movement,"slide_seconds")*60).rounded())
-        guard let versions=root["versions"] as? [String:Int],let version=versions["rules"], [1,2,3,4].contains(version),self == RunRules(version:UInt16(version)) else {throw DreamError.unsupportedVersion}
+        guard let versions=root["versions"] as? [String:Int],let version=versions["rules"], version == 1,self == RunRules() else {throw DreamError.unsupportedVersion}
     }
 }
 

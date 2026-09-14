@@ -42,6 +42,6 @@ Custom scheme and `.dream` document import are registered in `Configuration/Info
 
 ## Data, art and release
 
-Version-one mechanics load and validate against the bundled data contract. Changes require a new version implementation and migration/reproducibility evidence; the app preserves R1 movement defaults and supports R2 with a 12.25 m/s initial speed and R3 with the narrower, quicker steering. All geometry, the procedural icon and synthesized tones are original code-generated assets. Six supplied mood images remain only in `references/` and are not bundled.
+Current mechanics load and validate against the bundled data contract. This unreleased build has one G1/R1/C1 implementation; obsolete prerelease rule branches and saves are unsupported. The active-time speed curve runs from 12.25 to 22 m/s with ±0.9 m steering. The current development store is `profile.json`; discarded development stores are not migrated. All geometry, the procedural icon and synthesized tones are original code-generated assets. Six supplied mood images remain only in `references/` and are not bundled.
 
 Run `python3 scripts/release_preflight.py [owner-config.json]`. This rejects enabled sales with example product IDs, enabled ads without IDs, non-HTTPS claimed URLs and bundled mood references. It does not replace actual StoreKit/ad/privacy, physical-device or App Store review testing.

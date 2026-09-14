@@ -3,7 +3,7 @@ import Foundation
 public enum AssetID: Int, Codable, CaseIterable, Sendable {
     case trackStraight = 1, trackCurve, trackRamp, stairsStraight, stairsCurve, stairsSpiral, platform, trackBroken, arch, column, mirror, window, roomShell, house, tower, fountain, chair, bed, tree, flower, mushroom, rock, mountain, cloud, water, moon, balloon, heart, star, soccer, eightBall, softball, americanFootball, nazar, ribbon, curtain, clover, rail, horse, zebra, rabbit, pig
 }
-public enum Encounter: String, Codable, CaseIterable, Sendable { case breathing, dodge, rolling, gap, slide, jump, mirror, drop }
+public enum Encounter: String, Codable, CaseIterable, Sendable { case breathing, dodge, rolling, gap, slide, jump, step, swing, lightning, mirror, drop }
 public struct RouteSample: Codable, Equatable, Sendable {
     public var x: Double; public var y: Double; public var z: Double; public var yaw: Double
 }
@@ -25,6 +25,11 @@ public struct HazardDescription: Codable, Equatable, Identifiable, Sendable {
     public var spawnTick: UInt64 = 0
     public var resolved = false
     public var pig: PigDecision? = nil
+    public var motionPhase=0.0
+    public var strikeTick:UInt64 = UInt64.max
+    public var requiresJump:Bool {encounter == .jump || encounter == .step}
+    public func lateral(at tick:UInt64)->Double {encounter == .swing ? lateral+0.95*sin(Double(tick)/60*2.2+motionPhase):lateral}
+    public func striking(at tick:UInt64)->Bool {strikeTick != UInt64.max && tick>=strikeTick && tick-strikeTick<24}
     public func position(at tick: UInt64) -> Double { distance - Double(tick >= spawnTick ? tick - spawnTick : 0) / 60 * speed }
     public var isRollingSportsBall:Bool {speed > 0 && [.soccer,.eightBall,.softball,.americanFootball].contains(asset)}
     public var rollingRadius:Double {asset == .americanFootball ? 0.35 : radius}
@@ -35,7 +40,7 @@ public struct HazardDescription: Codable, Equatable, Identifiable, Sendable {
     }
     // Football mesh has a 0.65 m lateral semi-axis; its visible tips must make contact.
     public var contactHalfWidth:Double {asset == .americanFootball ? max(radius,0.65) : radius}
-    public var fatal: Bool { asset == .rabbit || asset == .nazar || encounter == .slide }
+    public var fatal: Bool { asset == .rabbit || asset == .nazar || encounter == .slide || requiresJump || encounter == .swing || encounter == .lightning }
 }
 public struct PickupDescription: Codable, Equatable, Identifiable, Sendable {
     public var id: String; public var distance: Double; public var lateral: Double; public var height: Double = 0.9
@@ -53,6 +58,9 @@ public struct ChunkDescription: Codable, Equatable, Identifiable, Sendable {
     public var recipe: Int
     public var gap: ClosedRange<Double>?
     public var drop: SafeDropContract?
+    public var halfWidth=2.0
+    public var step:DreamStep?
+    public var collapsing=false
     public var candidateAttempts=1
     public var fallbackReason:String?
     public var end: Double { start + 24 }
@@ -79,28 +87,28 @@ public struct WorldGenerator: Sendable {
 
     public func chunk(_ index: Int, tutorial: Bool = false) -> ChunkDescription {
         let start = Double(index) * 24
-        var route = identity.stream("route", 0), rng = identity.stream("hazards", index / 2), scenery = identity.stream("scenery", index)
+        var route = identity.stream("route", 0), scenery = identity.stream("scenery", index)
         let families: [AssetID] = [.trackStraight,.trackCurve,.trackRamp,.stairsStraight,.stairsCurve,.stairsSpiral,.platform]
         var mood=identity.stream("mood",0)
         let recipe=(Int(mood.below(6))+index/18)%6
         var result = ChunkDescription(id: index, routeFamily: families[(Int(route.below(7))+index/2)%7], start: start, hazards: [], pickups: [], scenery: [], recipe: recipe)
-        let anchor = Double(index / 2) * 48 + 36
-        if index % 2 == 1 && start > 72 {
-            var order:[Encounter]=[.dodge,.rolling,.gap,.slide,.jump,.breathing]
-            var ordering=identity.stream("hazardOrder",index/12)
-            for j in stride(from:5,through:1,by:-1) {order.swapAt(j,Int(ordering.below(UInt64(j+1))))}
-            let e=order[(index/2)%6]
-            let asset: AssetID = e == .dodge ? .rabbit : e == .slide ? (rng.below(2) == 0 ? .zebra : .horse) : e == .jump ? .column : [.soccer,.eightBall,.softball,.americanFootball,.nazar][Int(rng.below(5))]
-            if e == .gap {
-                result.gap = (anchor - 1.8)...(anchor + 1.8); result.routeFamily = .trackBroken
-            } else if e != .breathing {
-                result.hazards.append(HazardDescription(id: "h:\(index)", asset: asset, encounter: e, distance: anchor, lateral: (e == .slide || e == .jump) ? 0 : (rng.below(2) == 0 ? -0.8 : 0.8), radius: asset == .nazar ? 0.7 : 0.45, height: e == .slide ? 2.4 : e == .jump ? 0.45 : asset == .rabbit ? 0.8 : 0.9, speed: e == .rolling ? (identity.rulesVersion >= 4 ? 8 : 4) : 0))
+        if start>72 {
+            let tier=DreamDifficulty.tier(distance:start)
+            if index%2 == 1 || (tier>0 && index%6 != 0) {
+                let kind=obstacle(index)
+                // Alternate a simple setup with the principal action, avoiding consecutive low gates.
+                let c=encounterChunk(index,kind:index%2 == 1 ? kind : (kind == .window ? .furniture:.animals),tier:tier)
+                result.hazards=c.hazards;result.gap=c.gap;result.step=c.step
+                result.collapsing=c.collapsing;result.halfWidth=c.halfWidth;result.routeFamily=c.routeFamily
+                if index%2 == 0 && kind != .window {
+                    result.hazards=[HazardDescription(id:"setup:\(index)",asset:.nazar,encounter:.dodge,distance:start+12,lateral:-0.7,radius:0.42,height:1.4)]
+                }
             }
         }
         // Safe transitions own a wide, hazard-free horizon on either side.
         let local = start.truncatingRemainder(dividingBy: 1800)
         if local >= 1080 && local < 1708 {result.routeFamily = .stairsSpiral}
-        if local >= 792 && local <= 1008 || local <= 72 && start >= 1800 { result.hazards = []; result.gap = nil }
+        if local >= 864 && local <= 936 || local <= 48 && start >= 1800 { result.hazards = []; result.gap = nil;result.step=nil;result.collapsing=false;result.halfWidth=2 }
         if local == 888 { result.drop = SafeDropContract(departure: start + 12, landing: start + 28) }
         if local == 0 && start >= 1800 { result.hazards = [HazardDescription(id: "mirror:\(index)", asset: .mirror, encounter: .mirror, distance: start + 12, lateral: 0, radius: 2, height: 4)] }
         if result.gap == nil && result.hazards.isEmpty {
@@ -116,7 +124,7 @@ public struct WorldGenerator: Sendable {
             result.scenery.append(SceneryPlacement(asset: list[(index*2+n)%list.count], distance: start + Double(n*12), lateral: (n == 0 ? -1 : 1) * Double(8 + scenery.below(8)), scale: 1.8 + Double(scenery.below(4))))
         }
         if tutorial && start < 432 {
-            result.hazards = []; result.gap = nil; result.routeFamily = .trackStraight
+            result.hazards = []; result.gap = nil;result.step=nil;result.collapsing=false;result.halfWidth=2; result.routeFamily = .trackStraight
             if index == 5 { result.gap = 132...134; result.routeFamily = .trackBroken }
             if index == 9 { result.hazards = [HazardDescription(id: "tutorial:slide", asset: .zebra, encounter: .slide, distance: 228, lateral: 0, radius: 2, height: 2.4)] }
             if index == 13 { result.hazards = [HazardDescription(id: "tutorial:rabbit", asset: .rabbit, encounter: .dodge, distance: 324, lateral: 0.7, radius: 0.35, height: 0.8)] }
@@ -138,11 +146,11 @@ public enum VisualPhase: String, Codable, Sendable {
 }
 public struct FairnessValidator {
     public static func validate(_ chunk: ChunkDescription) -> Bool {
-        guard chunk.hazards.count <= 1, chunk.drop?.validated != false else { return false }
-        if let gap = chunk.gap { guard gap.upperBound-gap.lowerBound <= 4.8 else { return false } }
+        guard chunk.halfWidth >= 1.2, chunk.hazards.count <= 2, chunk.drop?.validated != false else { return false }
+        if let gap = chunk.gap { guard gap.upperBound-gap.lowerBound <= 6.1 else { return false } }
         return chunk.hazards.allSatisfy { h in
             if h.encounter == .slide { return h.height >= 0.85 }
-            if h.encounter == .jump { return h.height <= 0.45 }
+            if h.requiresJump { return h.height <= 0.75 }
             return abs(h.lateral) + h.radius + 0.28 < 2 || h.encounter == .mirror
         }
     }

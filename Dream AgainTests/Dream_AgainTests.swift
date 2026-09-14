@@ -299,3 +299,44 @@ extension Dream_AgainTests {
         XCTAssertTrue(r.chunks[18] === chunk)
     }
 }
+
+extension Dream_AgainTests {
+    @MainActor func testObstacleGeometryAndLightningAnimation() throws {
+        let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
+        for kind in DreamObstacle.allCases {
+            game.labObstacle(kind)
+            XCTAssertEqual(game.run.mode,.debug)
+            for hazard in game.run.hazards {
+                guard let entity=renderer.obstacleModel(hazard),hazard.encounter != .step else {continue}
+                let bounds=entity.visualBounds(relativeTo:entity)
+                XCTAssertTrue(bounds.extents.x.isFinite);XCTAssertGreaterThan(bounds.extents.y,0)
+                if hazard.asset == .window {XCTAssertEqual(bounds.min.y,0.85,accuracy:0.02)}
+                if hazard.encounter == .lightning {
+                    let bolt=try XCTUnwrap(entity.findEntity(named:"lightning-bolt"))
+                    let warning=try XCTUnwrap(entity.findEntity(named:"strike-warning"))
+                    renderer.animateObstacle(entity,h:hazard,run:game.run)
+                    XCTAssertFalse(bolt.isEnabled);XCTAssertTrue(warning.isEnabled)
+                    var strike=game.run;strike.activeTicks=hazard.strikeTick
+                    renderer.animateObstacle(entity,h:hazard,run:strike)
+                    XCTAssertTrue(bolt.isEnabled)
+                    strike.activeTicks += 24
+                    renderer.animateObstacle(entity,h:hazard,run:strike)
+                    XCTAssertFalse(bolt.isEnabled);XCTAssertFalse(warning.isEnabled)
+                }
+            }
+        }
+    }
+    @MainActor func testObstacleAnimationReusesEntitiesAndRewardsStayDisabled() throws {
+        let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
+        game.labObstacle(.collapse)
+        let wallet=game.profile.balance
+        let roots=renderer.chunks.mapValues{ObjectIdentifier($0)}
+        for _ in 0..<20 {
+            game.simulation.state.distance += 0.1
+            renderer.render(game.run,equipped:game.profile.equipped)
+        }
+        for (id,root) in roots {XCTAssertEqual(renderer.chunks[id].map{ObjectIdentifier($0)},root)}
+        XCTAssertEqual(game.profile.balance,wallet)
+        XCTAssertFalse(game.run.unbroken)
+    }
+}

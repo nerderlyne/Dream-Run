@@ -53,10 +53,10 @@ Snapshots occur every 15 active seconds and on pause, rare-event commitment/coll
 
 A `.dream` file contains only `format` and `dreamID`, is limited to 32 KiB and always imports as Revisit. The custom URL is `dreamagain://dream/<code>`; no owned HTTPS domain or universal association is claimed.
 
-Current running speed starts at **12.25 m/s**, with a **16 m/s** cap. Steering spans **±0.9 m**,
+Current running speed starts at **12.25 m/s**, rising to **16 m/s at two minutes, 19 m/s at five minutes, and a 22 m/s cap at ten minutes**. Steering spans **±0.9 m**,
 with 6 m/s lateral movement, 40 ms smoothing and 12° calibrated full-scale tilt.
 
-Dreams use the current 35-image collage pipeline, a straw doll runner and vivid track materials. Balls approach at **8 m/s** and rotate with their travelled distance. There is no alternate legacy art renderer.
+Dreams use the current 35-image collage pipeline, a straw doll runner and vivid track materials. Balls approach at **8 m/s**, with **10 m/s** volleys in the hardest tier and rotate with their travelled distance. There is no alternate legacy art renderer.
 
 For the collage proof, open the DEBUG Lab and choose collage 1–5. Use run/freeze to inspect world-space motion. Simulator launch arguments are `--art-review --collage-scene 0` (0–4), optionally `--collage-moving`. All proof runs are DEBUG-only and earn no rewards. Details and exact kit contents: [collage pipeline](docs/HYBRID_COLLAGE_PIPELINE.md).
 
@@ -67,3 +67,23 @@ The visible path continues roughly 6.1 km ahead using simplified distant geometr
 See [visual direction](docs/VISUAL_ART_DIRECTION.md) and [current captures](evidence/design-review.md).
 The straw doll, six new atmosphere plates, mirror and track palette comparisons are captured
 from the actual simulator renderer. Historical art branches and superseded review files are removed.
+
+
+## Difficulty and obstacles
+
+New runs use one current ruleset and a fresh `profile.json` development store. Old prerelease
+rules/saves are unsupported; no compatibility implementation is retained.
+The deterministic generator mixes oversized stair jumps, broken floors, exposed bridges,
+low windows, swinging moons, collapsing tiles, sleeping furniture, ball volleys and the
+existing animal hazards. Ordinary stairs remain automatic. Amber broken-edge marks identify
+fatal gaps; the established white double marks identify safe drops. Ball hits slow and push
+the runner sideways, so contact near an exposed bridge edge can end the run.
+
+Lightning marks a fixed circle at least two active seconds before a short strike. Tilt clear
+of that circle; jumping does not avoid lightning. Pausing also pauses its warning clock.
+Patterns become denser after 1,200 metres and reach their hardest tier after 4,500 metres.
+The speed cap does not end the run or change pig probabilities.
+
+In DEBUG, open **Lab** and select any obstacle. Use **run**, **freeze**, and **again** to
+practice its actual collision behavior without earning rewards. For a static lightning
+strike preview, launch with `--art-review --design-review --obstacle lightning --strike`.

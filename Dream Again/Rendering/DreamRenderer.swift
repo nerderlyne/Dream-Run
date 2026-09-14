@@ -7,6 +7,7 @@ import simd
     let view: ARView
     let anchor=AnchorEntity(world:.zero)
     let world=Entity(), runner=Entity(), camera=PerspectiveCamera(), headAttachment=Entity()
+    var terrainKeys:[Int:String]=[:]
     let distantPath=DistantPathRenderer()
     let art=DreamArtDirection()
     let evolution=PaletteEvolution()
@@ -67,7 +68,7 @@ import simd
         let targetPalette=artPalette ?? (cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex)
         if lastRun != run.id {
             distantPath.reset();art.reset();art.invalidateEnvironment()
-            world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
+            world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); terrainKeys.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
             evolution.reset(palette:palette,definition:surfacePalettes[palette])
             art.environment(view:view)
         } else if newBase != base {
@@ -81,7 +82,12 @@ import simd
         if run.visual == .deepSparse && lastVisual != .deepSparse {view.environment.background = .color(.black)}
         palette=targetPalette;lastVisual=run.visual
         let active=Set(run.chunks.map(\.id))
-        for (id,e) in chunks where !active.contains(id) { e.removeFromParent(); chunks.removeValue(forKey:id) }
+        for (id,e) in chunks where !active.contains(id) { e.removeFromParent(); chunks.removeValue(forKey:id);terrainKeys.removeValue(forKey:id) }
+        for c in run.chunks {
+            let key="\(c.halfWidth)/\(String(describing:c.gap))/\(String(describing:c.step))/\(c.collapsing)"
+            if terrainKeys[c.id] != key {chunks[c.id]?.removeFromParent();chunks[c.id]=nil;terrainKeys[c.id]=key}
+        }
+        terrainKeys=terrainKeys.filter{active.contains($0.key)}
         for c in run.chunks where chunks[c.id] == nil {
             let root=Entity(),p=surfacePalettes[palette]
             let pattern=artPattern ?? TrackArt.pattern(identity:run.identity,distance:c.start)
@@ -93,19 +99,23 @@ import simd
                 if !cinematic && dropPosition >= 900 && dropPosition < 916 {continue}
                 // Real gaps and drops never receive an invisible collision floor.
                 let sampleA=generator.sample(s),sampleB=generator.sample(s+1)
-                let a=local(sampleA,origin:origin), b=local(sampleB,origin:origin)
+                let elevation=Float(c.step?.height(at:middle) ?? 0)
+                let a=local(sampleA,origin:origin)+[0,elevation,0], b=local(sampleB,origin:origin)+[0,elevation,0]
                 let stair=[AssetID.stairsStraight,.stairsCurve,.stairsSpiral].contains(c.routeFamily)
                 let y=stair ? max(a.y,b.y) : a.y
                 let rightA=SIMD3<Float>(Float(cos(sampleA.yaw)),0,Float(sin(sampleA.yaw))), rightB=SIMD3<Float>(Float(cos(sampleB.yaw)),0,Float(sin(sampleB.yaw)))
                 for x in 0..<4 {
-                    let left=Float(x)-2, right=left+1
+                    let width=Float(c.halfWidth)
+                    let left=(Float(x)/2-1)*width, right=left+width/2
                     let aa=SIMD3<Float>(a.x,y,a.z)+rightA*left,bb=SIMD3<Float>(b.x,stair ? y : b.y,b.z)+rightB*left,cc=SIMD3<Float>(b.x,stair ? y : b.y,b.z)+rightB*right,dd=SIMD3<Float>(a.x,y,a.z)+rightA*right
                     if TrackArt.isLight(pattern,distance:Int(s),column:x) { light.quad(aa,dd,cc,bb) } else { dark.quad(aa,dd,cc,bb) }
                 }
                 let lower=SIMD3<Float>(0,-0.35,0)
-                deck.quad(a-rightA*2+lower,b-rightB*2+lower,b+rightB*2+lower,a+rightA*2+lower)
-                for x:Float in [-2.03,2.03] { let aa=a+rightA*x,bb=b+rightB*x;rim.tube([aa+[0,0.025,0],bb+[0,0.025,0]],radius:0.035,segments:4);deck.quad(aa,aa+lower,bb+lower,bb) }
-                if stair {deck.quad(a-rightA*2,a+rightA*2,a+rightA*2+[0,y-a.y,0],a-rightA*2+[0,y-a.y,0])}
+                deck.quad(a-rightA*Float(c.halfWidth)+lower,b-rightB*Float(c.halfWidth)+lower,b+rightB*Float(c.halfWidth)+lower,a+rightA*Float(c.halfWidth)+lower)
+                for x:Float in [-Float(c.halfWidth)-0.03,Float(c.halfWidth)+0.03] { let aa=a+rightA*x,bb=b+rightB*x;rim.tube([aa+[0,0.025,0],bb+[0,0.025,0]],radius:0.035,segments:4);deck.quad(aa,aa+lower,bb+lower,bb) }
+                let rise=elevation-Float(c.step?.height(at:s-0.5) ?? 0)
+                if rise != 0 {deck.quad(a-rightA*Float(c.halfWidth)-[0,rise,0],a+rightA*Float(c.halfWidth)-[0,rise,0],a+rightA*Float(c.halfWidth),a-rightA*Float(c.halfWidth))}
+                if stair {deck.quad(a-rightA*Float(c.halfWidth),a+rightA*Float(c.halfWidth),a+rightA*Float(c.halfWidth)+[0,y-a.y,0],a-rightA*Float(c.halfWidth)+[0,y-a.y,0])}
             }
             for (g,color,role) in [(light,UIColor(hex:p.track_light),"light"),(dark,UIColor(hex:p.track_dark),"dark"),(rim,UIColor(hex:p.accent_b),"rim"),(deck,UIColor(hex:p.fog),"deck")] where !g.positions.isEmpty {
                 if let mesh=try? g.resource() { let model=ModelEntity(mesh:mesh,materials:[factory.material(color,style:11)]);model.name="palette:\(role)";root.addChild(model) }
@@ -114,8 +124,10 @@ import simd
                 for s in [drop.departure-1,drop.departure-0.6] { var g=Geometry(); let pos=local(generator.sample(s),origin:origin); g.box(pos+[0,0.05,0],[4.2,0.05,0.1]); if let mesh=try? g.resource() { root.addChild(ModelEntity(mesh:mesh,materials:[UnlitMaterial(color:.white)])) } }
                 let landing=factory.build(.platform,palette:palette,lod:1); landing.scale=[1.25,1,0.18]; landing.position=local(generator.sample(drop.landing+2),origin:origin); root.addChild(landing)
             }
+            terrainDecorations(c,root:root,generator:generator,origin:origin,palette:p)
             chunks[c.id]=root; world.addChild(root);evolution.register(root,palette:palette,palettes:surfacePalettes,art:art)
         }
+        animateTerrain(run)
         distantPath.update(run:run,origin:origin,palette:surfacePalettes[palette],world:world)
         let activeHazards=Set(run.hazards.filter{ !$0.resolved }.map(\.id))
         for (id,e) in hazards where !activeHazards.contains(id) { e.removeFromParent(); hazards.removeValue(forKey:id) }
@@ -128,15 +140,15 @@ import simd
                     pivot.name="rolling-ball";pivot.position.y=Float(h.rollingRadius)
                     mesh.position.y = -0.45
                     pivot.addChild(mesh);e.addChild(pivot)
-                } else {e=factory.build(h.asset,palette:palette,lod:0)}
-                if h.encounter == .jump { e.scale=[0.47,1,0.47]; e.orientation=simd_quatf(angle:.pi/2,axis:[0,0,1]) }
+                } else {e=obstacleModel(h) ?? factory.build(h.asset,palette:palette,lod:0)}
                 if h.pig?.clover == true { let clover=factory.build(.clover,palette:palette); clover.scale=[0.45,0.45,0.45]; clover.position=[0,0.7,0]; e.addChild(clover) }
                 world.addChild(e); hazards[h.id]=e
             }
             let routeSample=generator.sample(h.position(at:run.activeTicks))
-            e.position=local(routeSample,origin:origin,lateral:h.lateral)
+            e.position=local(routeSample,origin:origin,lateral:h.lateral(at:run.activeTicks))+[0,Float(run.floorHeight(at:h.position(at:run.activeTicks))),0]
             e.orientation=simd_quatf(angle:-Float(routeSample.yaw),axis:[0,1,0])
-            if h.encounter == .jump {e.orientation *= simd_quatf(angle:.pi/2,axis:[0,0,1]);e.position += [Float(cos(routeSample.yaw))*2,0.225,Float(sin(routeSample.yaw))*2]}
+
+            animateObstacle(e,h:h,run:run)
             if let pivot=e.findEntity(named:"rolling-ball") {pivot.orientation=simd_quatf(angle:Float(h.rollAngle(at:run.activeTicks)),axis:[1,0,0])}
             e.isEnabled=h.hasStartedMoving(at:run.activeTicks) && run.pigs.count < 3 && (h.pig != nil || h.encounter == .mirror || h.position(at:run.activeTicks) >= run.safeUntilDistance)
         }
@@ -147,7 +159,8 @@ import simd
             let e=factory.build(.balloon,palette:palette,style:1,lod:0); e.position=local(generator.sample(p.distance),origin:origin,lateral:p.lateral)+[0,0.3,0]; world.addChild(e); pickups[p.id]=e
         }
         let position=local(generator.sample(visualDistance),origin:origin,lateral:run.player.lateral)
-        runner.position=position+[0,Float(run.player.height),0]; runner.isEnabled=true
+        runner.position=position+[0,Float(run.player.height+run.floorHeight(at:visualDistance)),0]; runner.isEnabled=true
+        if run.cause == "fell from edge" {runner.position.y -= Float(min(1.25,run.endingElapsed)*5)}
         let slide=run.player.slideTicks > 0, faint=run.pigs.count == 3 && run.endingElapsed > 51
         let stumble=cinematic ? Float(0) : Float(run.stumbleWeight)
         let stumbleAge=Float(1-run.stumbleWeight)
@@ -226,7 +239,7 @@ import simd
     }
     func preview(_ id:AssetID,palette:Int,style:Int,lod:Int,colliders:Bool = false) {
         art.invalidateEnvironment()
-        world.children.removeAll(); chunks.removeAll(); hazards.removeAll(); pickups.removeAll(); gallery=nil; runner.isEnabled=false; lastRun=nil
+        world.children.removeAll(); chunks.removeAll(); terrainKeys.removeAll(); hazards.removeAll(); pickups.removeAll(); gallery=nil; runner.isEnabled=false; lastRun=nil
         let e=factory.build(id,palette:palette,style:style,lod:lod); world.addChild(e); gallery=e
         let bounds=e.visualBounds(relativeTo:e), center=bounds.center, extent=max(bounds.extents.x,max(bounds.extents.y,bounds.extents.z))
         if colliders {
