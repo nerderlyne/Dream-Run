@@ -241,8 +241,12 @@ public struct GameSimulation: Sendable {
             contacts.append(Contact(t:t,priority:h.encounter == .mirror ? 5 : h.pig?.clover == true ? 3 : h.fatal ? 0 : 2,hazard:i))
         }
         for p in state.chunks.flatMap(\.pickups) where !state.collectedIDs.contains(p.id) {
-            guard let s=interval(oldDistance,state.distance,p.distance-0.55,p.distance+0.55), let x=interval(oldLateral,state.player.lateral,p.lateral-0.7,p.lateral+0.7), max(s.0,x.0) <= min(s.1,x.1), state.player.height < p.height+0.6 else { continue }
-            contacts.append(Contact(t:max(s.0,x.0),priority:4,pickup:p))
+            let before=p.balloonPosition(at:state.activeTicks-1),after=p.balloonPosition(at:state.activeTicks)
+            guard let s=interval(oldDistance,state.distance,p.distance-0.55,p.distance+0.55),
+                  let x=interval(oldLateral-before.lateral,state.player.lateral-after.lateral,-0.58,0.58),
+                  let y=interval(oldHeight-before.height,state.player.height-after.height,-state.player.bodyHeight-0.32,0.36),
+                  max(s.0,x.0,y.0) <= min(s.1,x.1,y.1) else {continue}
+            contacts.append(Contact(t:max(s.0,x.0,y.0),priority:4,pickup:p))
         }
         contacts.sort { abs($0.t-$1.t) < 1e-9 ? $0.priority < $1.priority : $0.t < $1.t }
         for c in contacts {

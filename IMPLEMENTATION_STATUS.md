@@ -5,6 +5,28 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 The locked pig/continue probabilities and nonterminal three-hour evolution are unchanged.
 
+## Moving balloon collection — September 14, 2026
+
+- Balloon bodies bob, sway and gently rise on a deterministic active-time trajectory. About
+  one quarter of ordinary pickups above 100 m float higher; a jump is needed when above reach.
+  Safe-drop guide balloons stay low. All balloons have a tied neck and thin curved string;
+  the bottom circle is removed.
+- The renderer and swept three-axis pickup collision share the same motion. Contact must reach
+  the balloon body, including while sliding/jumping; collection remains exactly once per ID.
+- Collection replaces the balloon with seven fading fragments for 0.4 active seconds and a soft
+  synthesized pop. At most 12 bursts live at once; repeated frames cannot replay the reward.
+- The HUD shows a rising, fading +1 receipt at the balloon total and a small counter pulse.
+  Rapid collections combine; Reduced Motion removes the travel/pulse. No extra XP currency/bar.
+- 46 optimized core tests passed (96.842 s), including the 20-seed six-hour oracle, motion bounds,
+  jump-only collection and duplicate protection. Native simulator suite: 22 passed; a subsequent
+  targeted effects test passed after the final effects/audio changes. Debug simulator build passed.
+  Specification validator: 51 passed. Logs: `evidence/balloon-core-tests.log`,
+  `evidence/balloon-native-tests.log`, `evidence/balloon-effects-test.log`.
+  Runtime motion and pop/counter evidence: `evidence/balloon-motion.mp4` and
+  `evidence/balloon-collection.png`. The final counter receipt has a fixed intrinsic width
+  after visual review caught its text being clipped by the narrow total.
+- No new Release build, UI suite or physical-device performance tests ran for this change.
+
 ## Soccer ball correction — September 14, 2026
 
 The soccer prefab now uses a spherical truncated-icosahedron panel layout: 12 black pentagons,

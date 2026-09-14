@@ -60,6 +60,14 @@ import UIKit
         buffer.frameLength=AVAudioFrameCount(count)
         let frequency=event == .clover ? 880.0 : event == .thunder ? 55.0 : event == .stumble ? 130.0 : 660.0
         for i in 0..<count { let t=Double(i)/rate, envelope=sin(Double.pi*Double(i)/Double(count))*exp(-t*(event == .thunder ? 5:25)); let rumble=sin(2*Double.pi*frequency*t)+sin(2*Double.pi*83*t)*0.5+sin(2*Double.pi*127*t)*0.2; samples[i]=Float((event == .thunder ? rumble:sin(2*Double.pi*frequency*t))*envelope*0.09) }
+        if event == .balloon {
+            for i in 0..<count {
+                let t=Double(i)/rate
+                let crack=sin(Double(i)*2.399)*exp(-t*160)
+                let chirp=sin(2*Double.pi*(1050*t-2200*t*t))*exp(-t*48)
+                samples[i]=Float(crack*0.13+chirp*0.055)
+            }
+        }
         effect.stop(); effect.scheduleBuffer(buffer); effect.play()
     }
     func stop() { player.pause(); effect.stop(); engine.pause(); running=false }

@@ -1,5 +1,7 @@
 # Known limitations
 
+- Rising-balloon jump timing and collection feedback need physical-device playtesting. Simulator
+  captures and deterministic collision tests do not establish human timing or frame pacing.
 - Physical iPhone/iPad tilt, frame pacing, GPU memory, thermals and sustained rendering have not
   been measured in this pass. Simulator CPU timing is not device performance evidence; the
   native test process emitted CAMetalLayer drawable-allocation warnings despite passing assertions.

@@ -380,3 +380,23 @@ extension Dream_AgainTests {
         await fulfillment(of:[captured],timeout:15)
     }
 }
+
+extension Dream_AgainTests {
+    @MainActor func testBalloonsMoveWithoutRebuildingAndPopEffectsExpire() throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        game.labCollage(index:0)
+        let id=try XCTUnwrap(r.pickups.keys.first),entity=try XCTUnwrap(r.pickups[id])
+        let before=entity.position
+        game.simulation.state.activeTicks += 30
+        r.render(game.run,equipped:[:])
+        XCTAssertTrue(r.pickups[id] === entity);XCTAssertNotEqual(before,entity.position)
+        game.simulation.state.collectedIDs.insert(id);game.simulation.state.balloons += 1
+        r.render(game.run,equipped:[:])
+        XCTAssertNil(r.pickups[id]);XCTAssertEqual(r.balloonPops.activeCount,1)
+        r.render(game.run,equipped:[:]);XCTAssertEqual(r.balloonPops.activeCount,1)
+        game.simulation.state.activeTicks += 24;r.render(game.run,equipped:[:])
+        XCTAssertEqual(r.balloonPops.activeCount,0)
+        for _ in 0..<30 {r.balloonPops.spawn(at:.zero,world:r.world,tick:0)}
+        XCTAssertEqual(r.balloonPops.activeCount,12);r.balloonPops.reset();XCTAssertEqual(r.balloonPops.activeCount,0)
+    }
+}

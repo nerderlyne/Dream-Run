@@ -110,7 +110,7 @@ struct ContentView:View {
                 HStack(spacing:20) {
                     Text(game.time(game.run.activeTicks)).monospacedDigit().tracking(2)
                     Spacer()
-                    Label("\(game.run.balloons)",systemImage:"balloon").monospacedDigit()
+                    BalloonCounter(total:game.run.balloons,tick:game.run.activeTicks,runID:game.run.id,reducedMotion:game.settings.reducedMotion)
                     Button {game.pause()} label:{Image(systemName:"pause").frame(width:44,height:44)}.accessibilityLabel("pause").accessibilityIdentifier("pause")
                 }.font(.system(size:14,weight:.medium)).padding(.leading,24).padding(.trailing,12).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.65) : .white).shadow(color:.black.opacity(0.5),radius:5,y:1)
                 if game.run.mode != .fresh {Text(game.run.mode == .debug ? "PREVIEW · NO REWARDS" : game.run.mode.rawValue.uppercased()).font(.system(size:9,weight:.medium)).tracking(2).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.5) : .white.opacity(0.7)).allowsHitTesting(false)}

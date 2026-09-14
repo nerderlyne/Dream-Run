@@ -182,7 +182,10 @@ extension UIColor {
             sphere(&body,[0,1.1,0],[1.1,1.1,1.1]); bodyColor=UIColor(hex:"#EEE6CD")
             for n in 0..<5 { let a=Float(n)*2.1; sphere(&trim,[cos(a)*0.6,1.1+sin(a)*0.6,0.91],[0.14,0.11,0.04]) }
         case .balloon:
-            sphere(&body,[0,0.65,0],[0.3,0.4,0.3]); body.polygon([[-0.06,0],[0.06,0],[0,0.1]],center:[0,0.19,0],depth:0.08); trim.tube([[0,0.22,0],[0.025,0,0],[-0.04,-0.23,0],[0,-0.45,0]],radius:0.012); ring(&semantic,[0,0.03,0],0.39,0.018)
+            sphere(&body,[0,0.65,0],[0.32,0.41,0.32])
+            body.polygon([[-0.055,0],[0.055,0],[0,0.085]],center:[0,0.20,0],depth:0.055)
+            trimColor=UIColor(hex:"#F4EBDD")
+            trim.tube((0...16).map {i in let t=Float(i)/16;return [0.045*sin(t*7),0.23-t*0.64,0.025*sin(t*5)]},radius:0.006,segments:6)
         case .heart: heart(&body,[0,1,0],1)
         case .star:
             let pts=(0..<10).map { n -> SIMD2<Float> in let t=Float(n)*Float.pi/5+Float.pi/2,r:Float=n%2 == 0 ? 1 : 0.44; return [cos(t)*r,sin(t)*r] }; body.polygon(pts,center:[0,1,0],depth:0.22)

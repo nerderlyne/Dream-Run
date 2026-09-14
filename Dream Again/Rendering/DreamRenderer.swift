@@ -22,6 +22,7 @@ import simd
     private var equippedCache:[String:String]?
     var gallery:Entity?
     var renderEntities = 0
+    let balloonPops=BalloonPopEffects()
     var frozenFrame: UIImage?
     var originalMaterials: [ObjectIdentifier:[PhysicallyBasedMaterial]] = [:]
     init(palettes:[PaletteDefinition]) {
@@ -68,7 +69,7 @@ import simd
         let targetPalette=artPalette ?? (cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex)
         if lastRun != run.id {
             distantPath.reset();art.reset();art.invalidateEnvironment()
-            world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); terrainKeys.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
+            balloonPops.reset();world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); terrainKeys.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
             evolution.reset(palette:palette,definition:surfacePalettes[palette])
             art.environment(view:view)
         } else if newBase != base {
@@ -154,10 +155,22 @@ import simd
         }
         let available=run.chunks.flatMap(\.pickups).filter { !run.collectedIDs.contains($0.id) }
         let ids=Set(available.map(\.id))
-        for (id,e) in pickups where !ids.contains(id) { e.removeFromParent(); pickups.removeValue(forKey:id) }
-        for p in available where pickups[p.id] == nil {
-            let e=factory.build(.balloon,palette:palette,style:1,lod:0); e.position=local(generator.sample(p.distance),origin:origin,lateral:p.lateral)+[0,0.3,0]; world.addChild(e); pickups[p.id]=e
+        for (id,e) in pickups where !ids.contains(id) {
+            if run.collectedIDs.contains(id) {balloonPops.spawn(at:e.position,world:world,tick:run.activeTicks)}
+            e.removeFromParent();pickups.removeValue(forKey:id)
         }
+        for p in available {
+            let e:Entity
+            if let existing=pickups[p.id] {e=existing} else {
+                e=factory.build(.balloon,palette:palette,style:1,lod:0);world.addChild(e);pickups[p.id]=e
+            }
+            let motion=p.balloonPosition(at:run.activeTicks)
+            let center=local(generator.sample(p.distance),origin:origin,lateral:motion.lateral)+[0,Float(motion.height+run.floorHeight(at:p.distance)),0]
+            // Rotate around the balloon body, so its collision center stays on the shared trajectory.
+            let rotation=simd_quatf(angle:Float(motion.roll),axis:[0,0,1])
+            e.orientation=rotation;e.position=center-rotation.act([0,0.65,0])
+        }
+        balloonPops.update(tick:run.activeTicks)
         let position=local(generator.sample(visualDistance),origin:origin,lateral:run.player.lateral)
         runner.position=position+[0,Float(run.player.height+run.floorHeight(at:visualDistance)),0]; runner.isEnabled=true
         if run.cause == "fell from edge" {runner.position.y -= Float(min(1.25,run.endingElapsed)*5)}
