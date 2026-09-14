@@ -56,17 +56,18 @@ public struct DreamCollagePlacement:Equatable,Sendable {
 public enum DreamCollageComposition {
     public static let slotCount=16
     public static let proofSeeds:[UInt64]=[42,117,802,2026,9001]
-    public static func plate(identity:DreamIdentity,section:Int)->DreamRepresentation {
-        var rng=identity.stream("collage-kit-C2-sky",section)
+    public static func plate(identity:DreamIdentity,section:Int,transition:Int=0)->DreamRepresentation {
+        var rng=identity.stream("collage-sky",section)
         let plates=DreamCollageKit.assets.filter(\.isPlate)
-        return plates[Int(rng.below(UInt64(plates.count)))]
+        let initial=Int(rng.below(UInt64(plates.count)))
+        return plates[(initial+transition*4)%plates.count]
     }
     public static func placement(identity:DreamIdentity,distance:Double,slot:Int)->DreamCollagePlacement {
         let period=slot<4 ? 768.0 : slot<12 ? 384.0 : 192.0
         let offset=Double(slot)*period/Double(slotCount)
         let cell=Int(floor((distance+offset)/period))
         let anchor=Double(cell)*period-offset
-        var rng=identity.stream("collage-kit-C2-slot-\(slot)",cell)
+        var rng=identity.stream("collage-slot-\(slot)",cell)
         let families:[AssetID]=slot == 0 ? [.moon] : slot<4 ? [.moon,.cloud,.cloud,.house,.arch] : slot<12 ? [.horse,.horse,.tree,.tree,.house,.arch,.window] : [.cloud,.cloud,.tree]
         let concept=families[Int(rng.below(UInt64(families.count)))]
         let choices=DreamCollageKit.assets.filter{$0.concept == concept}

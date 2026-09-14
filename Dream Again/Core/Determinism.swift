@@ -38,12 +38,10 @@ public struct DreamIdentity: Codable, Hashable, Sendable {
     public var contentVersion: UInt16 = 1
     public var seed: UInt64
     public init(seed: UInt64) { self.seed = seed }
-    public static func current(seed:UInt64) -> Self {var identity=Self(seed:seed);identity.rulesVersion=4;identity.contentVersion=2;return identity}
-    public var supported: Bool { generatorVersion == 1 && [1,2,3,4].contains(rulesVersion) && [1,2].contains(contentVersion) }
+    public static func current(seed:UInt64) -> Self {var identity=Self(seed:seed);identity.rulesVersion=4;return identity}
+    public var supported: Bool { generatorVersion == 1 && [1,2,3,4].contains(rulesVersion) && contentVersion == 1 }
     public func stream(_ domain: String, _ index: Int) -> SplitMix64 {
-        // C2 changes scenery representations only. Its simulation streams deliberately
-        // retain the C1 namespace; collage uses its own explicitly versioned domain.
-        SplitMix64(SplitMix64.fnv("DR1|G\(generatorVersion)|R\(rulesVersion)|C\(contentVersion == 2 ? 1 : contentVersion)|\(String(format: "%016llX", seed))|\(domain)|\(index)"))
+        SplitMix64(SplitMix64.fnv("DR1|G\(generatorVersion)|R\(rulesVersion)|C\(contentVersion)|\(String(format: "%016llX", seed))|\(domain)|\(index)"))
     }
     private static let alphabet = Array("0123456789ABCDEFGHJKMNPQRSTVWXYZ")
     static func base32(_ n: UInt64, count: Int) -> String {

@@ -30,24 +30,19 @@ struct PaletteTransition {
     private(set) var target=0
     private(set) var updatesLastFrame=0
     private var serial=0
-    private var lastSkyStep = -1
-    private var skyFrom=UIColor.white,skyTo=UIColor.white
     private var fogFrom=UIColor.white,fogTo=UIColor.white
     private(set) var fog=UIColor.white
     func reset(palette:Int,definition:PaletteDefinition) {
-        surfaces.removeAll();cursor=0;serial=0;target=palette;transition=nil;lastSkyStep = -1
-        skyFrom = palette == 5 ? .black : .white;skyTo=skyFrom;fog=UIColor(hex:definition.fog);fogFrom=fog;fogTo=fog
+        surfaces.removeAll();cursor=0;serial=0;target=palette;transition=nil
+        fog=UIColor(hex:definition.fog);fogFrom=fog;fogTo=fog
     }
     func request(_ palette:Int,seconds:Double,accelerated:Bool,palettes:[PaletteDefinition],art:DreamArtDirection) {
         guard palette != target else {return}
-        let prior=transition
-        let skyProgress=prior?.skyFraction(at:seconds) ?? 1
-        skyFrom=blend(skyFrom,skyTo,skyProgress);fogFrom=fog
+        fogFrom=fog
         let definition=palettes[palette]
-        skyTo=palette == 5 ? .black : blend(.white,UIColor(hex:definition.sky),0.65)
         fogTo=UIColor(hex:definition.fog)
         transition=PaletteTransition(from:target,to:palette,started:seconds,accelerated:accelerated)
-        target=palette;lastSkyStep = -1
+        target=palette
         surfaces.removeAll{$0.model.parent == nil}
         for i in surfaces.indices {surfaces[i].original=art.baseMaterials(of:surfaces[i].model);surfaces[i].applied = -1}
     }
@@ -83,7 +78,6 @@ struct PaletteTransition {
             let surface=surfaces[i]
             let materials=surface.original.enumerated().map {index,base in
                 var m=base;m.baseColor.tint=blend(base.baseColor.tint,colors[surface.roles[index]],t)
-                if surface.model.name == "atmosphere-cloud" {m.emissiveColor = .init(color:m.baseColor.tint,texture:base.emissiveColor.texture)}
                 return m
             }
             art.replaceBaseMaterials(of:surface.model,with:materials)
@@ -93,8 +87,6 @@ struct PaletteTransition {
         }
         let skyProgress=transition.skyFraction(at:seconds)
         fog=blend(fogFrom,fogTo,skyProgress)
-        let step=Int(skyProgress*80)
-        if step != lastSkyStep {lastSkyStep=step;art.tintSky(blend(skyFrom,skyTo,skyProgress))}
     }
     func voidWeight(seconds:Double)->Double {
         guard let transition else{return target == 5 ? 1 : 0}

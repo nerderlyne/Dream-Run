@@ -232,6 +232,36 @@
       "orientation": "front",
       "source": "/Users/shiv/.codex/generated_images/01a09a7a-9d3e-7c03-b81f-5fffaf7566ee/exec-e9f36f0e-b1a6-4999-b3f5-629de3062a76.png",
       "prompt": "Portrait 2:3 full opaque environment sky plate, painterly pink and lavender dawn atmosphere, exquisite softly brushed peach rose clouds across pale mauve sky, pearlescent pink calm ocean on lower third continuing to bottom, diffuse distant horizon. Restrained fine painterly texture with luminous depth. Empty atmosphere ONLY, no sun disc or moon, buildings, animals, trees, architecture, track, stairs, foreground land or objects, text, border or frame. Reusable canvas for procedural collage."
+    },
+    {
+      "id": "sky_cosmos",
+      "prompt": "Use case: stylized-concept. Asset type: opaque base atmosphere plate for a layered native 3D dream runner. Deep indigo open space, delicate distant stars and immense soft violet nebula haze. Restrained luminous dust, expansive quiet areas, no planets or moons. Portrait 2:3 aspect ratio. Fill the entire image edge to edge with atmosphere; tactile photographic dream quality, rich color, soft depth, no hard vignette. This is ONLY the furthest background canvas; the game adds all semantic objects separately. Absolutely no track, stairs, player, horses, trees, houses, arches, windows, moons, UI, text, logos, frame or foreground objects. Do not compose a finished level. Produce one image.",
+      "source": "/Users/shiv/.codex/generated_images/01a09a7a-9d3e-7c03-b81f-5fffaf7566ee/exec-59462c73-0bf5-45df-8899-709acbd6b316.png"
+    },
+    {
+      "id": "sky_underwater",
+      "prompt": "Use case: stylized-concept. Asset type: opaque base atmosphere plate for a layered native 3D dream runner. Immersed beneath a turquoise ocean, looking toward diffuse light through the water surface high above. Deep teal below, soft cyan light shafts and suspended haze. No seabed, coral, animals or objects. Portrait 2:3 aspect ratio. Fill the entire image edge to edge with atmosphere; tactile photographic dream quality, rich color, soft depth, no hard vignette. This is ONLY the furthest background canvas; the game adds all semantic objects separately. Absolutely no track, stairs, player, horses, trees, houses, arches, windows, moons, UI, text, logos, frame or foreground objects. Do not compose a finished level. Produce one image.",
+      "source": "/Users/shiv/.codex/generated_images/01a09a7a-9d3e-7c03-b81f-5fffaf7566ee/exec-b8a437e3-9c00-4ef9-aac7-9884c166f99d.png"
+    },
+    {
+      "id": "sky_aurora",
+      "prompt": "Use case: stylized-concept. Asset type: opaque base atmosphere plate for a layered native 3D dream runner. Vast midnight blue polar atmosphere with silky emerald and rose aurora curtains and tiny distant stars. Low indistinct ice horizon, gentle mist; no mountains as prominent subjects. Portrait 2:3 aspect ratio. Fill the entire image edge to edge with atmosphere; tactile photographic dream quality, rich color, soft depth, no hard vignette. This is ONLY the furthest background canvas; the game adds all semantic objects separately. Absolutely no track, stairs, player, horses, trees, houses, arches, windows, moons, UI, text, logos, frame or foreground objects. Do not compose a finished level. Produce one image.",
+      "source": "/Users/shiv/.codex/generated_images/01a09a7a-9d3e-7c03-b81f-5fffaf7566ee/exec-2fb2dfa0-5122-49e5-8024-90d8ff976d37.png"
+    },
+    {
+      "id": "sky_mirage",
+      "prompt": "Use case: stylized-concept. Asset type: opaque base atmosphere plate for a layered native 3D dream runner. Apricot and rose desert atmosphere, a hazy pale horizon with very distant nonspecific dunes, luminous heat-haze and peach cloud wisps. No discrete rocks, plants or architecture. Portrait 2:3 aspect ratio. Fill the entire image edge to edge with atmosphere; tactile photographic dream quality, rich color, soft depth, no hard vignette. This is ONLY the furthest background canvas; the game adds all semantic objects separately. Absolutely no track, stairs, player, horses, trees, houses, arches, windows, moons, UI, text, logos, frame or foreground objects. Do not compose a finished level. Produce one image.",
+      "source": "/Users/shiv/.codex/generated_images/01a09a7a-9d3e-7c03-b81f-5fffaf7566ee/exec-87ea6a26-9613-4d15-9a9c-fbe93ee32970.png"
+    },
+    {
+      "id": "sky_lavender_mist",
+      "prompt": "Use case: stylized-concept. Asset type: opaque base atmosphere plate for a layered native 3D dream runner. Dreamlike lavender atmosphere over a distant misty ocean, layers of pearl fog, very distant indistinct mauve mountain silhouettes below a spacious pale violet sky. Portrait 2:3 aspect ratio. Fill the entire image edge to edge with atmosphere; tactile photographic dream quality, rich color, soft depth, no hard vignette. This is ONLY the furthest background canvas; the game adds all semantic objects separately. Absolutely no track, stairs, player, horses, trees, houses, arches, windows, moons, UI, text, logos, frame or foreground objects. Do not compose a finished level. Produce one image.",
+      "source": "/Users/shiv/.codex/generated_images/01a09a7a-9d3e-7c03-b81f-5fffaf7566ee/exec-774c7bdb-bace-4091-b57f-e895a0fc3f27.png"
+    },
+    {
+      "id": "sky_opal_dawn",
+      "prompt": "Use case: stylized-concept. Asset type: opaque base atmosphere plate for a layered native 3D dream runner. Opalescent dawn sky with soft cream, powder blue and pale gold cloud layers over a distant silver ocean horizon. Atmospheric light scattering, broad pearlescent light, understated and luminous. Portrait 2:3 aspect ratio. Fill the entire image edge to edge with atmosphere; tactile photographic dream quality, rich color, soft depth, no hard vignette. This is ONLY the furthest background canvas; the game adds all semantic objects separately. Absolutely no track, stairs, player, horses, trees, houses, arches, windows, moons, UI, text, logos, frame or foreground objects. Do not compose a finished level. Produce one image.",
+      "source": "/Users/shiv/.codex/generated_images/01a09a7a-9d3e-7c03-b81f-5fffaf7566ee/exec-cf5bfbcb-e812-4f07-8232-8fbd52a05c7c.png"
     }
   ]
 }

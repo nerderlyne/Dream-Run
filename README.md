@@ -53,20 +53,17 @@ Snapshots occur every 15 active seconds and on pause, rare-event commitment/coll
 
 A `.dream` file contains only `format` and `dreamID`, is limited to 32 KiB and always imports as Revisit. The custom URL is `dreamagain://dream/<code>`; no owned HTTPS domain or universal association is claimed.
 
-Original app icon art is supplied in `Dream Again/Resources/DreamAgainIcon.png` with legacy bundle metadata. Production asset-catalogue renditions require validation after simulator access is available.
+Current running speed starts at **12.25 m/s**, with a **16 m/s** cap. Steering spans **±0.9 m**,
+with 6 m/s lateral movement, 40 ms smoothing and 12° calibrated full-scale tilt.
 
-R2 introduced initial forward speed **12.25 m/s** (1.75× the original 7 m/s), approaching the existing 16 m/s cap. Start a new dream to try this tuning. R1 saved codes and suspended runs retain their original speed and replay rules.
-
-**R3** narrowed steering to **±0.9 m** (28% narrower), with 6 m/s maximum lateral movement and 40 ms smoothing. Default full steering needs 12° of calibrated tilt. R3 retains the faster 12.25 m/s start; older saved dreams keep their own tuning.
-
-New dreams use **G1/R4/C2**, retaining the faster runner and narrow tilt range while balls approach at **8 m/s**. Sports-ball rotation follows their actual travelled distance. They first become visible already rolling on a 60 m approach. C2 adds the 29-piece procedural collage kit; C1 saved dreams remain supported with legacy scenery and the same gameplay RNG.
+Dreams use the current 35-image collage pipeline, a straw doll runner and vivid track materials. Balls approach at **8 m/s** and rotate with their travelled distance. There is no alternate legacy art renderer.
 
 For the collage proof, open the DEBUG Lab and choose collage 1–5. Use run/freeze to inspect world-space motion. Simulator launch arguments are `--art-review --collage-scene 0` (0–4), optionally `--collage-moving`. All proof runs are DEBUG-only and earn no rewards. Details and exact kit contents: [collage pipeline](docs/HYBRID_COLLAGE_PIPELINE.md).
 
 The visible path continues roughly 6.1 km ahead using simplified distant geometry that blends into the sky. Detailed scenery and gameplay remain streamed nearby.
 
-### Visual slice and full-frame landscapes
+### Current visual review
 
-The September visual pass adds PBR material families, smooth runner/rabbit stand-ins, layered clouds, water, moulded windows, a seeded horizon landscape and density evolution. In a Debug build, open **Lab → cloud slice / aqua slice / void slice**. Previews are frozen for inspection and never earn rewards; **pause → ready** runs the preview. Starting a normal dream clears art overrides.
-
-See [the visual/art replacement contract](docs/VISUAL_ART_DIRECTION.md), actual images under `evidence/art-*.png`, and the latest verification section in `IMPLEMENTATION_STATUS.md`. The images are simulator captures; final authored asset polish and physical-device performance are not certified.
+See [visual direction](docs/VISUAL_ART_DIRECTION.md) and [current captures](evidence/design-review.md).
+The straw doll, six new atmosphere plates, mirror and track palette comparisons are captured
+from the actual simulator renderer. Historical art branches and superseded review files are removed.

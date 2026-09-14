@@ -92,10 +92,18 @@ extension UIColor {
                 for j in 0..<4 { let c=SIMD3<Float>(x+Float(j)-1.5,y,-s); if (n+j)%2 == 0 { trim.box(c,[1,0.035,1]) } else { dark.box(c,[1,0.035,1]) } }
             }
             trimColor=UIColor(hex:p.track_light)
-        case .arch,.mirror:
+        case .arch:
             for x:Float in [-2.2,2.2] { body.box([x,1.6,0],[0.35,3.2,0.45]); trim.box([x,0.12,0],[0.6,0.24,0.7]) }
             body.tube((0...24).map { let t=Float($0)/24*Float.pi; return SIMD3<Float>(2.2*cos(t),3.2+2.2*sin(t),0) },radius:0.22)
-            if id == .mirror { dark.box([0,2.5,-0.1],[4.2,5,0.06]); darkColor = .black; trim.tube([[-1.7,0.5,0.02],[-1.5,4,0.02],[-0.8,4.5,0.02]],radius:0.018) }
+        case .mirror:
+            // The void and its frame share a rectangular opening; no square corners
+            // protrude from a curved arch. The black plane stays just behind the lip.
+            bodyColor=UIColor(hex:"#C99B43");trimColor=UIColor(hex:"#F6DEA1");darkColor = .black
+            for x:Float in [-2.25,2.25] {body.box([x,2.575,0],[0.3,5.45,0.3])}
+            for y:Float in [-0.075,5.225] {body.box([0,y,0],[4.8,0.3,0.3])}
+            dark.box([0,2.575,-0.04],[4.3,5.2,0.025])
+            for x:Float in [-2.115,2.385] {for sign:Float in [-1,1] {trim.tube([[sign*x,-0.16,0.16],[sign*x,5.36,0.16]],radius:0.018,segments:8)}}
+            for y:Float in [0.065,5.075,5.36,-0.16] {trim.tube([[-2.385,y,0.16],[2.385,y,0.16]],radius:0.018,segments:8)}
         case .column:
             body.tube([[0,0.2,0],[0,3.8,0]],radius:0.32,segments:12)
             for y:Float in [0.15,3.8,4] { trim.box([0,y,0],[0.95,0.2,0.95]) }
@@ -219,7 +227,7 @@ extension UIColor {
         }
         var count=0
         for (g,color) in [(body,bodyColor),(trim,trimColor),(dark,darkColor),(semantic,semanticColor)] where !g.positions.isEmpty {
-            do { let chosen:any Material = material(color,style:style)
+            do { let chosen:any Material = id == .mirror && color == UIColor.black ? UnlitMaterial(color:.black) : material(color,style:id == .mirror ? 2:style)
                 let entity=ModelEntity(mesh:try g.resource(),materials:[chosen]); root.addChild(entity); count += g.indices.count/3 }
             catch { assertionFailure("Procedural mesh \(id): \(error)") }
         }

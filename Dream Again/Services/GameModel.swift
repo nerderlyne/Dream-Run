@@ -34,6 +34,8 @@ import UIKit
     #if DEBUG
     @Published var collageMotion=false
     @Published var collageSceneIndex:Int?
+    var artEquipped:[String:String]?
+    var artIdle=false
     private var collageCaptureSignalled=false
     #endif
     var store:ProfileStore?
@@ -70,7 +72,13 @@ import UIKit
             rules=try RunRules(configData:Data(contentsOf:rulesURL))
             catalogue=try read("cosmetics","items"); achievements=try read("achievements","achievements"); assets=try read("asset_catalog","assets"); palettes=try read("palettes","palettes")
             guard assets.count == 42, assets.last?.id == "pig" else { throw DreamError.corruptStore }
-            let directory=try FileManager.default.url(for:.applicationSupportDirectory,in:.userDomainMask,appropriateFor:nil,create:true).appendingPathComponent("DreamAgain",isDirectory:true)
+            var directory=try FileManager.default.url(for:.applicationSupportDirectory,in:.userDomainMask,appropriateFor:nil,create:true).appendingPathComponent("DreamAgain",isDirectory:true)
+            #if DEBUG
+            let args=ProcessInfo.processInfo.arguments
+            if args.contains("--ui-test") || args.contains("--art-review") || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+                directory=FileManager.default.temporaryDirectory.appendingPathComponent("DreamReview-\(UUID().uuidString)",isDirectory:true)
+            }
+            #endif
             let store=try ProfileStore(url:directory.appendingPathComponent("profile-v1.json")); self.store=store; profile=store.profile; settings=profile.settings
             if store.recoveredBackup { error="A damaged save was preserved and the last good backup was recovered. Progress since that backup may be missing." }
             commerce=BalloonStore(store:store); renderer=DreamRenderer(palettes:palettes)
@@ -96,8 +104,14 @@ import UIKit
                     let character=arguments.firstIndex(of:"--character").flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1] : nil} ?? "girl"
                     let hat=arguments.firstIndex(of:"--hat").flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1] : nil} ?? "bare_head"
                     let equipped=["character":character,"hat":hat]
+                    artEquipped=equipped
                     renderer?.render(run,equipped:equipped)
                     if pose == "portrait" {renderer?.previewAvatar(equipped:equipped)}
+                }
+                if arguments.contains("--design-review") {
+                    func arg(_ key:String,_ fallback:String)->String {arguments.firstIndex(of:key).flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1]:nil} ?? fallback}
+                    labDesign(theme:theme,pose:pose,variant:Int(arg("--variant","0")) ?? 0,sky:arg("--sky","sky_cosmos"),pattern:TrackPattern(rawValue:arg("--pattern","checker")) ?? .checker,mirror:arguments.contains("--design-mirror"),contrast:arguments.contains("--design-contrast"))
+                    collageMotion=arguments.contains("--collage-moving")
                 }
 
 
@@ -119,7 +133,10 @@ import UIKit
         do { try store.transaction(action); refresh() } catch { self.error=error.localizedDescription; simulation.pause() }
     }
     func start(identity:DreamIdentity? = nil,mode:RunMode? = nil) {
-        artReview=false;renderer?.artPalette=nil
+        artReview=false;renderer?.artPalette=nil;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
+        #if DEBUG
+        artEquipped=nil;artIdle=false
+        #endif
         guard store != nil, renderer != nil else { error="The game resources or profile could not be loaded."; return }
         if let identity, !identity.supported { error=DreamError.unsupportedVersion.localizedDescription; return }
         let selectedMode=mode ?? (identity == nil ? (profile.achievements.contains("first_dream") ? .fresh : .tutorial) : .revisit)
@@ -248,12 +265,12 @@ import UIKit
                 }
                 previousTime=now
             } else {previousTime=0}
-            renderer?.render(run,equipped:profile.equipped)
-            if !collageCaptureSignalled,renderer?.art.collage.ready == true,collageSceneIndex != nil {
+            renderer?.render(run,equipped:artEquipped ?? profile.equipped,menu:artIdle)
+            if !collageCaptureSignalled,renderer?.art.collage.ready == true {
                 let args=ProcessInfo.processInfo.arguments
                 if let i=args.firstIndex(of:"--collage-capture-token"),args.indices.contains(i+1),let token=UUID(uuidString:args[i+1]) {
                     let path=URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("collage-ready-\(token.uuidString).txt")
-                    try? Data("29 textures ready; C2; DEBUG no rewards".utf8).write(to:path,options:.atomic)
+                    try? Data("35 textures ready; DEBUG no rewards".utf8).write(to:path,options:.atomic)
                     collageCaptureSignalled=true
                 }
             }
@@ -302,7 +319,28 @@ import UIKit
         audio.update(active:true,palette:run.paletteIndex,settings:settings)
     }
     #if DEBUG
+    func labDesign(theme:Int,pose:String="run",variant:Int=0,sky:String="sky_cosmos",pattern:TrackPattern = .checker,mirror:Bool=false,contrast:Bool=false) {
+        labCollage(index:0)
+        renderer?.artPalette=max(0,min(palettes.count-1,theme));renderer?.artPattern=pattern
+        renderer?.art.collage.previewPlate=sky
+        let looks:[[String:String]]=[[:],["character":"girl","hat":"bow","body_color":"rose_body"],["character":"girl","hat":"nightcap","body_color":"pearl_body"],["hat":"moon_hat","body_color":"mint_body"],["hat":"beyond_crown","body_color":"pearl_body"]]
+        artEquipped=looks[((variant%looks.count)+looks.count)%looks.count]
+        artIdle=pose == "idle"
+        simulation.state.distance=61.3;simulation.state.activeTicks=300
+        if pose == "jump" {simulation.state.player.height=1.0}
+        if pose == "slide" {simulation.state.player.slideTicks=30}
+        simulation.state.chunks=[];simulation.state.hazards=[];simulation.streamChunks()
+        if mirror {simulation.state.hazards=[.init(id:"design-mirror",asset:.mirror,encounter:.mirror,distance:72,lateral:0,radius:2.1,height:5)]}
+        if contrast {
+            simulation.state.safeUntilDistance=0
+            simulation.state.hazards=[.init(id:"contrast-rabbit",asset:.rabbit,encounter:.dodge,distance:67,lateral:-1,radius:0.4,height:0.8),.init(id:"contrast-pig",asset:.pig,encounter:.dodge,distance:68,lateral:1,radius:0.4,height:0.8),.init(id:"contrast-nazar",asset:.nazar,encounter:.dodge,distance:72,lateral:0,radius:0.4,height:0.8),.init(id:"contrast-horse",asset:.horse,encounter:.slide,distance:79,lateral:0,radius:2,height:3),.init(id:"contrast-zebra",asset:.zebra,encounter:.slide,distance:89,lateral:0,radius:2,height:3)]
+        }
+        // Clear only this DEBUG preview's retained presentation, after the overrides.
+        renderer?.lastRun=nil
+        renderer?.render(run,equipped:artEquipped ?? [:],menu:artIdle)
+    }
     func labCollage(index:Int) {
+        artEquipped=nil;artIdle=false;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
         artReview=true;renderer?.artPalette=nil
         collageSceneIndex=((index%5)+5)%5;collageMotion=false
         let seed=DreamCollageComposition.proofSeeds[((index%5)+5)%5]
@@ -313,6 +351,7 @@ import UIKit
         simulation.streamChunks();screen="gameplay";renderer?.render(run,equipped:profile.equipped)
     }
     func labArt(theme:Int,distance:Double=37.5,pose:String="run") {
+        artEquipped=nil;artIdle=pose == "idle";renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
         collageSceneIndex=nil;collageMotion=false
         artReview=true;renderer?.artPalette=max(0,min(palettes.count-1,theme))
         simulation=GameSimulation(identity:DreamIdentity.current(seed:42),mode:.debug)

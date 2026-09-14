@@ -27,6 +27,8 @@ import UIKit
             m.roughness=0.3;m.emissiveColor = .init(color:tint);m.emissiveIntensity=0.35
         case 8: m.roughness=0.12;m.clearcoat=1.0;m.metallic=0.3 // wet stone / water
         case 9: m.roughness=1.0;m.specular=0.0 // absorptive void
+        case 10: m.roughness=0.86;m.specular=0.22;m.anisotropyLevel=0.75 // dry reed fibre
+        case 11: m.roughness=0.22;m.metallic=0.08;m.clearcoat=0.72;m.clearcoatRoughness=0.18 // vivid lacquer floor
         default: break
         }
         if [0,3,4,6,8].contains(style) {

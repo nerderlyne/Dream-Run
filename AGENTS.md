@@ -22,6 +22,8 @@ Mirrors lead through reflected void into a visual-state change. Safe drops alway
 
 ## Execution
 
+This game is unreleased. Replace superseded implementations and delete rejected art/review files. Do not add compatibility branches, duplicate catalogs or migrations solely to preserve earlier development builds.
+
 Inspect existing files and tools before changes; preserve unrelated user work. Use specification defaults instead of repeatedly asking product questions. Work in verified increments but continue through the entire scope, including 42 assets, economy, save/share, endings and tests. Maintain `IMPLEMENTATION_STATUS.md` with real completion evidence.
 
 Commit a real runnable Xcode project and shared schemes. The first greybox is a milestone, not the finished deliverable. Generate original recognizable procedural assets when external models are absent. No missing-file stubs, fake in-app purchases or copied unlicensed art/audio. The six mood images are reference-only, not production resources.

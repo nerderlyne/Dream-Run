@@ -166,7 +166,7 @@ struct ContentView:View {
             Text("your character").font(.headline)
             HStack {
                 Button(game.profile.equipped["character"] == "girl" ? "Girl · wearing dress" : "Girl · dress") {game.chooseCharacter("girl")}
-                Button(game.profile.equipped["character"] != "girl" ? "Runner · wearing trousers" : "Runner · trousers") {game.chooseCharacter("runner")}
+                Button(game.profile.equipped["character"] != "girl" ? "Doll · wearing ribbon" : "Doll · ribbon") {game.chooseCharacter("runner")}
             }.buttonStyle(.bordered)
             Text("Both looks are free. Hats and colours work with either.").font(.caption)
             Button("No hat") {if let item=game.catalogue.first(where:{$0.id == "bare_head"}) {game.equip(item)}}
@@ -234,6 +234,8 @@ struct ContentView:View {
                 HStack{Button("palette"){game.labPalette=(game.labPalette+1)%12;game.previewAsset()};Button("material"){game.labStyle=(game.labStyle+1)%8;game.previewAsset()};Button("LOD \(game.labLOD)"){game.labLOD=(game.labLOD+1)%3;game.previewAsset()}}
                 HStack {Button("cloud slice"){game.labArt(theme:0)};Button("aqua slice"){game.labArt(theme:1)};Button("void slice"){game.labArt(theme:5)}}.font(.caption)
                 HStack {Text("Collage kit");ForEach(0..<5,id:\.self){i in Button("\(i+1)"){game.labCollage(index:i)}}}.font(.caption)
+                HStack {Text("Straw doll");ForEach(0..<5,id:\.self){i in Button("\(i+1)"){game.labDesign(theme:i,variant:i,sky:DreamCollageKit.skyIDs[i])}}}.font(.caption)
+                HStack {ForEach(["idle","run","jump","slide"],id:\.self){pose in Button(pose){game.labDesign(theme:0,pose:pose)}}}.font(.caption)
                 Toggle("Show role bounds",isOn:$game.labColliders).onChange(of:game.labColliders){_,_ in game.previewAsset()}
                 HStack{TextField("Dream ID for world preview",text:$code).font(.caption).textFieldStyle(.roundedBorder);Button("preview"){game.labWorld(code)};Button("+24m"){game.labStep()}}
                 ScrollView(.horizontal){HStack{ForEach(["Rabbit","Nazar","Zebra","Ball","Mirror","Drop","Ordinary pig","Clover pig","Lucky Dream","Three hours","Sparse","Beyond","Void","Waking"],id:\.self){event in Button(event){game.labEvent(event)}.buttonStyle(.bordered)}}}

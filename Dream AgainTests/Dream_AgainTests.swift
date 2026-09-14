@@ -11,6 +11,23 @@ final class Dream_AgainTests:XCTestCase {
 }
 
 extension Dream_AgainTests {
+    @MainActor func testMirrorVoidCoversFrameOpening() throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        let mirror=r.factory.build(.mirror)
+        let panel=try XCTUnwrap(mirror.children.compactMap{$0 as? ModelEntity}.first{
+            $0.model?.materials.first is UnlitMaterial
+        })
+        let bounds=panel.visualBounds(relativeTo:mirror)
+        XCTAssertLessThan(bounds.min.x,-2.1);XCTAssertGreaterThan(bounds.max.x,2.1)
+        XCTAssertLessThan(bounds.min.y,0.075);XCTAssertGreaterThan(bounds.max.y,5.075)
+    }
+    @MainActor func testNormalDreamClearsVisualReviewOverrides() throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        game.labDesign(theme:3,variant:2,sky:"sky_underwater",pattern:.solid)
+        game.start()
+        XCTAssertNil(r.artPalette);XCTAssertNil(r.artPattern)
+        XCTAssertNil(r.art.collage.previewPlate);XCTAssertNil(game.artEquipped)
+    }
     func testRepresentationRegistryKeepsExactlyFortyTwoSemanticConcepts() throws {
         XCTAssertEqual(DreamRepresentationRegistry.concepts.count,42)
         XCTAssertEqual(Set(DreamRepresentationRegistry.concepts.map(\.semanticID)),Set(AssetID.allCases))
@@ -36,13 +53,13 @@ extension Dream_AgainTests {
         let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
         await renderer.art.collage.waitForPreload()
         XCTAssertEqual(renderer.art.collage.loadErrors,[])
-        XCTAssertEqual(renderer.art.collage.loadedTextureCount,29)
+        XCTAssertEqual(renderer.art.collage.loadedTextureCount,35)
         game.labCollage(index:0)
         renderer.render(game.run,equipped:game.profile.equipped)
         XCTAssertGreaterThan(renderer.art.collage.activeCardCount,5)
         XCTAssertEqual(renderer.art.collage.pooledCardCount,18)
         for _ in 0..<30 {renderer.render(game.run,equipped:game.profile.equipped)}
-        XCTAssertEqual(renderer.art.collage.loadedTextureCount,29)
+        XCTAssertEqual(renderer.art.collage.loadedTextureCount,35)
         XCTAssertTrue(renderer.art.collage.root.children.allSatisfy{$0.components[CollisionComponent.self] == nil})
         for asset in DreamCollageKit.assets {
             XCTAssertNotNil(Bundle.main.url(forResource:asset.resource,withExtension:"png"))
@@ -71,8 +88,8 @@ extension Dream_AgainTests {
             XCTAssertEqual(kit.root.children.map{ObjectIdentifier($0)},identities)
             XCTAssertLessThanOrEqual(kit.activeCardCount,18)
         }
-        for version:UInt16 in [1,2] {
-            game.labCollage(index:0);game.simulation.state.identity.contentVersion=version
+        do {
+            game.labCollage(index:0)
             game.simulation.state.id=UUID()
             var timings:[Double]=[]
             for tick in 0..<720 {
@@ -84,7 +101,7 @@ extension Dream_AgainTests {
                 if tick>=60 {timings.append((CFAbsoluteTimeGetCurrent()-start)*1000)}
             }
             timings.sort()
-            print("COLLAGE_CPU_C\(version) samples=\(timings.count) median_ms=\(timings[timings.count/2]) p95_ms=\(timings[Int(Double(timings.count)*0.95)]) max_ms=\(timings.last!) entities=\(r.renderEntities) cards=\(kit.activeCardCount)")
+            print("DREAM_RENDER_CPU samples=\(timings.count) median_ms=\(timings[timings.count/2]) p95_ms=\(timings[Int(Double(timings.count)*0.95)]) max_ms=\(timings.last!) entities=\(r.renderEntities) cards=\(kit.activeCardCount)")
         }
     }
     @MainActor func testCollageReviewClearsInitialGapsAndCannotEarn() throws {
@@ -125,10 +142,18 @@ extension Dream_AgainTests {
         let expected=try XCTUnwrap(UIColor(hex:"#F4F3EF").artSRGB.cgColor.components)
         for i in 0..<3 {XCTAssertEqual(actual[i],expected[i],accuracy:0.0001)}
     }
-    @MainActor func testAuthoredCharacterRejectsIncompleteArt() {
-        XCTAssertThrowsError(try AuthoredDreamRunner(entity:Entity()))
-        let e=Entity(),socket=Entity();socket.name="hat.socket";e.addChild(socket)
-        XCTAssertThrowsError(try AuthoredDreamRunner(entity:e))
+    @MainActor func testStrawCostumesRetainTheSameRig() throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        r.dress([:])
+        let head=try XCTUnwrap(r.runner.findEntity(named:"straw-head"))
+        let hips=r.legs.map{ObjectIdentifier($0)}
+        for hat in ["bow","nightcap","moon_hat","beyond_crown"] {
+            r.dress(["character":"girl","hat":hat])
+            XCTAssertTrue(r.runner.findEntity(named:"straw-head") === head)
+            XCTAssertEqual(r.legs.map{ObjectIdentifier($0)},hips)
+            XCTAssertNotNil(r.runner.findEntity(named:"straw-skirt"))
+        }
+        r.dress([:]);XCTAssertNil(r.runner.findEntity(named:"straw-skirt"))
     }
     @MainActor func testArtPreviewCannotEarnOrPersistRewards() throws {
         let game=GameModel(),balance=game.profile.balance,snapshot=game.profile.snapshot
@@ -167,7 +192,8 @@ extension Dream_AgainTests {
                     XCTAssertLessThan(bounds.extents.x,0.5,"Hat must stay head-sized: \(item.id)")
                     XCTAssertTrue(bounds.extents.y.isFinite)
                 } else {XCTAssertTrue(renderer.headAttachment.children.isEmpty)}
-                XCTAssertEqual(renderer.runner.findEntity(named:"ponytail") != nil,character == "girl")
+                XCTAssertNotNil(renderer.runner.findEntity(named:"straw-head"))
+                XCTAssertEqual(renderer.runner.findEntity(named:"straw-skirt") != nil,character == "girl")
             }
         }
         XCTAssertEqual(game.run.id,originalRun.id)
@@ -241,10 +267,9 @@ extension Dream_AgainTests {
     @MainActor func testPaletteBoundaryRetainsWorldAndChangesObjectsGradually() throws {
         let game=GameModel(),r=try XCTUnwrap(game.renderer)
         game.labArt(theme:0,distance:431.9)
-        game.simulation.state.identity.contentVersion=1 // Retained legacy scenery contract.
         let equipped=game.profile.equipped
         for _ in 0..<30 {r.render(game.run,equipped:equipped)}
-        let chunks=r.chunks,landmark=try XCTUnwrap(r.art.horizon.children.first)
+        let chunks=r.chunks,cards=r.art.collage.root.children.map{ObjectIdentifier($0)}
         let chunk=try XCTUnwrap(chunks[18])
         let track=try XCTUnwrap(chunk.children.first(where:{$0.name == "palette:light"}) as? ModelEntity)
         let before=try XCTUnwrap(track.model?.materials.first as? PhysicallyBasedMaterial).baseColor.tint
@@ -256,7 +281,7 @@ extension Dream_AgainTests {
         r.render(game.run,equipped:equipped)
         print("PALETTE_BOUNDARY_CPU_MS \((CFAbsoluteTimeGetCurrent()-boundaryStart)*1000)")
         XCTAssertEqual(r.art.environmentApplications,apps)
-        XCTAssertTrue(r.art.horizon.children.contains{$0 === landmark})
+        XCTAssertEqual(r.art.collage.root.children.map{ObjectIdentifier($0)},cards)
         for id in Set(chunks.keys).intersection(r.chunks.keys) {XCTAssertTrue(r.chunks[id] === chunks[id])}
         XCTAssertEqual((track.model?.materials.first as? PhysicallyBasedMaterial)?.baseColor.tint,before)
         for tick in 1...1500 {
@@ -267,7 +292,7 @@ extension Dream_AgainTests {
         let after=try XCTUnwrap(track.model?.materials.first as? PhysicallyBasedMaterial).baseColor.tint
         XCTAssertNotEqual(before,after)
         XCTAssertEqual(r.art.environmentApplications,apps,"Palette animation must not regenerate the environment")
-        XCTAssertTrue(r.art.horizon.children.contains{$0 === landmark})
+        XCTAssertEqual(r.art.collage.root.children.map{ObjectIdentifier($0)},cards)
         game.simulation.state.phase = .mirrorCrossing;r.artPalette=2
         r.render(game.run,equipped:equipped)
         XCTAssertEqual(r.evolution.transition?.accelerated,true)

@@ -26,6 +26,7 @@ import UIKit
     private(set) var loadedTextureCount=0
     private(set) var activeCardCount=0
     var ready:Bool {loadedTextureCount == DreamCollageKit.assets.count}
+    var previewPlate:String?
     var pooledCardCount:Int {slots.count+skies.count}
     var cardPositions:[SIMD3<Float>] {slots.map{$0.model.position}}
     init() {
@@ -79,10 +80,9 @@ import UIKit
     func update(run:RunState,origin:RouteSample,world:Entity,camera:PerspectiveCamera,aspect:Float,lowPower:Bool,voidWeight:Double) {
         guard slots.count == 16,skies.count == 2 else{return}
         if root.parent == nil {world.addChild(root)}
-        root.isEnabled=run.identity.contentVersion>=2
-        guard root.isEnabled else {activeCardCount=0;return}
+        root.isEnabled=true
         let density=DreamCollageComposition.density(seconds:run.seconds,visual:run.visual,voidWeight:voidWeight)
-        let sky=DreamCollageComposition.plate(identity:run.identity,section:Int(run.distance/1600))
+        let sky=DreamCollageKit.assets.first{$0.id == previewPlate && $0.isPlate} ?? DreamCollageComposition.plate(identity:run.identity,section:Int(run.distance/1600),transition:run.mirrorCount+run.dropCount)
         let current=skies[skyIndex],incoming=skies[1-skyIndex]
         if current.key.isEmpty,assign(sky,to:current) {current.key=sky.id}
         if current.key != sky.id && skyStarted == nil && !current.key.isEmpty,assign(sky,to:incoming) {
