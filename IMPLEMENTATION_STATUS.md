@@ -5,6 +5,30 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 The locked pig/continue probabilities and nonterminal three-hour evolution are unchanged.
 
+## Relative scale composition — September 14, 2026
+
+- One seeded scale-event budget per 768 m scene; only slot zero can become monumental/absurd.
+  Selection: 60% no anomaly, 15% miniature, 19% oversized, 5% monumental, 1% absurd.
+- Twelve small context slots, six ordinary slots and at most one modest oversized support.
+  Monumental/absurd events suppress that extra oversized support. All four vignette ingredients
+  obey this hierarchy. Scene subjects include horse, moon, chair, house, tree, window and arch.
+- Roughly a third of supporting scenery sits below route level. Large landmarks can be framed
+  whole, beneath the player, as crowns entering from below or as roots hanging from overhead.
+  Partial objects extend beyond the frame rather than always displaying their full silhouette.
+- Aspect/depth-aware sizes, smaller motion for small props and smooth approach fading stop
+  ordinary cards becoming accidental giants. Cards retain world-space perspective and their
+  assigned size until staggered replacement; no whole-scene resize at a boundary.
+- DEBUG Lab provides all five scale cases and normal play clears the override. No new assets,
+  textures or entities were added; 42 semantic families, gameplay, balloons and pig odds unchanged.
+- 11 scale/collage package tests passed, including 10,000 seeded scene selections, one-landmark
+  contrast budgets, inverse scale, approach fade and lower/partial framing. 23 native tests passed
+  before final tuning; two targeted native tests passed after the final scale/framing changes.
+  Debug simulator build and 51 specification checks passed. Tests recorded in
+  `evidence/scale-core-tests.log`, `evidence/scale-native-tests.log`, `evidence/scale-final-native.log`, `evidence/scale-spec.log`.
+- Matched simulator previews: `evidence/scale-gallery.html`. This is the current scale evidence;
+  earlier pilot/balloon galleries document their respective earlier changes.
+  No new Release build, complete core soak, UI suite or physical-device performance test ran.
+
 ## Moving balloon collection — September 14, 2026
 
 - Balloon bodies bob, sway and gently rise on a deterministic active-time trajectory. About

@@ -52,6 +52,7 @@ public struct DreamCollagePlacement:Equatable,Sendable {
     public let mirrored:Bool
     public let roll:Float
     public let opacity:Float
+    public var scaleRole:DreamScaleRole = .ordinary
 }
 public enum DreamCollageComposition {
     public static let slotCount=20
@@ -64,8 +65,9 @@ public enum DreamCollageComposition {
         let initial=Int(rng.below(UInt64(plates.count)))
         return plates[(initial+transition*4)%plates.count]
     }
-    public static func placement(identity:DreamIdentity,distance:Double,slot:Int)->DreamCollagePlacement {
-        if slot>=16 {return DreamVignette.selected(identity:identity,cell:cell(distance:distance,slot:slot)).placement(identity:identity,distance:distance,part:slot-16)}
+    public static func placement(identity:DreamIdentity,distance:Double,slot:Int,scaleEvent:DreamScaleEvent?=nil,framing:DreamScaleFraming?=nil)->DreamCollagePlacement {
+        let scale=DreamScaleComposition.plan(identity:identity,distance:distance,override:scaleEvent,framing:framing)
+        if slot>=16 {return DreamVignette.selected(identity:identity,cell:cell(distance:distance,slot:slot)).placement(identity:identity,distance:distance,part:slot-16,scaleEvent:scaleEvent)}
         let period=period(slot:slot)
         let offset=Double(slot)*period/16
         let cell=Int(floor((distance+offset)/period))
@@ -82,13 +84,18 @@ public enum DreamCollageComposition {
         let cycle=max(0,cell)/choices.count
         var bag=deck(cycle)
         if cycle>0 && bag.first?.id == deck(cycle-1).last?.id {bag.swapAt(0,1)}
-        let asset=bag[max(0,cell)%bag.count],concept=asset.concept!
+        var asset=bag[max(0,cell)%bag.count]
+        if slot==0 && scale.event != .none {
+            let variants=DreamCollageKit.assets.filter{$0.concept == scale.concept}
+            asset=variants[scale.scene%variants.count]
+        }
+        let concept=asset.concept!
         let depth=Float(period)+Float(80+rng.below(120))
         let height=depth*(concept == .moon ? 0.16 : concept == .cloud ? 0.13 : 0.12)+depth*Float(rng.below(100))/1000
         let side:Float=rng.below(2)==0 ? -1:1
         let lateral=side*depth*(0.10+Float(rng.below(160))/1000)
         let elevation=concept == .moon ? depth*(0.20+Float(rng.below(180))/1000) : concept == .cloud ? depth*Float(rng.below(200))/1000 : height*0.42-12+depth*Float(rng.below(100))/1000
-        return .init(representation:asset,cell:cell,anchorDistance:anchor,depth:depth,lateral:lateral,elevation:elevation,height:height,mirrored:rng.below(2)==0,roll:concept == .house && rng.below(4)==0 ? .pi : 0,opacity:concept == .moon ? 0.52 : concept == .cloud ? 0.28 : slot<8 ? 0.88 : 0.96)
+        return scale.compose(.init(representation:asset,cell:cell,anchorDistance:anchor,depth:depth,lateral:lateral,elevation:elevation,height:height,mirrored:rng.below(2)==0,roll:concept == .house && rng.below(4)==0 ? .pi : 0,opacity:concept == .moon ? 0.52 : concept == .cloud ? 0.28 : slot<8 ? 0.88 : 0.96),slot:slot)
     }
     public static func density(seconds:Double,visual:VisualPhase,voidWeight:Double)->Float {
         let cycle=seconds.truncatingRemainder(dividingBy:10800)

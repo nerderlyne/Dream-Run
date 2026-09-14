@@ -237,6 +237,8 @@ struct ContentView:View {
                 HStack {Text("Collage kit");ForEach(0..<5,id:\.self){i in Button("\(i+1)"){game.labCollage(index:i)}}}.font(.caption)
                 HStack {Text("Straw doll");ForEach(0..<5,id:\.self){i in Button("\(i+1)"){game.labDesign(theme:i,variant:i,sky:DreamCollageKit.skyIDs[i])}}}.font(.caption)
                 HStack {ForEach(["idle","run","jump","slide"],id:\.self){pose in Button(pose){game.labDesign(theme:0,pose:pose)}}}.font(.caption)
+                ScrollView(.horizontal){HStack{ForEach(DreamScaleFraming.allCases,id:\.self){framing in Button(framing.title){game.labScale(.absurd,framing:framing)}}}}.font(.caption)
+                ScrollView(.horizontal){HStack{ForEach(DreamScaleEvent.allCases,id:\.self){event in Button(event.title){game.labScale(event)}}}}.font(.caption)
                 ScrollView(.horizontal){HStack{ForEach(DreamVignette.allCases,id:\.self){scene in Button(scene.title){game.labVignette(scene)}}}}.font(.caption)
                 ScrollView(.horizontal){HStack{ForEach(DreamObstacle.allCases,id:\.self){kind in Button(kind.title){game.labObstacle(kind)}}}}.font(.caption)
                 Toggle("Show role bounds",isOn:$game.labColliders).onChange(of:game.labColliders){_,_ in game.previewAsset()}

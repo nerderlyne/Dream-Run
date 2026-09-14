@@ -24,7 +24,9 @@ extension Dream_AgainTests {
     @MainActor func testNormalDreamClearsVisualReviewOverrides() throws {
         let game=GameModel(),r=try XCTUnwrap(game.renderer)
         game.labDesign(theme:3,variant:2,sky:"sky_underwater",pattern:.solid)
+        game.labScale(.absurd,framing:.crownOnly)
         game.start()
+        XCTAssertNil(r.art.collage.previewScale);XCTAssertNil(r.art.collage.previewFraming)
         XCTAssertNil(r.artPalette);XCTAssertNil(r.artPattern)
         XCTAssertNil(r.art.collage.previewPlate);XCTAssertNil(game.artEquipped)
     }

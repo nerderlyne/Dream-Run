@@ -1,3 +1,21 @@
+## Creator clarification — scenery beneath the route and partial framing
+
+The visible dream must extend below the player as well as above. Compose lower foreground and
+underfoot scenery. Enormous objects need not fit wholly on screen: support a tree whose crown
+enters from below while its trunk/roots remain out of view, and overhead trees whose roots hang
+into view while branches extend offscreen. Apply this vertical framing vocabulary across semantic
+subjects while preserving relative scale contrast and readable gameplay.
+
+## Creator override — relative scenic scale (September 14, 2026)
+
+Scenic collage composition must emphasize scale contrast. Most objects are small, ordinary or
+visibly distant. Oversized objects are a minority; monumental landmarks are rare and absurd
+screen-dominating subjects extremely rare. A scene may have no scale anomaly. At most one
+semantic scale-event subject (horse/moon/chair/house/tree/window/arch) may dominate at once,
+with restrained smaller context objects around it. Support inverse events with miniature
+normally-large objects. Vignette components obey the same scene budget. Do not rescale the
+whole scene at a boundary. Sky coverage, track readability and 42 registered families remain.
+
 # DREAM AGAIN — complete game-system and implementation specification
 
 **Working title:** Dream Again. This is a project name, not a cleared commercial title.  

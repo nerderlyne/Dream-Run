@@ -93,3 +93,10 @@ select Whale Cottage, Jelly Garden, Inverted Procession, Floating Bedroom or Mid
 Launch a specific one with `--art-review --design-review --vignette 0` (0–4), optionally
 `--collage-moving`. See [runtime gallery and motion clip](evidence/pilot-gallery.html) and
 [exact prompts and provenance](docs/COLLAGE_PILOT.json). These previews earn no rewards.
+
+Relative scale previews: DEBUG Lab → Quiet scale / Miniature / Oversized / Monumental / Absurd.
+Use `--art-review --design-review --scale-event 0` (0–4) for matched captures.
+[Current scale comparison](evidence/scale-gallery.html) shows the same seed with each event forced.
+
+Vertical framing previews are also in DEBUG Lab: World below / Crown from below / Roots overhead.
+Use `--scale-event 4 --scale-framing 2` with the art-review flags for the crown-from-below case.

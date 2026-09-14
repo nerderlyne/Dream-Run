@@ -1,5 +1,8 @@
 # Known limitations
 
+- Scale-event probabilities are seeded per scene, not guaranteed screen appearances: camera
+  framing, density/void phases and approach fading can hide a selected subject. The matched
+  simulator gallery covers eight scale/framing cases; broader seed/device visual review remains outstanding.
 - Rising-balloon jump timing and collection feedback need physical-device playtesting. Simulator
   captures and deterministic collision tests do not establish human timing or frame pacing.
 - Physical iPhone/iPad tilt, frame pacing, GPU memory, thermals and sustained rendering have not

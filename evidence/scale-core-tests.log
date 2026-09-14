@@ -1,0 +1,47 @@
+Building for production...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/5] Compiling DreamCore BalloonMotion.swift
+[5/7] Compiling DreamCoreTests BalloonTests.swift
+[6/8] Compiling DreamCorePackageTests runner.swift
+[6/8] Write Objects.LinkFileList
+[7/8] Linking DreamCorePackageTests
+Build complete! (14.79s)
+Test Suite 'Selected tests' started at 2026-09-14 23:09:06.971.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-14 23:09:06.979.
+Test Suite 'CollageTests' started at 2026-09-14 23:09:06.979.
+Test Case '-[DreamCoreTests.CollageTests testBackgroundMotionIsBoundedDeterministicAndCanBeDisabled]' started.
+Test Case '-[DreamCoreTests.CollageTests testBackgroundMotionIsBoundedDeterministicAndCanBeDisabled]' passed (0.016 seconds).
+Test Case '-[DreamCoreTests.CollageTests testCurrentSeedRoundTrips]' started.
+Test Case '-[DreamCoreTests.CollageTests testCurrentSeedRoundTrips]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CollageTests testDensityIsNonterminalAndRebuilds]' started.
+Test Case '-[DreamCoreTests.CollageTests testDensityIsNonterminalAndRebuilds]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CollageTests testFiveRecombinationsAreStableAndDifferent]' started.
+Test Case '-[DreamCoreTests.CollageTests testFiveRecombinationsAreStableAndDifferent]' passed (0.003 seconds).
+Test Case '-[DreamCoreTests.CollageTests testKitCountsAndMetadata]' started.
+Test Case '-[DreamCoreTests.CollageTests testKitCountsAndMetadata]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CollageTests testPilotScenesAreLayerableAndApparitionsStayRare]' started.
+Test Case '-[DreamCoreTests.CollageTests testPilotScenesAreLayerableAndApparitionsStayRare]' passed (0.009 seconds).
+Test Case '-[DreamCoreTests.CollageTests testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies]' started.
+Test Case '-[DreamCoreTests.CollageTests testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies]' passed (0.022 seconds).
+Test Suite 'CollageTests' passed at 2026-09-14 23:09:07.032.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.052 (0.053) seconds
+Test Suite 'ScaleCompositionTests' started at 2026-09-14 23:09:07.032.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testApproachingSceneryFadesBeforeExceedingRoleBudget]' started.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testApproachingSceneryFadesBeforeExceedingRoleBudget]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.ScaleCompositionTests testEventFrequencyAndStableSceneSelection]' started.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testEventFrequencyAndStableSceneSelection]' passed (0.037 seconds).
+Test Case '-[DreamCoreTests.ScaleCompositionTests testSceneHierarchyHasOnlyOnePossibleLandmark]' started.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testSceneHierarchyHasOnlyOnePossibleLandmark]' passed (0.002 seconds).
+Test Case '-[DreamCoreTests.ScaleCompositionTests testUnderfootLayersAndPartialLandmarkFraming]' started.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testUnderfootLayersAndPartialLandmarkFraming]' passed (0.000 seconds).
+Test Suite 'ScaleCompositionTests' passed at 2026-09-14 23:09:07.072.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.040 (0.040) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-14 23:09:07.072.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.091 (0.092) seconds
+Test Suite 'Selected tests' passed at 2026-09-14 23:09:07.072.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.091 (0.101) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

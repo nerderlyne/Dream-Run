@@ -71,7 +71,7 @@ extension CollageTests {
                 for part in 0..<4 {
                     let a=scene.placement(identity:identity,distance:150,part:part)
                     XCTAssertTrue(a.representation.backgroundOnly);XCTAssertFalse(a.representation.interactive)
-                    XCTAssertGreaterThan(a.elevation-a.height/2,0)
+                    XCTAssertTrue(a.elevation.isFinite)
                     XCTAssertEqual(a,scene.placement(identity:identity,distance:150,part:part))
                 }
             }
@@ -80,7 +80,7 @@ extension CollageTests {
     func testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies() {
         var seen=Set<String>()
         let identity=DreamIdentity.current(seed:2026)
-        for slot in 0..<16 {
+        for slot in 1..<16 {
             var previous=""
             for cell in 1..<100 {
                 let distance=Double(cell)*DreamCollageComposition.period(slot:slot)

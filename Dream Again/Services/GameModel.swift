@@ -115,6 +115,7 @@ import UIKit
                     labDesign(theme:theme,pose:pose,variant:Int(arg("--variant","0")) ?? 0,sky:arg("--sky","sky_cosmos"),pattern:TrackPattern(rawValue:arg("--pattern","checker")) ?? .checker,mirror:arguments.contains("--design-mirror"),contrast:arguments.contains("--design-contrast"))
                     if let kind=DreamObstacle(rawValue:arg("--obstacle","")) {labObstacle(kind,striking:arguments.contains("--strike"))}
                     if let value=Int(arg("--vignette","-1")),let vignette=DreamVignette(rawValue:value) {labVignette(vignette)}
+                    if let value=Int(arg("--scale-event","-1")),let event=DreamScaleEvent(rawValue:value) {labScale(event,framing:DreamScaleFraming(rawValue:Int(arg("--scale-framing","-1")) ?? -1))}
                     collageMotion=arguments.contains("--collage-moving")
                 }
 
@@ -139,7 +140,7 @@ import UIKit
     func start(identity:DreamIdentity? = nil,mode:RunMode? = nil) {
         artReview=false;renderer?.artPalette=nil;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
         #if DEBUG
-        artEquipped=nil;artIdle=false;obstacleReview=nil;renderer?.art.collage.previewVignette=nil
+        artEquipped=nil;artIdle=false;obstacleReview=nil;renderer?.art.collage.previewVignette=nil;renderer?.art.collage.previewScale=nil;renderer?.art.collage.previewFraming=nil
         #endif
         guard store != nil, renderer != nil else { error="The game resources or profile could not be loaded."; return }
         if let identity, !identity.supported { error=DreamError.unsupportedVersion.localizedDescription; return }
@@ -326,6 +327,13 @@ import UIKit
         audio.update(active:true,palette:run.paletteIndex,settings:settings)
     }
     #if DEBUG
+    func labScale(_ event:DreamScaleEvent,framing:DreamScaleFraming?=nil) {
+        labCollage(index:0)
+        renderer?.art.collage.previewScale=event;renderer?.art.collage.previewFraming=framing
+        simulation.state.distance=200
+        renderer?.art.collage.reset();renderer?.lastRun=nil
+        renderer?.render(run,equipped:profile.equipped)
+    }
     func labVignette(_ kind:DreamVignette) {
         labCollage(index:kind.rawValue)
         renderer?.art.collage.previewVignette=kind
@@ -370,7 +378,7 @@ import UIKit
         renderer?.render(run,equipped:artEquipped ?? [:],menu:artIdle)
     }
     func labCollage(index:Int) {
-        obstacleReview=nil;renderer?.art.collage.previewVignette=nil
+        obstacleReview=nil;renderer?.art.collage.previewVignette=nil;renderer?.art.collage.previewScale=nil;renderer?.art.collage.previewFraming=nil
         artEquipped=nil;artIdle=false;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
         artReview=true;renderer?.artPalette=[0,2,4,6,1][((index%5)+5)%5]
         collageSceneIndex=((index%5)+5)%5;collageMotion=false

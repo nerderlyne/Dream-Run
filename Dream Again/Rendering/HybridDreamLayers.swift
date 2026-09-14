@@ -30,6 +30,8 @@ import UIKit
     var previewPlate:String?
     var previewVignette:DreamVignette?
     var reducedMotion=false
+    var previewScale:DreamScaleEvent?
+    var previewFraming:DreamScaleFraming?
     var pooledCardCount:Int {slots.count+skies.count}
     var cardPositions:[SIMD3<Float>] {slots.map{$0.model.position}}
     init() {
@@ -111,8 +113,8 @@ import UIKit
             let cell=DreamCollageComposition.cell(distance:run.distance,slot:i)
             let p:DreamCollagePlacement
             if let cached=slot.placement,cached.cell == cell {p=cached}
-            else if i>=16,let scene=previewVignette {p=scene.placement(identity:run.identity,distance:run.distance,part:i-16)}
-            else {p=DreamCollageComposition.placement(identity:run.identity,distance:run.distance,slot:i)}
+            else if i>=16,let scene=previewVignette {p=scene.placement(identity:run.identity,distance:run.distance,part:i-16,scaleEvent:previewScale)}
+            else {p=DreamCollageComposition.placement(identity:run.identity,distance:run.distance,slot:i,scaleEvent:previewScale,framing:previewFraming)}
             let key="\(p.cell):\(p.representation.id)"
             if slot.key != key {
                 guard assign(p.representation,to:slot) else {opacity(slot,0);continue}
@@ -125,7 +127,8 @@ import UIKit
                 slot.basePosition=slot.model.position
             }
             let motion=DreamScenicMotion.sample(id:p.representation.id,seconds:run.seconds,slot:i,reduced:reducedMotion || lowPower)
-            slot.model.position=slot.basePosition+camera.orientation.act([motion.offset.x,motion.offset.y,0])
+            let motionScale=min(1,p.height/40)
+            slot.model.position=slot.basePosition+camera.orientation.act([motion.offset.x*motionScale,motion.offset.y*motionScale,0])
             slot.model.scale=[p.height*p.representation.aspect*(p.mirrored ? -1:1)*motion.scale,p.height*motion.scale,1]
             slot.model.orientation=camera.orientation*simd_quatf(angle:p.roll+motion.roll,axis:[0,0,1])
             let age=run.distance-p.anchorDistance
@@ -136,7 +139,9 @@ import UIKit
             let coversRoute=abs(delta.x)-abs(slot.model.scale.x)*0.5<z*0.10 && delta.y-slot.model.scale.y*0.5<z*0.06
             let readability:Float=coversRoute && p.representation.concept != .cloud ? 0.65:1
             let visible:Float=z>35 && (!lowPower || i<10) ? 1:0
-            opacity(slot,p.opacity*edge*population*visible*readability*(run.pigs.count>=3 ? 0:1))
+            let angularExtent=max(abs(slot.model.scale.x),slot.model.scale.y)/max(1,z)
+            let scaleVisibility=DreamScaleComposition.visibility(extent:angularExtent,role:p.scaleRole)
+            opacity(slot,p.opacity*edge*population*visible*readability*scaleVisibility*(run.pigs.count>=3 ? 0:1))
         }
         let cameraInverse=camera.orientation.inverse
         let ordered=(skies+slots).sorted {

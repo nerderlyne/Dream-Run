@@ -18,14 +18,14 @@ public enum DreamVignette:Int,CaseIterable,Sendable {
         for i in stride(from:bag.count-1,through:1,by:-1) {bag.swapAt(i,Int(rng.below(UInt64(i+1))))}
         return bag[max(0,cell)%5]
     }
-    public func placement(identity:DreamIdentity,distance:Double,part:Int)->DreamCollagePlacement {
+    public func placement(identity:DreamIdentity,distance:Double,part:Int,scaleEvent:DreamScaleEvent?=nil)->DreamCollagePlacement {
         let cell=Int(floor(distance/640)),anchor=Double(cell)*640
         var rng=identity.stream("vignette-position",cell)
         let side:Float=rng.below(2)==0 ? -1:1
         let heights:[Float]=self == .midnightKitchen ? [44,48,29,24]:[90,52,85,43]
         let offsets:[SIMD2<Float>]=self == .midnightKitchen ? [[-18,16],[17,0],[57,47],[-45,48]]:[[0,38],[23,-15],[-35,30],[58,49]]
         let asset=DreamCollageKit.assets.first{$0.id == ingredients[part]}!
-        return .init(representation:asset,cell:cell,anchorDistance:anchor,depth:500+Float(part)*9,lateral:side*(52+offsets[part].x),elevation:55+offsets[part].y,height:heights[part],mirrored:side<0,roll:self == .invertedProcession && part==0 ? .pi:0,opacity:part==2 && self != .midnightKitchen ? 0.65:1)
+        return DreamScaleComposition.plan(identity:identity,distance:distance,override:scaleEvent).compose(.init(representation:asset,cell:cell,anchorDistance:anchor,depth:500+Float(part)*9,lateral:side*(52+offsets[part].x),elevation:55+offsets[part].y,height:heights[part],mirrored:side<0,roll:self == .invertedProcession && part==0 ? .pi:0,opacity:part==2 && self != .midnightKitchen ? 0.65:1),slot:16+part)
     }
 }
 

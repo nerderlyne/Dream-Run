@@ -41,7 +41,8 @@ Five `DreamVignette` compositions use four separate cards each: whale/cottage, j
 upside-down procession, floating bedroom and midnight kitchen. One occurrence of each is scheduled
 in every shuffled five-cell cycle; each cell is 640 metres. Cultural apparitions only appear in
 midnight kitchen, never in the general scenery deck. Their frequency is one cell per 3,200 metres.
-The general 16-card pool visits each eligible ingredient before repeating it in a slot.
+The ordinary scenery slots visit each eligible ingredient before repeating a deck. Slot zero
+now reserves the single semantic scale-event budget described below.
 
 The four composition cards join the existing 16 cards and two sky cards: 22 pooled entities total.
 Transforms are sampled from active seconds with bounded drift, bob, rotation and jellyfish breathing.
@@ -52,3 +53,40 @@ maximalist/moderate/sparse/void cycle and Lucky Dream stripping.
 
 Family #05 is now sea creatures; ordinary curved stairs are #04 variants. Family #23 is cultural
 apparitions; mountains/cliffs are #22 rock variants. The registry and pig #42 remain intact.
+
+## Relative scale hierarchy
+
+`DreamScaleComposition` owns the scene-wide scale budget. Each 768 m scene has a seeded
+60% chance of no anomaly, 15% miniature, 19% oversized, 5% monumental and 1% absurd.
+An event selects horse, moon, chair, house, tree, window or arch as its semantic subject;
+only slot zero can become monumental or absurd. This is visual RNG, independent of gameplay luck.
+Twelve supporting slots are tiny, six are ordinary, and at most one is modestly oversized.
+For monumental/absurd events that extra oversized support is also ordinary. Vignettes obey
+these same roles, so their four ingredients no longer all appear at landmark scale.
+
+Sizes account for asset aspect ratio and depth, with ordinary angular diameters of 0.022/0.05
+for tiny/ordinary and 0.085 for modest oversized support. Monumental/absurd subjects start at
+0.32/0.55; miniature subjects at 0.008. These are longest-side/depth ratios, not metre sizes
+or probabilities. Motion amplitude scales down with object size. Fixed world-space geometry
+retains parallax; a smooth approach fade prevents ordinary props becoming accidental giants.
+
+Existing cards retain their assigned roles until their normal staggered replacement. There is
+no simultaneous whole-scene resizing, and the single event slot fades before its next event.
+Density/void evolution and full-frame sky plates remain independent of object size.
+DEBUG Lab offers all five scale cases. Launch with `--art-review --design-review --scale-event 0`
+(0–4); normal play clears the override. Capture using `tools/capture_scale.py DEVICE_ID`.
+
+## Vertical composition and partial landmarks
+
+Seven supporting slots per 19-slot context group are placed below route level, at distinct
+negative elevations and lateral offsets. They remain background-only world-space cards; track
+geometry occludes them. This supplies scenery beneath the player, not only across the skyline.
+Large scale events also choose whole, beneath, crown-from-below or roots-overhead framing.
+The latter two deliberately extend the object beyond the image rather than fitting every landmark
+inside it. With tree subjects, one exposes the crown while the trunk/roots continue beneath the
+frame, and the other exposes hanging roots while upper branches continue beyond the top edge.
+The same placement vocabulary applies to houses, arches and other selected semantic subjects.
+
+DEBUG Lab offers all four framing cases using an absurd-scale subject. Launch with
+`--art-review --design-review --scale-event 4 --scale-framing 2` (framing 0–3).
+These overrides change composition only and remain reward-isolated.
