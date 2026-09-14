@@ -197,8 +197,11 @@ extension UIColor {
                 bodyColor = .black; trimColor = .white; darkColor = .black
                 for sign:Float in [-1,1] { sphere(&trim,[0,radius,sign*0.423],[0.23,0.23,0.035]); for y:Float in [radius-0.075,radius+0.075] { ring(&dark,[0,y,sign*0.46],0.072,0.025,vertical:true) } }
             } else if id == .soccer {
-                bodyColor = .white; trimColor = UIColor(hex:"#292733")
-                for n in 0..<10 { let a=Float(n)*2.4, y=Float(n%3-1)*0.23; sphere(&trim,[cos(a)*0.37,radius+y,sin(a)*0.37],[0.13,0.13,0.08]) }
+                let panels=SoccerPanels.make(lod:lod)
+                body=panels.white;trim=panels.black
+                bodyColor = .white;trimColor=UIColor(white:0.025,alpha:1)
+                darkColor=UIColor(white:0.16,alpha:1)
+                dark.ellipsoid([0,radius,0],[0.445,0.445,0.445],segments:lod == 2 ? 16:24,rings:lod == 2 ? 8:12)
             } else if id == .softball {
                 bodyColor=UIColor(hex:"#D9E969"); trimColor = .white
                 for sign:Float in [-1,1] { trim.tube((0...24).map { n in let a=Float(n)/24*2*Float.pi; return [sign*0.2+0.07*cos(a*2),radius+0.39*cos(a),0.39*sin(a)] },radius:0.018) }
@@ -237,7 +240,7 @@ extension UIColor {
         }
         var count=0
         for (g,color) in [(body,bodyColor),(trim,trimColor),(dark,darkColor),(semantic,semanticColor)] where !g.positions.isEmpty {
-            do { let chosen:any Material = id == .mirror && color == UIColor.black ? UnlitMaterial(color:.black) : material(color,style:id == .mirror ? 2:style)
+            do { let chosen:any Material = id == .mirror && color == UIColor.black ? UnlitMaterial(color:.black) : material(color,style:id == .mirror ? 2:id == .soccer ? 0:style)
                 let entity=ModelEntity(mesh:try g.resource(),materials:[chosen]); root.addChild(entity); count += g.indices.count/3 }
             catch { assertionFailure("Procedural mesh \(id): \(error)") }
         }

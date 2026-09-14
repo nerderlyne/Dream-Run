@@ -342,3 +342,41 @@ extension Dream_AgainTests {
         XCTAssertFalse(game.run.unbroken)
     }
 }
+
+extension Dream_AgainTests {
+    @MainActor func testSoccerPanelTopologyAndPreview() async throws {
+        let faces=SoccerPanels.faces
+        XCTAssertEqual(faces.filter{$0.count==5}.count,12)
+        XCTAssertEqual(faces.filter{$0.count==6}.count,20)
+        for lod in 0...2 {
+            let panels=SoccerPanels.make(lod:lod)
+            for g in [panels.white,panels.black] {
+                for p in g.positions {XCTAssertEqual(simd_length(p-[0,0.45,0]),0.45,accuracy:0.00001)}
+                for i in stride(from:0,to:g.indices.count,by:3) {
+                    let a=g.positions[Int(g.indices[i])],b=g.positions[Int(g.indices[i+1])],c=g.positions[Int(g.indices[i+2])]
+                    XCTAssertGreaterThan(simd_dot(simd_cross(b-a,c-a),a-[0,0.45,0]),0)
+                }
+            }
+        }
+        let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
+        game.screen="lab"
+        let scene=try XCTUnwrap(UIApplication.shared.connectedScenes.first as? UIWindowScene)
+        let window=UIWindow(windowScene:scene),controller=UIViewController()
+        controller.view=renderer.view;window.rootViewController=controller;window.makeKeyAndVisible()
+        defer {window.isHidden=true}
+        renderer.view.frame=window.bounds
+        renderer.preview(.soccer,palette:0,style:5,lod:0)
+        let ready=expectation(description:"render soccer preview")
+        DispatchQueue.main.asyncAfter(deadline:.now()+2) {ready.fulfill()}
+        await fulfillment(of:[ready],timeout:5)
+        let captured=expectation(description:"snapshot")
+        renderer.snapshot {image in
+            if let image,let png=image.pngData() {
+                try? png.write(to:URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("soccer-preview.png"))
+                let attachment=XCTAttachment(image:image);attachment.lifetime = .keepAlways;self.add(attachment)
+            } else {XCTFail("Soccer preview capture unavailable")}
+            captured.fulfill()
+        }
+        await fulfillment(of:[captured],timeout:15)
+    }
+}

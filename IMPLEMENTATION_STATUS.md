@@ -5,6 +5,18 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 The locked pig/continue probabilities and nonterminal three-hour evolution are unchanged.
 
+## Soccer ball correction — September 14, 2026
+
+The soccer prefab now uses a spherical truncated-icosahedron panel layout: 12 black pentagons,
+20 white hexagons and recessed seams. All LODs retain the pattern; its opaque black-and-white
+material is independent of dream palette/style. The LOD0 mesh has 3,456 triangles, below its
+3,500-triangle catalog target. Rolling behavior and collision rules are unchanged.
+The Debug simulator build and two targeted native tests passed (all 42 prefab builders,
+plus panel counts, spherical positions, outward winding across all three LODs and a rendered
+preview). Specification validator: 51 checks passed. Evidence: `evidence/soccer-tests.log`
+and visually inspected `evidence/soccer-preview.png`. No new physical-device or Release tests
+were run for this isolated mesh correction.
+
 ## Current visual implementation
 
 - One current collage renderer and one Swift catalog: 46 transparent ingredients, nine skies (55 images total).
