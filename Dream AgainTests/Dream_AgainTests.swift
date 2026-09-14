@@ -195,6 +195,12 @@ extension Dream_AgainTests {
                     XCTAssertLessThan(bounds.min.y,0.025,"Hat must meet the head fitting line: \(item.id)")
                     XCTAssertLessThan(bounds.extents.x,0.5,"Hat must stay head-sized: \(item.id)")
                     XCTAssertTrue(bounds.extents.y.isFinite)
+                    if item.id == "paper_hat" {
+                        let face=try XCTUnwrap(hat.findEntity(named:"red-smiley-back"))
+                        XCTAssertGreaterThan(face.visualBounds(relativeTo:hat).min.z,0.15)
+                        XCTAssertLessThan(bounds.min.y,-0.23)
+                        XCTAssertGreaterThan(bounds.max.y,0.15)
+                    }
                 } else {XCTAssertTrue(renderer.headAttachment.children.isEmpty)}
                 XCTAssertNotNil(renderer.runner.findEntity(named:"straw-head"))
                 XCTAssertEqual(renderer.runner.findEntity(named:"straw-skirt") != nil,character == "girl")

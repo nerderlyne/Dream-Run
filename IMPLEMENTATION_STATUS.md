@@ -5,6 +5,16 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 The locked pig/continue probabilities and nonterminal three-hour evolution are unchanged.
 
+## Smiley paper bag — September 14, 2026
+
+The paper-hat cosmetic is now a fitted brown kraft bag covering the straw head, with an open
+bottom, irregular folded edges and a crude red marker smile on the +Z rear face visible to the
+chase camera. Shop name: Smiley paper bag; cosmetic ID and 150-balloon price remain unchanged.
+Debug simulator build and the all-hats/both-characters fit test passed, including rear-face
+placement and head coverage assertions (one native test, 0.928 s). Specification: 51 checks pass.
+Evidence: `evidence/paper-bag-test.log` and rear gameplay capture `evidence/paper-bag.png`.
+No new full core/UI suite, Release build or physical-device checks ran for this cosmetic edit.
+
 ## Relative scale composition — September 14, 2026
 
 - One seeded scale-event budget per 768 m scene; only slot zero can become monumental/absurd.

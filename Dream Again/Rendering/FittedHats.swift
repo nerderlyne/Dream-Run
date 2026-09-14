@@ -20,8 +20,33 @@ extension DreamRenderer {
         }
         switch id {
         case "paper_hat":
-            var g=Geometry();g.loft([[-0.02,0.156,0.135,0],[0.025,0.16,0.135,0],[0.16,0.15,0.008,0],[0.18,0.001,0.001,0]],segments:48);add(g,pearl,0)
-            g=Geometry();g.loft([[-0.035,0.165,0.14,0],[0.012,0.165,0.14,0]],segments:48);add(g,pearl,0)
+            // Open-bottom kraft bag slips over the entire head. +Z is the rear,
+            // facing the chase camera; the marker smile belongs on that face.
+            let a:SIMD3<Float>=[-0.17,-0.255,-0.15],b:SIMD3<Float>=[0.17,-0.248,-0.15]
+            let c:SIMD3<Float>=[0.165,0.19,-0.145],d:SIMD3<Float>=[-0.168,0.182,-0.145]
+            let e:SIMD3<Float>=[-0.17,-0.255,0.155],f:SIMD3<Float>=[0.17,-0.248,0.155]
+            let g:SIMD3<Float>=[0.165,0.19,0.15],h:SIMD3<Float>=[-0.168,0.182,0.15]
+            var paper=Geometry();paper.quad(a,d,c,b);paper.quad(e,f,g,h)
+            paper.quad(a,e,h,d);paper.quad(b,c,g,f);paper.quad(d,h,g,c)
+            add(paper,UIColor(hex:"#AF804B"),0)
+            var folds=Geometry()
+            folds.tube([[-0.17,-0.24,0.156],[0,-0.236,0.158],[0.17,-0.233,0.156]],radius:0.003,segments:6)
+            folds.tube([[-0.17,-0.20,0.025],[-0.164,0.11,0],[-0.166,0.18,-0.04]],radius:0.0025,segments:6)
+            folds.tube([[0.17,-0.20,0.025],[0.164,0.11,0],[0.166,0.18,-0.04]],radius:0.0025,segments:6)
+            folds.tube([[-0.16,0.186,0.10],[0,0.192,0.09],[0.16,0.194,0.10]],radius:0.003,segments:6)
+            add(folds,UIColor(hex:"#805934"),0)
+            var marker=Geometry()
+            marker.tube([[-0.072,0.022,0.161],[-0.077,0.004,0.162],[-0.069,-0.015,0.163]],radius:0.01,segments:8)
+            marker.tube([[0.064,0.029,0.161],[0.071,0.012,0.162],[0.068,-0.008,0.163]],radius:0.009,segments:8)
+            marker.tube((0...14).map {i in
+                let t=Float(i)/14
+                return [-0.092+t*0.181,-0.079-0.053*sin(t * .pi)+0.003*sin(t*23),0.163]
+            },radius:0.008,segments:8)
+            add(marker,UIColor(hex:"#C32220"),0)
+            if let ink=Array(root.children).last {
+                ink.name="red-smiley-back";ink.scale.z=0.03;ink.position.z=0.156
+                ink.components.set(DynamicLightShadowComponent(castsShadow:false))
+            }
         case "nightcap":
             var g=Geometry();g.loft([[-0.02,0.15,0.135,0],[0.06,0.148,0.13,0],[0.18,0.105,0.09,0.015],[0.25,0.055,0.05,0.055],[0.19,0.008,0.008,0.14]],segments:48);add(g,UIColor(hex:"#A299BD"))
             ring(0,0.15,0.135,0.018,pearl)

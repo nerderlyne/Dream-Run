@@ -12,11 +12,11 @@
     },
     {
       "id": "paper_hat",
-      "name": "Paper hat",
+      "name": "Smiley paper bag",
       "slot": "hat",
       "balloon_price": 150,
       "required_achievement": null,
-      "notes": "Folded pale paper; small clear silhouette."
+      "notes": "Brown kraft paper bag fitted over the straw head; crude red marker smile on the rear face seen by the chase camera."
     },
     {
       "id": "bow",
