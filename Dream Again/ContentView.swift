@@ -11,7 +11,8 @@ struct ContentView:View {
     @State private var renameID:UUID?
     @State private var renameText=""
     @State private var continueWarning=false
-    @State private var swipeStarted:Date?
+    @State private var swipe=RunnerSwipe()
+    @GestureState private var swipeActive=false
     var body:some View {
         ZStack {
             if let renderer=game.renderer { DreamSceneView(renderer:renderer).ignoresSafeArea() }
@@ -91,21 +92,22 @@ struct ContentView:View {
             if game.run.instabilityUntil > game.run.activeTicks && game.run.phase == .running { LinearGradient(colors:[.clear,.black.opacity(0.45)],startPoint:.center,endPoint:.bottom).ignoresSafeArea().allowsHitTesting(false) }
 
             Color.clear.contentShape(Rectangle()).gesture(DragGesture(minimumDistance:8)
+                .updating($swipeActive) { _,active,_ in active=true }
                 .onChanged { value in
                     guard [.running,.safeDrop,.mirrorCrossing].contains(game.run.phase) else {return}
-                    if swipeStarted == nil {swipeStarted=value.time}
+                    handleSwipe(value.translation)
                     if game.simulatorDragInput {
                         let dx=value.translation.width,dy=value.translation.height
                         game.input.steering=abs(dx)>abs(dy) ? max(-1,min(1,Double(dx)/80)) : 0
                     }
                 }
                 .onEnded { value in
-                    defer {swipeStarted=nil;if game.simulatorDragInput {game.input.steering=0}}
-                    guard [.running,.safeDrop,.mirrorCrossing].contains(game.run.phase) else {return}
-                    let dy=value.translation.height,dx=value.translation.width
-                    guard abs(dy)>=34,abs(dy)>abs(dx)*1.4,value.time.timeIntervalSince(swipeStarted ?? value.time)<=0.45 else {return}
-                    if dy < 0 {game.input.jump=true} else {game.input.slide=true}
+                    if [.running,.safeDrop,.mirrorCrossing].contains(game.run.phase) {handleSwipe(value.translation)}
+                    resetSwipe()
                 })
+                .onChange(of:swipeActive) { _,active in if !active {resetSwipe()} }
+                .onChange(of:game.run.phase) { _,_ in resetSwipe() }
+
             VStack {
                 HStack(spacing:20) {
                     Text(game.time(game.run.activeTicks)).monospacedDigit().tracking(2)
@@ -142,6 +144,17 @@ struct ContentView:View {
             }
             if game.run.phase == .resuming {Text("breathe…").font(.largeTitle).frame(maxHeight:.infinity)}
         }
+    }
+    private func handleSwipe(_ translation:CGSize) {
+        switch swipe.update(x:Double(translation.width),y:Double(translation.height)) {
+        case .jump: game.input.jump=true
+        case .slide: game.input.slide=true
+        case nil: break
+        }
+    }
+    private func resetSwipe() {
+        swipe=RunnerSwipe()
+        if game.simulatorDragInput {game.input.steering=0}
     }
     var tutorialPrompt:String {
         switch game.run.distance {case ..<80:"steer gently toward the balloons";case ..<155:"swipe up to jump across the gap";case ..<255:"swipe down to slide beneath the zebra";case ..<345:"cute, but keep clear of the rabbit";default:"follow the dream. you’re ready."}

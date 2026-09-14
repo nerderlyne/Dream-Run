@@ -5,6 +5,14 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 The locked pig/continue probabilities and nonterminal three-hour evolution are unchanged.
 
+## Swipe response correction — September 15, 2026
+
+- Fixed jump/slide waiting for finger release and silently rejecting gestures lasting over 450 ms. Recognition now commits while moving at 24 points with 1.2× vertical dominance, once per contact. Cancellation, completion and phase changes clear gesture state; simulator steering still resets on release.
+- Added independently testable RunnerSwipe intent recognition. Jump physics, buffering, difficulty and hazard generation are unchanged. Updated the source/bundled input contract and specification to match.
+- Verification: five targeted Release Swift package tests passed (four swipe regressions plus opening/capped-speed obstacle survival). Debug iPhone 16 Pro Max simulator build and all 23 native tests passed, 68.921 seconds. Logs: `evidence/swipe-core-tests.log`, `evidence/swipe-native-tests.log`, `evidence/swipe-spec.log`.
+- Specification validator: 51 checks passed. Corrected reference validation to check the six required filenames, allowing additional owner reference images. The extra `references/app_target_01.jpeg` is untouched.
+- No physical-device touch latency measurement, UI automation, full core soak or Release iOS build in this pass. Existing simulator CAMetalLayer allocation warnings remain; native test success is not a GPU-performance claim.
+
 ## Atmospheric scale correction — September 15, 2026
 
 - Restored an independent three-slot atmospheric collage over the sky canvas: enormous

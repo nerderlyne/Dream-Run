@@ -1,0 +1,36 @@
+[0/1] Planning build
+Building for production...
+[0/5] Write sources
+[2/5] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Compiling DreamCore BalloonMotion.swift
+[5/7] Compiling DreamCoreTests AtmosphereTests.swift
+[6/8] Compiling DreamCorePackageTests runner.swift
+[6/8] Write Objects.LinkFileList
+[7/8] Linking DreamCorePackageTests
+Build complete! (100.17s)
+Test Suite 'Selected tests' started at 2026-09-15 01:45:27.376.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-15 01:45:27.391.
+Test Suite 'ObstacleTests' started at 2026-09-15 01:45:27.391.
+Test Case '-[DreamCoreTests.ObstacleTests testEveryObstacleHasASurvivalWitnessAtOpeningAndCap]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testEveryObstacleHasASurvivalWitnessAtOpeningAndCap]' passed (0.057 seconds).
+Test Suite 'ObstacleTests' passed at 2026-09-15 01:45:27.449.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.057 (0.058) seconds
+Test Suite 'RunnerSwipeTests' started at 2026-09-15 01:45:27.450.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testJumpCommitsBeforeReleaseAndNeverRepeatsDuringContact]' started.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testJumpCommitsBeforeReleaseAndNeverRepeatsDuringContact]' passed (0.004 seconds).
+Test Case '-[DreamCoreTests.RunnerSwipeTests testRecognizedSwipeStartsJumpOnNextSimulationTick]' started.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testRecognizedSwipeStartsJumpOnNextSimulationTick]' passed (0.667 seconds).
+Test Case '-[DreamCoreTests.RunnerSwipeTests testSlideAndNextContact]' started.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testSlideAndNextContact]' passed (0.003 seconds).
+Test Case '-[DreamCoreTests.RunnerSwipeTests testSteeringJitterAndInvalidSamplesDoNotCommit]' started.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testSteeringJitterAndInvalidSamplesDoNotCommit]' passed (0.007 seconds).
+Test Suite 'RunnerSwipeTests' passed at 2026-09-15 01:45:28.143.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.681 (0.694) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-15 01:45:28.144.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.738 (0.752) seconds
+Test Suite 'Selected tests' passed at 2026-09-15 01:45:28.144.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.738 (0.767) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.006 seconds.

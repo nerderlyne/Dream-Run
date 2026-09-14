@@ -195,7 +195,7 @@ Support alternate touch steering and visible jump/slide buttons for simulator an
 
 ### 4.3 Jump and slide
 
-Jump: upward swipe of at least 34 points within 450 ms, sufficiently more vertical than horizontal. Default vertical launch velocity 8 m/s and gravity 22 m/s²: approximately 0.73 seconds flight on level ground, approximately 1.45 m apex. Use a 120 ms input buffer and 80 ms coyote allowance. One jump per airborne cycle; no double jump. Use actual floor height at landing, including ascending/descending stairs.
+Jump: trigger during an upward swipe as soon as translation reaches 24 points and vertical travel exceeds horizontal travel by 1.2×. Do not wait for finger release or reject a recognized swipe because it took too long. Emit one action per contact; reset on completion or cancellation. Downward slide uses the same recognition rule. Default vertical launch velocity 8 m/s and gravity 22 m/s²: approximately 0.73 seconds flight on level ground, approximately 1.45 m apex. Use a 120 ms input buffer and 80 ms coyote allowance. One jump per airborne cycle; no double jump. Use actual floor height at landing, including ascending/descending stairs.
 
 Slide: downward swipe with the same recognition thresholds. Reduce gameplay capsule height from 1.55 m to 0.58 m for 0.85 seconds, with the base still on the route. Match the pose visually; do not just shrink the mesh. Max extra clearance extension is 0.25 seconds if an overhead obstacle would otherwise make the character stand into its underside. Level validation must fit slides inside that window. Holding/swiping repeatedly cannot slide forever.
 

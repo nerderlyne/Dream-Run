@@ -34,8 +34,8 @@
     "slide_max_clearance_extension_seconds": 0.25,
     "jump_buffer_seconds": 0.12,
     "coyote_seconds": 0.08,
-    "swipe_min_points": 34.0,
-    "swipe_max_seconds": 0.45
+    "swipe_min_points": 24.0,
+    "swipe_vertical_dominance": 1.2
   },
   "camera": {
     "vertical_fov_degrees": 62.0,

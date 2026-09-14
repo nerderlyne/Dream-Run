@@ -1,5 +1,7 @@
 # Known limitations
 
+- Swipe timing fix (September 15): deterministic tests verify recognition before release and next-tick jump onset. Actual finger-to-display latency and feel on a physical iPhone have not been measured; main-thread rendering stalls could still delay touch processing.
+
 - Large translucent atmospheric cards increase overdraw; physical-device GPU cost and sustained
   frame pacing remain unmeasured. Route-overlap attenuation is broad, not a per-pixel mask;
   four simulator compositions do not establish visibility for every seed and device size.

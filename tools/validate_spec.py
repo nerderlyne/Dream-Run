@@ -106,7 +106,7 @@ def main() -> None:
     else:
         raise AssertionError('Schema accepts negative wallet lot')
     require(True,'SQLite negative-wallet check enforced')
-    require(len(list((ROOT/'references').glob('*.jpeg')))==6,'All six creator visual references included')
+    require(all((ROOT/'references'/f'{i:02d}_visual_reference.jpeg').is_file() for i in range(1,7)),'All six creator visual references included')
     require((ROOT/'AGENTS.md').stat().st_size < 12_000,'Root agent instructions remain compact')
     require(all((ROOT/name).exists() for name in ['START_HERE.md','CODEX_PROMPT.md','ACCEPTANCE_TESTS.md','docs/SOURCES.md','docs/REFERENCE_ALGORITHMS.md']), 'All entry, reference and acceptance files present')
     print(f'PASS: {len(checks)} specification/reference consistency checks')
