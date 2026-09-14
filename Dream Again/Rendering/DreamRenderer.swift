@@ -46,7 +46,7 @@ import simd
         let colors=["pearl_body":"#E9E6E2","rose_body":"#CBA6B7","mint_body":"#ACCFBE"]
         let bodyColor=UIColor(hex:colors[equipped["body_color"] ?? ""] ?? (feminine ? "#C8A7BC" : "#B5C8C3"))
         strawCostume(feminine:feminine,color:bodyColor)
-        if equipped["trail"] != nil {
+        if equipped["trail"] == "void_ribbon" {
             var g=Geometry();g.tube([[0,0.5,0.2],[0.15,0.35,0.65],[-0.1,0.2,1.1]],radius:0.03)
             if let mesh=try? g.resource() {let trail=ModelEntity(mesh:mesh,materials:[factory.material(UIColor(hex:"#D5C6D6").withAlphaComponent(0.25),style:0)]);trail.name="equipped-trail";runner.addChild(trail)}
         }

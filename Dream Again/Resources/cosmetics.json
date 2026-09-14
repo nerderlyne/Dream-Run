@@ -107,14 +107,6 @@
       "notes": "Cosmetic material preset only."
     },
     {
-      "id": "ribbon_trail",
-      "name": "Ribbon trail",
-      "slot": "trail",
-      "balloon_price": 1000,
-      "required_achievement": null,
-      "notes": "Low-intensity, short, behind the runner."
-    },
-    {
       "id": "lucky_pig_hat",
       "name": "Lucky pig hat",
       "slot": "hat",

@@ -184,6 +184,7 @@ struct ContentView:View {
             }.buttonStyle(.bordered)
             Text("Both looks are free. Hats and colours work with either.").font(.caption)
             Button("No hat") {if let item=game.catalogue.first(where:{$0.id == "bare_head"}) {game.equip(item)}}
+            Button("No trail") {game.removeTrail()}
             Text("\(game.profile.balance) balloons").font(.title3)
             button("balloon packs"){game.screen="store"}
             ForEach(game.catalogue){item in

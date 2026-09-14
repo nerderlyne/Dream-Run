@@ -233,6 +233,10 @@ import UIKit
         transact { $0.equipped["character"]=character }
         renderer?.previewAvatar(equipped:profile.equipped,wardrobe:true)
     }
+    func removeTrail() {
+        transact { $0.equipped.removeValue(forKey:"trail") }
+        renderer?.dress(profile.equipped)
+    }
     func equip(_ item:CosmeticDefinition) { guard profile.owned.contains(item.id) else { return }; transact { $0.equipped[item.slot]=item.id }; renderer?.dress(profile.equipped) }
     func saveSettings() { link?.preferredFramesPerSecond=settings.lowPower ? 30 : 60;transact { $0.settings=settings } }
     func time(_ ticks:UInt64)->String { let seconds=ticks/60; return String(format:"%02lld:%02lld:%02lld",seconds/3600,(seconds/60)%60,seconds%60) }

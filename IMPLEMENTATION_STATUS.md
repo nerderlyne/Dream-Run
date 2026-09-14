@@ -5,6 +5,12 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 The locked pig/continue probabilities and nonterminal three-hour evolution are unchanged.
 
+## Ribbon trail removal — September 15, 2026
+
+- Removed the purchasable Ribbon trail from source and bundled cosmetic catalogues. The renderer no longer draws it, including from an existing equipped selection.
+- Added Wardrobe → No trail, which transactionally clears the trail slot and immediately refreshes the avatar. The separate achievement-only Void ribbon remains available.
+- Specification validation: 51 checks passed. Debug iPhone 16 Pro Max simulator build passed (`evidence/trail-build.log`). No device or UI automation pass for this small removal.
+
 ## Composition hierarchy refinement — September 15, 2026
 
 - Analyzed the owner's successful `app_target_01.jpeg`: cropped architecture, sky/stone superposition, tiny context and a quiet route. Full reasoning and limitations: `docs/COMPOSITION_REVIEW.md`.
