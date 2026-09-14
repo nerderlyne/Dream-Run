@@ -1,3 +1,13 @@
+## Creator override — atmospheric scale correction (September 15, 2026)
+
+Three independent compositional systems are required: semantic scenery retains relative scale
+hierarchy; atmospheric collage frequently uses 1–3 very large, cropped, translucent overlapping
+architecture/trees/fabric/cloud/organic fragments; rare scale events make one recognizable semantic
+object enormous. Atmospheric layers do not consume a giant-object event. Sky plates are only the
+base canvas. Restore ambiguous, blended overlapping realities around a clean gameplay corridor.
+Atmospheric density follows the normal/moderate/sparse/void evolution, preserving underfoot
+imagery, partial framing, seeded placement and the 42 semantic-family cap.
+
 ## Creator clarification — scenery beneath the route and partial framing
 
 The visible dream must extend below the player as well as above. Compose lower foreground and

@@ -100,3 +100,7 @@ Use `--art-review --design-review --scale-event 0` (0–4) for matched captures.
 
 Vertical framing previews are also in DEBUG Lab: World below / Crown from below / Roots overhead.
 Use `--scale-event 4 --scale-framing 2` with the art-review flags for the crown-from-below case.
+
+The current atmosphere uses independent large translucent layers over sky plates, alongside
+semantic scale diversity. [Current atmospheric comparison](evidence/atmosphere-gallery.html)
+shows normal seeded dreams and a scene with a separate rare landmark.

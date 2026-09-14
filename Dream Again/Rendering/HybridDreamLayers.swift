@@ -1,7 +1,7 @@
 import RealityKit
 import UIKit
 
-/// Fixed pool: 20 object cards and two sky cards; no decoding or mesh creation in update.
+/// Fixed pool: 20 semantic cards, three atmospheric cards and two sky cards; no decoding or mesh creation in update.
 @MainActor final class HybridDreamLayers {
     @MainActor private final class Slot {
         let model:ModelEntity
@@ -14,7 +14,7 @@ import UIKit
         }
     }
     let root=Entity()
-    private var slots:[Slot]=[],skies:[Slot]=[]
+    private var slots:[Slot]=[],atmosphere:[Slot]=[],skies:[Slot]=[]
     // Blend every transparent layer before writing their depths. Otherwise a clear
     // part of a nearer quad can clip a farther card into a visible rectangle.
     private let sortGroup=ModelSortGroup(depthPass:.postPass)
@@ -32,8 +32,9 @@ import UIKit
     var reducedMotion=false
     var previewScale:DreamScaleEvent?
     var previewFraming:DreamScaleFraming?
-    var pooledCardCount:Int {slots.count+skies.count}
-    var cardPositions:[SIMD3<Float>] {slots.map{$0.model.position}}
+    var pooledCardCount:Int {slots.count+atmosphere.count+skies.count}
+    var activeAtmosphereCount:Int {atmosphere.filter{$0.model.isEnabled}.count}
+    var cardPositions:[SIMD3<Float>] {(slots+atmosphere).map{$0.model.position}}
     init() {
         root.name="dream-collage"
         var d=MeshDescriptor(name:"collage-unit-quad")
@@ -45,8 +46,9 @@ import UIKit
         do {
             let mesh=try MeshResource.generate(from:[d])
             slots=(0..<DreamCollageComposition.slotCount).map{_ in Slot(mesh:mesh)}
+            atmosphere=(0..<DreamAtmosphere.slotCount).map{_ in Slot(mesh:mesh)}
             skies=(0..<2).map{_ in Slot(mesh:mesh)}
-            for slot in skies+slots {root.addChild(slot.model)}
+            for slot in skies+slots+atmosphere {root.addChild(slot.model)}
         } catch {loadErrors.append("Quad: \(error)")}
         preload=Task { [weak self] in
             let assets=DreamCollageKit.assets.filter(\.isPlate)+DreamCollageKit.assets.filter{!$0.isPlate}
@@ -65,10 +67,10 @@ import UIKit
     }
     func waitForPreload() async {await preload?.value}
     func reset() {
-        for slot in slots+skies {slot.key="";slot.placement=nil;slot.model.isEnabled=false}
+        for slot in slots+atmosphere+skies {slot.key="";slot.placement=nil;slot.model.isEnabled=false}
         skyStarted=nil;skyIndex=0;activeCardCount=0
     }
-    func rebase(by shift:SIMD3<Float>) {for slot in slots {slot.model.position += shift;slot.basePosition += shift}}
+    func rebase(by shift:SIMD3<Float>) {for slot in slots+atmosphere {slot.model.position += shift;slot.basePosition += shift}}
     private func assign(_ asset:DreamRepresentation,to slot:Slot)->Bool {
         guard let texture=textures[asset.id] else{return false}
         var material=UnlitMaterial(applyPostProcessToneMap:false)
@@ -107,12 +109,14 @@ import UIKit
         }
         if fade>=1 {opacity(current,0);current.key="";skyIndex=1-skyIndex;skyStarted=nil}
         let generator=WorldGenerator(run.identity)
-        for i in slots.indices {
-            let slot=slots[i]
-            let period=DreamCollageComposition.period(slot:i)
-            let cell=DreamCollageComposition.cell(distance:run.distance,slot:i)
+        let layers=slots+atmosphere
+        for i in layers.indices {
+            let slot=layers[i],isAtmosphere=i>=slots.count,a=i-slots.count
+            let period=isAtmosphere ? DreamAtmosphere.period(slot:a):DreamCollageComposition.period(slot:i)
+            let cell=isAtmosphere ? DreamAtmosphere.cell(distance:run.distance,slot:a):DreamCollageComposition.cell(distance:run.distance,slot:i)
             let p:DreamCollagePlacement
             if let cached=slot.placement,cached.cell == cell {p=cached}
+            else if isAtmosphere {p=DreamAtmosphere.placement(identity:run.identity,distance:run.distance,slot:a)}
             else if i>=16,let scene=previewVignette {p=scene.placement(identity:run.identity,distance:run.distance,part:i-16,scaleEvent:previewScale)}
             else {p=DreamCollageComposition.placement(identity:run.identity,distance:run.distance,slot:i,scaleEvent:previewScale,framing:previewFraming)}
             let key="\(p.cell):\(p.representation.id)"
@@ -132,19 +136,20 @@ import UIKit
             slot.model.scale=[p.height*p.representation.aspect*(p.mirrored ? -1:1)*motion.scale,p.height*motion.scale,1]
             slot.model.orientation=camera.orientation*simd_quatf(angle:p.roll+motion.roll,axis:[0,0,1])
             let age=run.distance-p.anchorDistance
-            let edge=Float(min(1,max(0,age/24))*min(1,max(0,(period-age)/24)))
+            let fadeDistance:Double=isAtmosphere ? 96:24
+            let edge=Float(min(1,max(0,age/fadeDistance))*min(1,max(0,(period-age)/fadeDistance)))
             let rank:Float=i>=16 ? 0.12:Float((i*7)%16)/16
-            let population=max(0,min(1,(density-rank)*8))
+            let population=isAtmosphere ? DreamAtmosphere.weight(density:density,slot:a,lowPower:lowPower):max(0,min(1,(density-rank)*8))
             let delta=camera.orientation.inverse.act(slot.model.position-camera.position),z = -delta.z
             let coversRoute=abs(delta.x)-abs(slot.model.scale.x)*0.5<z*0.10 && delta.y-slot.model.scale.y*0.5<z*0.06
-            let readability:Float=coversRoute && p.representation.concept != .cloud ? 0.65:1
-            let visible:Float=z>35 && (!lowPower || i<10) ? 1:0
+            let readability:Float=coversRoute ? (isAtmosphere ? 0.65:p.representation.concept != .cloud ? 0.65:1):1
+            let visible:Float=z>35 && (!lowPower || i<10 || isAtmosphere) ? 1:0
             let angularExtent=max(abs(slot.model.scale.x),slot.model.scale.y)/max(1,z)
-            let scaleVisibility=DreamScaleComposition.visibility(extent:angularExtent,role:p.scaleRole)
+            let scaleVisibility:Float=isAtmosphere ? 1:DreamScaleComposition.visibility(extent:angularExtent,role:p.scaleRole)
             opacity(slot,p.opacity*edge*population*visible*readability*scaleVisibility*(run.pigs.count>=3 ? 0:1))
         }
         let cameraInverse=camera.orientation.inverse
-        let ordered=(skies+slots).sorted {
+        let ordered=(skies+layers).sorted {
             cameraInverse.act($0.model.position-camera.position).z < cameraInverse.act($1.model.position-camera.position).z
         }
         for (order,slot) in ordered.enumerated() {

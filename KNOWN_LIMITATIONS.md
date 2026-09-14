@@ -1,5 +1,8 @@
 # Known limitations
 
+- Large translucent atmospheric cards increase overdraw; physical-device GPU cost and sustained
+  frame pacing remain unmeasured. Route-overlap attenuation is broad, not a per-pixel mask;
+  four simulator compositions do not establish visibility for every seed and device size.
 - Scale-event probabilities are seeded per scene, not guaranteed screen appearances: camera
   framing, density/void phases and approach fading can hide a selected subject. The matched
   simulator gallery covers eight scale/framing cases; broader seed/device visual review remains outstanding.

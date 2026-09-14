@@ -90,3 +90,26 @@ The same placement vocabulary applies to houses, arches and other selected seman
 DEBUG Lab offers all four framing cases using an absurd-scale subject. Launch with
 `--art-review --design-review --scale-event 4 --scale-framing 2` (framing 0–3).
 These overrides change composition only and remain reward-isolated.
+
+## Independent atmospheric collage
+
+`DreamAtmosphere` adds three dedicated compositional slots outside the 20 semantic slots.
+They reuse existing registered architecture/window, tree/botanical/organic and fog/fabric/cloud
+images. They are not extra world families or new texture resources. The pool is now 25 cards:
+20 semantic, 3 atmospheric and 2 sky plates, sharing geometry and preloaded image textures.
+
+The atmospheric longest-side/depth ratios are 0.62–1.14, with base opacity 0.20–0.27 and further
+attenuation where they cover the projected route. These forms intentionally span/crop beyond
+large areas of the frame, blend into the sky and overlap semantic scenery at distinct world-space
+depths. They bypass semantic approach-size limits and never select horses, moons, chairs, pigs
+or rabbits as atmospheric subjects. The rare scale-event selection is unchanged.
+
+Density weights introduce one layer at low density, two above 0.32, and three above 0.65,
+with gradual opacity ramps. Void/white-ending states remove them; Low Power keeps only one.
+Independent 1280/1024/768 m lifetimes and 96 m entrance/exit fades stagger replacement.
+They use active-time drift and retained world anchors; no whole-scene rebuild or new image decode
+occurs during updates. Opaque track/player/hazard geometry remains in front of the imagery.
+The broad route-overlap attenuation is conservative; it is not a per-pixel corridor mask.
+
+Current simulator comparison: `evidence/atmosphere-gallery.html`.
+Capture using `python3 tools/capture_atmosphere.py DEVICE_ID` after installing the DEBUG build.

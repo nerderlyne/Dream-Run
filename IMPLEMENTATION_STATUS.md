@@ -5,6 +5,26 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 The locked pig/continue probabilities and nonterminal three-hour evolution are unchanged.
 
+## Atmospheric scale correction — September 15, 2026
+
+- Restored an independent three-slot atmospheric collage over the sky canvas: enormous
+  translucent architecture/windows, ghost trees/organic forms and cloud/fabric/fog fragments.
+  These do not consume the rare semantic scale event. Small props, inverse scale, underfoot
+  scenery and partial landmark framing remain intact.
+- Density supports 1–3 layers with gradual opacity ramps; void removes them and Low Power
+  limits them to one. World-space motion, staggered replacement and 96 m fades retain continuity.
+  Shared resources: 25 pooled cards, the same 55 textures and exactly 42 registered families.
+- 13 targeted core tests passed after correcting an asset-selection closure that drew RNG
+  repeatedly during lookup. 23 native simulator tests passed (42.593 s), including texture/pool
+  retention, atmosphere presence and existing geometry/offline model checks. Debug build and
+  51 specification checks passed. No new UI suite, full core soak or Release build ran.
+- Simulator CPU sample: 660 submissions, median 0.477 ms, p95 0.502 ms, maximum 6.911 ms;
+  separate palette-boundary sample 16.855 ms. This excludes GPU work and is not frame-rate proof.
+  CAMetalLayer warnings remain in the simulator test log.
+- Current visual evidence: `evidence/atmosphere-gallery.html`. The previous scale-only gallery
+  documents the overcorrection and is not the current atmospheric appearance. Test logs:
+  `evidence/atmosphere-core-tests.log`, `evidence/atmosphere-native-tests.log`.
+
 ## Smiley paper bag — September 14, 2026
 
 The paper-hat cosmetic is now a fitted brown kraft bag covering the straw head, with an open

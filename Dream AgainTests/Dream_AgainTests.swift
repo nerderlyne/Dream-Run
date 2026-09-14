@@ -59,7 +59,8 @@ extension Dream_AgainTests {
         game.labCollage(index:0)
         renderer.render(game.run,equipped:game.profile.equipped)
         XCTAssertGreaterThan(renderer.art.collage.activeCardCount,5)
-        XCTAssertEqual(renderer.art.collage.pooledCardCount,22)
+        XCTAssertGreaterThanOrEqual(renderer.art.collage.activeAtmosphereCount,1)
+        XCTAssertEqual(renderer.art.collage.pooledCardCount,25)
         for _ in 0..<30 {renderer.render(game.run,equipped:game.profile.equipped)}
         XCTAssertEqual(renderer.art.collage.loadedTextureCount,55)
         XCTAssertTrue(renderer.art.collage.root.children.allSatisfy{$0.components[CollisionComponent.self] == nil})
@@ -90,7 +91,7 @@ extension Dream_AgainTests {
             game.simulation.state.activeTicks += 60
             game.simulation.streamChunks();r.render(game.run,equipped:game.profile.equipped)
             XCTAssertEqual(kit.root.children.map{ObjectIdentifier($0)},identities)
-            XCTAssertLessThanOrEqual(kit.activeCardCount,22)
+            XCTAssertLessThanOrEqual(kit.activeCardCount,25)
         }
         do {
             game.labCollage(index:0)
