@@ -6,13 +6,20 @@
 - The six-hour/20-seed core oracle passed. It establishes safe simulated trajectories, not human
   reaction-time/playability approval. The new difficulty curve needs physical-device playtesting.
 - Horizon warmup reduces cold certification work on the display thread; a cache miss still uses
-  synchronous validation. A palette-boundary CPU sample reached 19.514 ms. Hitch-free physical
+  synchronous validation. The current 660-submission CPU sample peaked at 10.354 ms; a separate palette-boundary
+  sample reached 32.783 ms. Hitch-free physical
   gameplay is not yet verified.
 - Straw-doll structural reference images mentioned in the request were not supplied. The model
   follows the written reed/twine construction. Cloth and straw use articulated geometry, not physics.
 - Selected runtime screenshots are visual evidence, not approval of every asset/material/LOD,
   seed, collision encounter, hat/action combination or small-phone/iPad layout. The remaining
   procedural world families vary in polish. Full reference-quality art acceptance remains open.
+- This is the approved 20-image pilot, not the eventual additional ~100-image library. All 55
+  textures currently preload. Measure physical-device memory and implement a bounded texture
+  working set before scaling production substantially. Rare cultural content is original generated
+  absurdist imagery, not imported internet memes. Motion uses transformed image cards, not GIFs,
+  skeletal swimming or a multi-frame cooking animation. Some story parts are intentionally
+  occluded by other scenery; every composition is not fully visible in every portrait frame.
 - Atmosphere is layered images, not volumetric clouds/water or true planar reflections.
   Oblique viewing can expose cards; ordinary gameplay uses the constrained third-person camera.
 - Local StoreKit purchase-sheet scenarios, live sandbox purchases, real ads/consent, Game Center,

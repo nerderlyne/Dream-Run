@@ -101,7 +101,7 @@ import simd
                 let sampleA=generator.sample(s),sampleB=generator.sample(s+1)
                 let elevation=Float(c.step?.height(at:middle) ?? 0)
                 let a=local(sampleA,origin:origin)+[0,elevation,0], b=local(sampleB,origin:origin)+[0,elevation,0]
-                let stair=[AssetID.stairsStraight,.stairsCurve,.stairsSpiral].contains(c.routeFamily)
+                let stair=[AssetID.stairsStraight,.stairsSpiral].contains(c.routeFamily)
                 let y=stair ? max(a.y,b.y) : a.y
                 let rightA=SIMD3<Float>(Float(cos(sampleA.yaw)),0,Float(sin(sampleA.yaw))), rightB=SIMD3<Float>(Float(cos(sampleB.yaw)),0,Float(sin(sampleB.yaw)))
                 for x in 0..<4 {

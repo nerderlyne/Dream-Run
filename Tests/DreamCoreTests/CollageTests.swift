@@ -4,9 +4,9 @@ import XCTest
 final class CollageTests:XCTestCase {
     func testKitCountsAndMetadata() {
         let kit=DreamCollageKit.assets
-        XCTAssertEqual(kit.count,35);XCTAssertEqual(Set(kit.map(\.id)).count,35)
+        XCTAssertEqual(kit.count,55);XCTAssertEqual(Set(kit.map(\.id )).count,55)
         XCTAssertEqual(kit.filter(\.isPlate).count,9)
-        for (concept,count) in [(AssetID.horse,5),(.tree,5),(.house,4),(.cloud,5),(.moon,3),(.arch,3),(.window,1)] {
+        for (concept,count) in [(AssetID.horse,5),(.tree,5),(.house,5),(.cloud,6),(.moon,3),(.arch,3),(.window,2)] {
             XCTAssertEqual(kit.filter{$0.concept == concept}.count,count)
         }
         for asset in kit {
@@ -52,5 +52,56 @@ final class CollageTests:XCTestCase {
         XCTAssertEqual(DreamCollageComposition.density(seconds:11050,visual:.deepSparse,voidWeight:0),0)
         XCTAssertEqual(DreamCollageComposition.density(seconds:11250,visual:.deepRebuilding,voidWeight:0),0.5)
         XCTAssertEqual(DreamCollageComposition.density(seconds:11400,visual:.deepRebuilding,voidWeight:0),1)
+    }
+}
+
+
+extension CollageTests {
+    func testPilotScenesAreLayerableAndApparitionsStayRare() {
+        XCTAssertEqual(DreamPilotKit.assets.count,20)
+        XCTAssertEqual(DreamPilotKit.assets.filter{$0.concept == .seaCreatures}.count,6)
+        for seed:UInt64 in 0..<20 {
+            let identity=DreamIdentity.current(seed:seed)
+            for block in 0..<20 {
+                let scenes=(block*5..<block*5+5).map{DreamVignette.selected(identity:identity,cell:$0)}
+                XCTAssertEqual(Set(scenes).count,5)
+                XCTAssertEqual(scenes.filter{$0 == .midnightKitchen}.count,1)
+            }
+            for scene in DreamVignette.allCases {
+                for part in 0..<4 {
+                    let a=scene.placement(identity:identity,distance:150,part:part)
+                    XCTAssertTrue(a.representation.backgroundOnly);XCTAssertFalse(a.representation.interactive)
+                    XCTAssertGreaterThan(a.elevation-a.height/2,0)
+                    XCTAssertEqual(a,scene.placement(identity:identity,distance:150,part:part))
+                }
+            }
+        }
+    }
+    func testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies() {
+        var seen=Set<String>()
+        let identity=DreamIdentity.current(seed:2026)
+        for slot in 0..<16 {
+            var previous=""
+            for cell in 1..<100 {
+                let distance=Double(cell)*DreamCollageComposition.period(slot:slot)
+                let p=DreamCollageComposition.placement(identity:identity,distance:distance,slot:slot)
+                XCTAssertNotEqual(p.representation.id,previous);previous=p.representation.id
+                XCTAssertNotEqual(p.representation.concept,.culturalApparitions)
+                seen.insert(previous)
+            }
+        }
+        for asset in DreamPilotKit.assets where asset.concept != .culturalApparitions {XCTAssertTrue(seen.contains(asset.id),asset.id)}
+    }
+    func testBackgroundMotionIsBoundedDeterministicAndCanBeDisabled() {
+        for asset in DreamPilotKit.assets {
+            let frozen=DreamScenicMotion.sample(id:asset.id,seconds:123,slot:3,reduced:true)
+            XCTAssertEqual(frozen.offset,.zero);XCTAssertEqual(frozen.roll,0);XCTAssertEqual(frozen.scale,1)
+            for time in stride(from:0.0,to:21600,by:137) {
+                let a=DreamScenicMotion.sample(id:asset.id,seconds:time,slot:3)
+                XCTAssertEqual(a,DreamScenicMotion.sample(id:asset.id,seconds:time,slot:3))
+                XCTAssertLessThanOrEqual(abs(a.offset.x),9);XCTAssertLessThanOrEqual(abs(a.offset.y),6)
+                XCTAssertLessThanOrEqual(abs(a.roll),0.05)
+            }
+        }
     }
 }

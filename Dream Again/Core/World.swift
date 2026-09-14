@@ -1,7 +1,7 @@
 import Foundation
 
 public enum AssetID: Int, Codable, CaseIterable, Sendable {
-    case trackStraight = 1, trackCurve, trackRamp, stairsStraight, stairsCurve, stairsSpiral, platform, trackBroken, arch, column, mirror, window, roomShell, house, tower, fountain, chair, bed, tree, flower, mushroom, rock, mountain, cloud, water, moon, balloon, heart, star, soccer, eightBall, softball, americanFootball, nazar, ribbon, curtain, clover, rail, horse, zebra, rabbit, pig
+    case trackStraight = 1, trackCurve, trackRamp, stairsStraight, seaCreatures, stairsSpiral, platform, trackBroken, arch, column, mirror, window, roomShell, house, tower, fountain, chair, bed, tree, flower, mushroom, rock, culturalApparitions, cloud, water, moon, balloon, heart, star, soccer, eightBall, softball, americanFootball, nazar, ribbon, curtain, clover, rail, horse, zebra, rabbit, pig
 }
 public enum Encounter: String, Codable, CaseIterable, Sendable { case breathing, dodge, rolling, gap, slide, jump, step, swing, lightning, mirror, drop }
 public struct RouteSample: Codable, Equatable, Sendable {
@@ -88,7 +88,7 @@ public struct WorldGenerator: Sendable {
     public func chunk(_ index: Int, tutorial: Bool = false) -> ChunkDescription {
         let start = Double(index) * 24
         var route = identity.stream("route", 0), scenery = identity.stream("scenery", index)
-        let families: [AssetID] = [.trackStraight,.trackCurve,.trackRamp,.stairsStraight,.stairsCurve,.stairsSpiral,.platform]
+        let families: [AssetID] = [.trackStraight,.trackCurve,.trackRamp,.stairsStraight,.stairsStraight,.stairsSpiral,.platform]
         var mood=identity.stream("mood",0)
         let recipe=(Int(mood.below(6))+index/18)%6
         var result = ChunkDescription(id: index, routeFamily: families[(Int(route.below(7))+index/2)%7], start: start, hazards: [], pickups: [], scenery: [], recipe: recipe)
@@ -118,7 +118,7 @@ public struct WorldGenerator: Sendable {
             result.pickups=[]
             for n in 0..<4 { result.pickups.append(PickupDescription(id:"drop-balloon:\(index):\(n)",distance:drop.departure+Double(n)*4,lateral:0)) }
         }
-        let recipes: [[AssetID]] = [[.cloud,.window,.house,.heart],[.water,.column,.roomShell,.fountain],[.rail,.moon,.star,.arch],[.tree,.horse,.rock],[.chair,.bed,.tower,.curtain],[.flower,.mushroom,.mountain,.ribbon]]
+        let recipes: [[AssetID]] = [[.cloud,.window,.house,.heart],[.water,.column,.roomShell,.fountain],[.rail,.moon,.star,.arch],[.tree,.horse,.rock],[.chair,.bed,.tower,.curtain],[.flower,.mushroom,.rock,.ribbon]]
         for n in 0..<2 {
             let list = recipes[result.recipe]
             result.scenery.append(SceneryPlacement(asset: list[(index*2+n)%list.count], distance: start + Double(n*12), lateral: (n == 0 ? -1 : 1) * Double(8 + scenery.below(8)), scale: 1.8 + Double(scenery.below(4))))

@@ -114,6 +114,7 @@ import UIKit
                     func arg(_ key:String,_ fallback:String)->String {arguments.firstIndex(of:key).flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1]:nil} ?? fallback}
                     labDesign(theme:theme,pose:pose,variant:Int(arg("--variant","0")) ?? 0,sky:arg("--sky","sky_cosmos"),pattern:TrackPattern(rawValue:arg("--pattern","checker")) ?? .checker,mirror:arguments.contains("--design-mirror"),contrast:arguments.contains("--design-contrast"))
                     if let kind=DreamObstacle(rawValue:arg("--obstacle","")) {labObstacle(kind,striking:arguments.contains("--strike"))}
+                    if let value=Int(arg("--vignette","-1")),let vignette=DreamVignette(rawValue:value) {labVignette(vignette)}
                     collageMotion=arguments.contains("--collage-moving")
                 }
 
@@ -138,7 +139,7 @@ import UIKit
     func start(identity:DreamIdentity? = nil,mode:RunMode? = nil) {
         artReview=false;renderer?.artPalette=nil;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
         #if DEBUG
-        artEquipped=nil;artIdle=false;obstacleReview=nil
+        artEquipped=nil;artIdle=false;obstacleReview=nil;renderer?.art.collage.previewVignette=nil
         #endif
         guard store != nil, renderer != nil else { error="The game resources or profile could not be loaded."; return }
         if let identity, !identity.supported { error=DreamError.unsupportedVersion.localizedDescription; return }
@@ -255,6 +256,7 @@ import UIKit
         }
     }
     @objc func frame(_ display:CADisplayLink) {
+        renderer?.art.collage.reducedMotion=settings.reducedMotion
         if artReview {
             #if DEBUG
             if collageMotion,renderer?.art.collage.ready == true {
@@ -273,7 +275,7 @@ import UIKit
                 let args=ProcessInfo.processInfo.arguments
                 if let i=args.firstIndex(of:"--collage-capture-token"),args.indices.contains(i+1),let token=UUID(uuidString:args[i+1]) {
                     let path=URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("collage-ready-\(token.uuidString).txt")
-                    try? Data("35 textures ready; DEBUG no rewards".utf8).write(to:path,options:.atomic)
+                    try? Data("55 textures ready; DEBUG no rewards".utf8).write(to:path,options:.atomic)
                     collageCaptureSignalled=true
                 }
             }
@@ -324,6 +326,12 @@ import UIKit
         audio.update(active:true,palette:run.paletteIndex,settings:settings)
     }
     #if DEBUG
+    func labVignette(_ kind:DreamVignette) {
+        labCollage(index:kind.rawValue)
+        renderer?.art.collage.previewVignette=kind
+        simulation.state.distance=150
+        renderer?.lastRun=nil;renderer?.render(run,equipped:profile.equipped)
+    }
     func labObstacle(_ kind:DreamObstacle,striking:Bool=false) {
         labCollage(index:0);obstacleReview=kind
         simulation.state.safeUntilDistance=0;simulation.state.activeTicks=36000
@@ -362,7 +370,7 @@ import UIKit
         renderer?.render(run,equipped:artEquipped ?? [:],menu:artIdle)
     }
     func labCollage(index:Int) {
-        obstacleReview=nil
+        obstacleReview=nil;renderer?.art.collage.previewVignette=nil
         artEquipped=nil;artIdle=false;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
         artReview=true;renderer?.artPalette=[0,2,4,6,1][((index%5)+5)%5]
         collageSceneIndex=((index%5)+5)%5;collageMotion=false

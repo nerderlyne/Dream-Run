@@ -10,7 +10,7 @@ final class TrackArtTests:XCTestCase {
         for i in 0..<100 {XCTAssertEqual(TrackArt.pattern(identity:id,distance:Double(i)*192),TrackArt.pattern(identity:id,distance:Double(i)*192+191))}
     }
     func testNineSkiesAndMirrorChange() {
-        XCTAssertEqual(DreamCollageKit.assets.count,35)
+        XCTAssertEqual(DreamCollageKit.assets.count,55)
         XCTAssertEqual(DreamCollageKit.assets.filter(\.isPlate).count,9)
         let id=DreamIdentity.current(seed:42)
         for section in 0..<50 {

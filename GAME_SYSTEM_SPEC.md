@@ -8,6 +8,10 @@
 
 > Run through a beautiful, unpredictable dream. Your movement is deliberately simple. The world is not. Collect balloons, avoid waking, save places you loved, and discover what the dream can become.
 
+## Creator-approved background pilot — 14 September 2026
+
+The 42 slots are semantic families, not file limits. Sea creatures occupy #05 and cultural apparitions #23; curved stairs merge into #04 and mountains into #22. Pig remains #42. The pilot adds twenty independently layerable cutouts and five animated compositions. Cultural apparitions are part of the 42 families, superseding the earlier separate meme-layer proposal. All imagery is original, bundled and harmless; motion, selection and recurrence are seeded/presentation-only.
+
 ## Creator-approved gameplay update — 14 September 2026
 
 These later creator decisions supersede the original tuning and scenery-only roles below:
@@ -201,7 +205,7 @@ Each prefab needs: bounds, pivot, LODs, semantic material slots, collision role 
 | 02 | `track_curve` — **Curved track** | Extrude the same cross-section along a gentle planar curve; preserve checker UV spacing. Left/right from signed curvature; no separately counted mirrored prefab; validate lookahead. |
 | 03 | `track_ramp` — **Rising/falling ramp** | Smooth deck with continuous height profile, not an obstacle or speed boost. Grade capped at 18 degrees initially; appearance can be grander outside the play strip. |
 | 04 | `stairs_straight` — **Straight staircase** | Repeated visible treads and risers over a continuous logical walk surface. Automatic climbing; explicit missing support intervals require jumping. |
-| 05 | `stairs_curve` — **Curved staircase** | Stair treads arranged along a broad curved centreline. Gentle curvature; player/camera follow the route automatically. |
+| 05 | `sea_creatures` — **Sea creatures** | Harmless layered whales, seahorses, rays, eels, jellyfish and nautiluses. Curved ordinary stairs are variants of family 04. |
 | 06 | `stairs_spiral` — **Spiral staircase** | Large-radius ascending/descending helix assembled from wedge treads. Gameplay radius at least 24 m; no tight blind spiral, camera obstruction, or roll. |
 | 07 | `platform` — **Floating platform / landing** | Broad beveled slab, round or rounded-square outline; patterned certified landing zone. Used for plazas, drop landings and step-like sequences; cosmetic widening does not increase steering range. |
 | 08 | `track_broken` — **Broken track / missing steps** | Paired ledges or stair groups with explicit empty support intervals. Real gap mask in simulation, not merely a black texture; telegraph based on current maximum speed. |
@@ -219,7 +223,7 @@ Each prefab needs: bounds, pivot, LODs, semantic material slots, collision role 
 | 20 | `flower` — **Oversized flower** | Curved stem, leaves, distinct petals and centre. Meadow clusters or monumental overhead flowers; never hide an active hazard. |
 | 21 | `mushroom` — **Mushroom** | Curved stem, cap, underside and optional procedural spots. May repeat into forests or appear alone; no secret power-up. |
 | 22 | `rock` — **Rock** | Seeded low-frequency displaced rounded rock with controllable faceting. Can be pearl, glass-like or velvet; not a route surface without an existing landing/track instance. |
-| 23 | `mountain` — **Mountain / cliff mass** | Large low-detail eroded silhouette with inset rock planes. Distant backdrop; cloud and track instances can surround it. |
+| 23 | `cultural_apparitions` — **Cultural apparitions** | Rare original cultural/media visual jokes, background only. Mountains and cliffs are large variants of rock family 22. |
 | 24 | `cloud` — **Cloud / fluffy mass** | Soft clustered volumes with an opaque stylized fallback; low transparent overdraw. Safe drops require a marker and a generated landing; a cloud alone never promises safety. |
 | 25 | `water` — **Water / reflective plane** | Bounded tileable plane with animated normal/ripple treatment. Ocean, flooded room or black reflecting surface; not automatically walkable or safe to fall into. |
 | 26 | `moon` — **Moon** | Sphere/disc with a restrained crater texture and optional crescent mask. Tiny, multiple, enormous or grounded; no luck effect. |

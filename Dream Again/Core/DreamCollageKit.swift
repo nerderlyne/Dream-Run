@@ -36,5 +36,5 @@ public enum DreamCollageKit {
         .init(id:"sky_mirage",concept:nil,medium:.photographic,orientation:"environmentPlate",moods:["dreamlike","atmospheric"],paletteTags:["peach", "apricot"],depths:[.background],backgroundOnly:true,interactive:false,rarity:1,alphaBounds:[0,0,681,1023],pixelSize:[682,1024],recommendedScaleRange:[1000,6000]),
         .init(id:"sky_lavender_mist",concept:nil,medium:.photographic,orientation:"environmentPlate",moods:["dreamlike","atmospheric"],paletteTags:["lavender", "pearl"],depths:[.background],backgroundOnly:true,interactive:false,rarity:1,alphaBounds:[0,0,681,1023],pixelSize:[682,1024],recommendedScaleRange:[1000,6000]),
         .init(id:"sky_opal_dawn",concept:nil,medium:.photographic,orientation:"environmentPlate",moods:["dreamlike","atmospheric"],paletteTags:["gold", "powderBlue"],depths:[.background],backgroundOnly:true,interactive:false,rarity:1,alphaBounds:[0,0,681,1023],pixelSize:[682,1024],recommendedScaleRange:[1000,6000])
-    ]
+    ] + DreamPilotKit.assets
 }

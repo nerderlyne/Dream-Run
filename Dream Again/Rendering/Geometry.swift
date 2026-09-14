@@ -76,8 +76,8 @@ extension UIColor {
             let pts=(0..<32).map { i -> SIMD2<Float> in let t=Float(i)/32*2*Float.pi; return SIMD2<Float>(16*pow(sin(t),3),13*cos(t)-5*cos(2*t)-2*cos(3*t)-cos(4*t))*scale/18 }; g.polygon(pts.reversed(),center:center,depth:scale*0.35)
         }
         switch id {
-        case .trackStraight,.trackCurve,.trackRamp,.stairsStraight,.stairsCurve,.stairsSpiral,.platform,.trackBroken:
-            let stairs=[AssetID.stairsStraight,.stairsCurve,.stairsSpiral].contains(id), curve=[AssetID.trackCurve,.stairsCurve,.stairsSpiral].contains(id)
+        case .trackStraight,.trackCurve,.trackRamp,.stairsStraight,.stairsSpiral,.platform,.trackBroken:
+            let stairs=[AssetID.stairsStraight,.stairsSpiral].contains(id), curve=[AssetID.trackCurve,.stairsSpiral].contains(id)
             for n in 0..<24 {
                 if id == .trackBroken && (10...13).contains(n) { continue }
                 let s=Float(n),x=curve ? 24*(1-cos(s/24)) : 0, y=stairs || id == .trackRamp ? s*0.13 : 0
@@ -159,9 +159,19 @@ extension UIColor {
         case .mushroom:
             sphere(&body,[0,0.8,0],[0.3,0.85,0.3]); sphere(&trim,[0,1.7,0],[1.1,0.5,1.1])
             for n in 0..<7 { let t=Float(n)*2.4; sphere(&semantic,[cos(t)*0.65,2.05,sin(t)*0.65],[0.12,0.04,0.12]) }
-        case .rock,.mountain:
-            let count=id == .mountain ? 5 : 3
-            for n in 0..<count { let t=Float(n)*2.4; body.ellipsoid([cos(t)*0.5,0.5+Float(n)*0.15,sin(t)*0.4],[0.8, id == .mountain ? 2+Float(n)*0.4 : 0.7,0.85],segments:max(16,segments),rings:max(8,segments/2)) }
+        case .rock:
+            let count=5
+            for n in 0..<count { let t=Float(n)*2.4; body.ellipsoid([cos(t)*0.5,0.5+Float(n)*0.15,sin(t)*0.4],[0.8, 2+Float(n)*0.4,0.85],segments:max(16,segments),rings:max(8,segments/2)) }
+        case .seaCreatures:
+            body.ellipsoid([0,1,0],[2.1,0.65,0.75],segments:32,rings:20)
+            trim.ellipsoid([1.95,1.1,0],[0.35,0.12,1.1],segments:24,rings:12)
+            trim.ellipsoid([-0.45,0.55,0.65],[0.85,0.1,0.3],segments:24,rings:12)
+            dark.ellipsoid([-1.6,1.2,0.56],[0.075,0.075,0.075])
+        case .culturalApparitions:
+            body.box([0,1,0],[1.7,1.3,0.8]);dark.box([0,1,0.42],[1.3,0.95,0.05])
+            trim.tube([[-0.3,1.65,0],[-0.75,2.2,0]],radius:0.025)
+            trim.tube([[0.3,1.65,0],[0.75,2.2,0]],radius:0.025)
+            for x:Float in [-0.6,0.6] {trim.box([x,0.2,0],[0.15,0.4,0.15])}
         case .cloud:
             body.sculpt([([-1.2,0,0],[1.3,0.65,0.85]),([0,0.25,0],[1.1,1.0,1]),([1.15,0,0.1],[1.2,0.65,0.9]),([0.55,0.65,-0.05],[0.6,0.65,0.7])],min:[-2.7,-0.85,-1.2],max:[2.6,1.5,1.2],step:lod == 2 ? 0.18 : 0.105,blend:0.4,ripple:0.012)
             bodyColor=UIColor(hex:p.fog)

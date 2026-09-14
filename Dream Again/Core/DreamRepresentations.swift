@@ -33,12 +33,12 @@ public struct DreamConceptDefinition:Sendable {
 }
 public enum DreamRepresentationRegistry {
     public static let concepts:[DreamConceptDefinition] = AssetID.allCases.map { id in
-        let interactive:Set<AssetID>=[.trackStraight,.trackCurve,.trackRamp,.stairsStraight,.stairsCurve,.stairsSpiral,.platform,.trackBroken,.column,.mirror,.window,.bed,.chair,.moon,.cloud,.balloon,.soccer,.eightBall,.softball,.americanFootball,.nazar,.clover,.horse,.zebra,.rabbit,.pig]
+        let interactive:Set<AssetID>=[.trackStraight,.trackCurve,.trackRamp,.stairsStraight,.stairsSpiral,.platform,.trackBroken,.column,.mirror,.window,.bed,.chair,.moon,.cloud,.balloon,.soccer,.eightBall,.softball,.americanFootball,.nazar,.clover,.horse,.zebra,.rabbit,.pig]
         return .init(semanticID:id,requiresGameplay3D:interactive.contains(id),representations:DreamCollageKit.assets.filter{$0.concept == id})
     }
     public static func definition(for id:AssetID)->DreamConceptDefinition {concepts[id.rawValue-1]}
 }
-public enum DreamMemeLibrary {public static let entries:[String]=[]}
+public enum DreamMemeLibrary {public static let entries=["chicken_chef","stove_chrome","tv_cloud","telephone_banana"]}
 
 /// A stable slot description. All positions derive from distance cells, never load timing.
 public struct DreamCollagePlacement:Equatable,Sendable {
@@ -54,7 +54,9 @@ public struct DreamCollagePlacement:Equatable,Sendable {
     public let opacity:Float
 }
 public enum DreamCollageComposition {
-    public static let slotCount=16
+    public static let slotCount=20
+    public static func period(slot:Int)->Double {slot>=16 ? 640:slot<4 ? 768:slot<12 ? 384:192}
+    public static func cell(distance:Double,slot:Int)->Int {Int(floor((distance+(slot>=16 ? 0:Double(slot)*period(slot:slot)/16))/period(slot:slot)))}
     public static let proofSeeds:[UInt64]=[42,117,802,2026,9001]
     public static func plate(identity:DreamIdentity,section:Int,transition:Int=0)->DreamRepresentation {
         var rng=identity.stream("collage-sky",section)
@@ -63,19 +65,24 @@ public enum DreamCollageComposition {
         return plates[(initial+transition*4)%plates.count]
     }
     public static func placement(identity:DreamIdentity,distance:Double,slot:Int)->DreamCollagePlacement {
-        let period=slot<4 ? 768.0 : slot<12 ? 384.0 : 192.0
-        let offset=Double(slot)*period/Double(slotCount)
+        if slot>=16 {return DreamVignette.selected(identity:identity,cell:cell(distance:distance,slot:slot)).placement(identity:identity,distance:distance,part:slot-16)}
+        let period=period(slot:slot)
+        let offset=Double(slot)*period/16
         let cell=Int(floor((distance+offset)/period))
         let anchor=Double(cell)*period-offset
         var rng=identity.stream("collage-slot-\(slot)",cell)
-        let families:[AssetID]=slot == 0 ? [.moon] : slot<4 ? [.moon,.cloud,.cloud,.house,.arch] : slot<12 ? [.horse,.horse,.tree,.tree,.house,.arch,.window] : [.cloud,.cloud,.tree]
-        let concept=families[Int(rng.below(UInt64(families.count)))]
-        let choices=DreamCollageKit.assets.filter{$0.concept == concept}
-        // Inverse rarity weights; iteration order is checked in the kit contract.
-        let weights=choices.map{max(1,12/$0.rarity)},total=weights.reduce(0,+)
-        var pick=Int(rng.below(UInt64(total))),index=0
-        for i in choices.indices {if pick<weights[i] {index=i;break};pick-=weights[i]}
-        let asset=choices[index]
+        let families:Set<AssetID>=slot<4 ? [.moon,.cloud,.house,.arch,.rock,.water,.seaCreatures] : slot<12 ? [.horse,.tree,.house,.arch,.window,.chair,.bed,.flower,.seaCreatures,.rock] : [.cloud,.tree,.water,.ribbon,.flower]
+        let choices=DreamCollageKit.assets.filter{$0.concept.map{families.contains($0)} ?? false}
+        // A shuffled deck visits every eligible ingredient before repeating it in this slot.
+        func deck(_ cycle:Int)->[DreamRepresentation] {
+            var values=choices,r=identity.stream("collage-deck-\(slot)",cycle)
+            for j in stride(from:values.count-1,through:1,by:-1) {values.swapAt(j,Int(r.below(UInt64(j+1))))}
+            return values
+        }
+        let cycle=max(0,cell)/choices.count
+        var bag=deck(cycle)
+        if cycle>0 && bag.first?.id == deck(cycle-1).last?.id {bag.swapAt(0,1)}
+        let asset=bag[max(0,cell)%bag.count],concept=asset.concept!
         let depth=Float(period)+Float(80+rng.below(120))
         let height=depth*(concept == .moon ? 0.16 : concept == .cloud ? 0.13 : 0.12)+depth*Float(rng.below(100))/1000
         let side:Float=rng.below(2)==0 ? -1:1

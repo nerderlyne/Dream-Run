@@ -1,12 +1,13 @@
 import RealityKit
 import UIKit
 
-/// Fixed pool: 16 object cards and two sky cards; no decoding or mesh creation in update.
+/// Fixed pool: 20 object cards and two sky cards; no decoding or mesh creation in update.
 @MainActor final class HybridDreamLayers {
     @MainActor private final class Slot {
         let model:ModelEntity
         var key=""
         var placement:DreamCollagePlacement?
+        var basePosition=SIMD3<Float>.zero
         init(mesh:MeshResource) {
             model=ModelEntity(mesh:mesh,materials:[]);model.isEnabled=false
             model.components.set(DynamicLightShadowComponent(castsShadow:false))
@@ -27,6 +28,8 @@ import UIKit
     private(set) var activeCardCount=0
     var ready:Bool {loadedTextureCount == DreamCollageKit.assets.count}
     var previewPlate:String?
+    var previewVignette:DreamVignette?
+    var reducedMotion=false
     var pooledCardCount:Int {slots.count+skies.count}
     var cardPositions:[SIMD3<Float>] {slots.map{$0.model.position}}
     init() {
@@ -63,7 +66,7 @@ import UIKit
         for slot in slots+skies {slot.key="";slot.placement=nil;slot.model.isEnabled=false}
         skyStarted=nil;skyIndex=0;activeCardCount=0
     }
-    func rebase(by shift:SIMD3<Float>) {for slot in slots {slot.model.position += shift}}
+    func rebase(by shift:SIMD3<Float>) {for slot in slots {slot.model.position += shift;slot.basePosition += shift}}
     private func assign(_ asset:DreamRepresentation,to slot:Slot)->Bool {
         guard let texture=textures[asset.id] else{return false}
         var material=UnlitMaterial(applyPostProcessToneMap:false)
@@ -78,7 +81,7 @@ import UIKit
         slot.model.components.set(OpacityComponent(opacity:max(0,min(1,value))))
     }
     func update(run:RunState,origin:RouteSample,world:Entity,camera:PerspectiveCamera,aspect:Float,lowPower:Bool,voidWeight:Double) {
-        guard slots.count == 16,skies.count == 2 else{return}
+        guard slots.count == DreamCollageComposition.slotCount,skies.count == 2 else{return}
         if root.parent == nil {world.addChild(root)}
         root.isEnabled=true
         let density=DreamCollageComposition.density(seconds:run.seconds,visual:run.visual,voidWeight:voidWeight)
@@ -104,10 +107,11 @@ import UIKit
         let generator=WorldGenerator(run.identity)
         for i in slots.indices {
             let slot=slots[i]
-            let period:Double=i<4 ? 768:i<12 ? 384:192
-            let cell=Int(floor((run.distance+Double(i)*period/16)/period))
+            let period=DreamCollageComposition.period(slot:i)
+            let cell=DreamCollageComposition.cell(distance:run.distance,slot:i)
             let p:DreamCollagePlacement
             if let cached=slot.placement,cached.cell == cell {p=cached}
+            else if i>=16,let scene=previewVignette {p=scene.placement(identity:run.identity,distance:run.distance,part:i-16)}
             else {p=DreamCollageComposition.placement(identity:run.identity,distance:run.distance,slot:i)}
             let key="\(p.cell):\(p.representation.id)"
             if slot.key != key {
@@ -118,12 +122,15 @@ import UIKit
                 let right=SIMD3<Float>(Float(cos(s.yaw)),0,Float(sin(s.yaw)))
                 slot.model.position=[Float(s.x-origin.x),Float(s.y-origin.y),Float(s.z-origin.z)]
                 slot.model.position += forward*p.depth+right*p.lateral+[0,p.elevation,0]
-                slot.model.scale=[p.height*p.representation.aspect*(p.mirrored ? -1:1),p.height,1]
+                slot.basePosition=slot.model.position
             }
-            slot.model.orientation=camera.orientation*simd_quatf(angle:p.roll,axis:[0,0,1])
+            let motion=DreamScenicMotion.sample(id:p.representation.id,seconds:run.seconds,slot:i,reduced:reducedMotion || lowPower)
+            slot.model.position=slot.basePosition+camera.orientation.act([motion.offset.x,motion.offset.y,0])
+            slot.model.scale=[p.height*p.representation.aspect*(p.mirrored ? -1:1)*motion.scale,p.height*motion.scale,1]
+            slot.model.orientation=camera.orientation*simd_quatf(angle:p.roll+motion.roll,axis:[0,0,1])
             let age=run.distance-p.anchorDistance
             let edge=Float(min(1,max(0,age/24))*min(1,max(0,(period-age)/24)))
-            let rank=Float((i*7)%16)/16
+            let rank:Float=i>=16 ? 0.12:Float((i*7)%16)/16
             let population=max(0,min(1,(density-rank)*8))
             let delta=camera.orientation.inverse.act(slot.model.position-camera.position),z = -delta.z
             let coversRoute=abs(delta.x)-abs(slot.model.scale.x)*0.5<z*0.10 && delta.y-slot.model.scale.y*0.5<z*0.06

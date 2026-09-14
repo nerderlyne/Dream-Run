@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture current RealityKit views after all 35 textures are ready."""
+"""Capture current RealityKit views after all catalog textures are ready."""
 import pathlib,subprocess,sys,time,uuid
 root=pathlib.Path(__file__).resolve().parents[1]
 device=sys.argv[1];out=root/'evidence'

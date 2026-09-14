@@ -56,7 +56,7 @@ A `.dream` file contains only `format` and `dreamID`, is limited to 32 KiB and a
 Current running speed starts at **12.25 m/s**, rising to **16 m/s at two minutes, 19 m/s at five minutes, and a 22 m/s cap at ten minutes**. Steering spans **±0.9 m**,
 with 6 m/s lateral movement, 40 ms smoothing and 12° calibrated full-scale tilt.
 
-Dreams use the current 35-image collage pipeline, a straw doll runner and vivid track materials. Balls approach at **8 m/s**, with **10 m/s** volleys in the hardest tier and rotate with their travelled distance. There is no alternate legacy art renderer.
+Dreams use the current 55-image collage pipeline, a straw doll runner and vivid track materials. Balls approach at **8 m/s**, with **10 m/s** volleys in the hardest tier and rotate with their travelled distance. There is no alternate legacy art renderer.
 
 For the collage proof, open the DEBUG Lab and choose collage 1–5. Use run/freeze to inspect world-space motion. Simulator launch arguments are `--art-review --collage-scene 0` (0–4), optionally `--collage-moving`. All proof runs are DEBUG-only and earn no rewards. Details and exact kit contents: [collage pipeline](docs/HYBRID_COLLAGE_PIPELINE.md).
 
@@ -87,3 +87,9 @@ The speed cap does not end the run or change pig probabilities.
 In DEBUG, open **Lab** and select any obstacle. Use **run**, **freeze**, and **again** to
 practice its actual collision behavior without earning rewards. For a static lightning
 strike preview, launch with `--art-review --design-review --obstacle lightning --strike`.
+
+The background pilot adds 20 transparent ingredients and five animated compositions. In DEBUG Lab,
+select Whale Cottage, Jelly Garden, Inverted Procession, Floating Bedroom or Midnight Kitchen.
+Launch a specific one with `--art-review --design-review --vignette 0` (0–4), optionally
+`--collage-moving`. See [runtime gallery and motion clip](evidence/pilot-gallery.html) and
+[exact prompts and provenance](docs/COLLAGE_PILOT.json). These previews earn no rewards.
