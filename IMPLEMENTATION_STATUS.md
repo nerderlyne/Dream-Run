@@ -239,3 +239,21 @@ The existing sky texture blends its tint while the lighting resource remains bou
 
 Verified: **12 native tests / 0 failures / 19.507 s**, **1 offline gameplay UI test / 0 failures / 31.245 s**, Release simulator build, 51 specification checks and release preflight. Tests assert unchanged initial colours, staggered timing, gradual completion, accelerated mirror timing, retained track/horizon identity, no environment rebinding, and at most four palette material submissions per frame. The boundary probe took **33.045 ms**, including newly streamed chunk work: this is improved architecture, not a claim that every device frame meets 16.7 ms. Steady CPU probe: median **0.633 ms**, p95 **3.978 ms**, max **10.852 ms**. Logs: `evidence/evolution-*.log`.
 Final haze-preserving recolour refinement also passes **12 native tests, 0 failures, 27.340 s** and the rebuilt Release target. Latest diagnostic sample: boundary **46.988 ms**, steady median/p95/max **0.861/5.143/13.929 ms**; this supersedes any interpretation of the earlier 33 ms sample as a worst-case guarantee. No physical-device FPS claim. See `evolution-atmosphere-tests.log`.
+
+## Corrected collage kit — September 14, 2026
+
+The first full-scene experiments were rejected by the user and quarantined outside the app. They are not evidence of the requested architecture. The replacement proof kit contains exactly 29 reusable images: 3 atmosphere/ocean plates, 5 horses, 5 trees, 4 houses, 5 clouds/mists, 3 moons and 4 architectural fragments. All 26 object/atmosphere cutouts pass a decoded-pixel alpha audit with zero significant edge pixels; the three plates are opaque. Generation stopped at the requested kit size.
+
+The C2 renderer preallocates 18 cards, preloads 29 textures asynchronously, and composes seeded world-space layers from independently staggered distance cells. Sky plates fill the camera frustum. Cards are pooled through transitions and floating-origin rebases. Decorative C1 chunk/horizon meshes are replaced in C2 to reduce CPU work; gameplay remains 3D. New codes save/share C2, while C1 remains supported and C2 explicitly retains C1 gameplay RNG streams. The 42-family registry is unchanged. DEBUG Lab exposes five seeds plus run/freeze controls; preview progression cannot earn rewards.
+
+Evidence: 51 specification checks passed. Swift package: 29 tests, zero failures, 150.178 s (the existing six-hour oracle test was excluded). First native simulator suite: 15 tests, zero failures, 31.409 s. Further visual and performance verification is recorded in `evidence/COLLAGE_KIT_REVIEW.md`. The initial oversized/overtransparent runtime capture was a diagnostic, not the final target. See `docs/HYBRID_COLLAGE_PIPELINE.md`, `ASSET_LICENSES.md`, and `art-review/kit-generation.json` for architecture and provenance.
+
+The completed suite reached 16 native tests and 3 UI tests with zero failures. Subsequent
+targeted compositing/rebase/preload/reward checks passed 3 tests in 41.255 s; final core
+composition contracts passed 4 tests in 0.193 s. The simulator CPU comparison measured
+C1 median/p95/max 2.578/6.973/950.206 ms and C2 0.374/0.513/10.341 ms. This is CPU update
+time, not device FPS; Metal allocation warnings during tests remain documented. The five
+runtime seeds and moving preview are collected in `evidence/collage-gallery.html`.
+Final DEBUG and Release arm64 simulator builds pass, including transparent-layer sorting,
+disabled card shadow casting and explicit main-actor isolation. Physical-device performance
+and subjective art acceptance remain open; the library has not expanded beyond 29 images.

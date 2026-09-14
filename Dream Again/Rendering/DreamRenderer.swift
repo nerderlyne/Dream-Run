@@ -147,10 +147,11 @@ import simd
             // Create the sky once for this run. Palette changes tint the retained texture.
             art.environment(palette:palette == 5 ? 0 : palette,definition:factory.palettes[palette == 5 ? 0 : palette],view:view,enabled:true)
             if palette == 5 {art.tintSky(.black)}
+            if run.identity.contentVersion >= 2 {view.environment.background = .color(.black)}
         } else if newBase != base {
             // Translate retained meshes into the new local origin; do not regenerate them.
             let shift=local(generator.sample(base),origin:origin)
-            for child in world.children where child !== distantPath.root && child !== art.horizon {child.position += shift}
+            for child in world.children where child !== distantPath.root && child !== art.horizon && child !== art.collage.root {child.position += shift}
             distantPath.rebase(by:shift);art.rebase(by:shift)
             base=newBase
         }
@@ -278,6 +279,8 @@ import simd
         let cameraPosition=local(generator.sample(visualDistance-4.8),origin:origin,lateral:run.player.lateral*0.2)+[0,2.8,0]
         let target=local(generator.sample(visualDistance+9),origin:origin)+[0,0.7,0]
         camera.look(at:target,from:cameraPosition,relativeTo:nil)
+        art.collage.update(run:run,origin:origin,world:world,camera:camera,aspect:Float(view.bounds.width/max(1,view.bounds.height)),lowPower:lowPower,voidWeight:evolution.voidWeight(seconds:run.seconds))
+        if run.identity.contentVersion >= 2 && art.collage.loadedTextureCount>0 {art.skyDome.isEnabled=false}
         if !cinematic {
             evolution.update(seconds:run.seconds,palettes:factory.palettes,art:art)
             art.haze(world,camera:cameraPosition,color:evolution.fog)

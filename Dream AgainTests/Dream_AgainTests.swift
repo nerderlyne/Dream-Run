@@ -11,6 +11,96 @@ final class Dream_AgainTests:XCTestCase {
 }
 
 extension Dream_AgainTests {
+    func testRepresentationRegistryKeepsExactlyFortyTwoSemanticConcepts() throws {
+        XCTAssertEqual(DreamRepresentationRegistry.concepts.count,42)
+        XCTAssertEqual(Set(DreamRepresentationRegistry.concepts.map(\.semanticID)),Set(AssetID.allCases))
+        XCTAssertEqual(DreamMemeLibrary.entries.count,0)
+        for concept in DreamRepresentationRegistry.concepts {
+            XCTAssertFalse(concept.proceduralRepresentationID.isEmpty)
+            XCTAssertTrue(concept.representations.allSatisfy{$0.concept == concept.semanticID})
+        }
+        XCTAssertTrue(DreamRepresentationRegistry.definition(for:.horse).requiresGameplay3D)
+        XCTAssertTrue(DreamRepresentationRegistry.definition(for:.rabbit).requiresGameplay3D)
+        XCTAssertFalse(DreamRepresentationRegistry.definition(for:.mountain).requiresGameplay3D)
+    }
+
+    func testCollageSelectionIsDeterministicAndPresentationOnly() throws {
+        let identity=DreamIdentity(seed:42)
+        let a=DreamCollageComposition.plate(identity:identity,section:7)
+        let b=DreamCollageComposition.plate(identity:identity,section:7)
+        XCTAssertEqual(a,b)
+        XCTAssertEqual(DreamCollageComposition.density(seconds:11100,visual:.deepSparse,voidWeight:0),0)
+    }
+
+    @MainActor func testHybridCollageLoadsOnceAndStaysBounded() async throws {
+        let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
+        await renderer.art.collage.waitForPreload()
+        XCTAssertEqual(renderer.art.collage.loadErrors,[])
+        XCTAssertEqual(renderer.art.collage.loadedTextureCount,29)
+        game.labCollage(index:0)
+        renderer.render(game.run,equipped:game.profile.equipped)
+        XCTAssertGreaterThan(renderer.art.collage.activeCardCount,5)
+        XCTAssertEqual(renderer.art.collage.pooledCardCount,18)
+        for _ in 0..<30 {renderer.render(game.run,equipped:game.profile.equipped)}
+        XCTAssertEqual(renderer.art.collage.loadedTextureCount,29)
+        XCTAssertTrue(renderer.art.collage.root.children.allSatisfy{$0.components[CollisionComponent.self] == nil})
+        for asset in DreamCollageKit.assets {
+            XCTAssertNotNil(Bundle.main.url(forResource:asset.resource,withExtension:"png"))
+        }
+    }
+
+    @MainActor func testCollageRebaseTransitionsAndCPUProfile() async throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer),kit=r.art.collage
+        await kit.waitForPreload()
+        XCTAssertTrue(kit.ready,"\(kit.loadErrors)")
+        game.labCollage(index:0)
+        game.simulation.state.distance=191.9;game.simulation.streamChunks()
+        r.render(game.run,equipped:game.profile.equipped)
+        let positions=kit.cardPositions
+        let oldOrigin=WorldGenerator(game.run.identity).sample(0),newOrigin=WorldGenerator(game.run.identity).sample(192)
+        let shift=SIMD3<Float>(Float(oldOrigin.x-newOrigin.x),Float(oldOrigin.y-newOrigin.y),Float(oldOrigin.z-newOrigin.z))
+        game.simulation.state.distance=192.1;game.simulation.streamChunks()
+        r.render(game.run,equipped:game.profile.equipped)
+        // Slot 1 is not crossing its staggered lifetime boundary here.
+        XCTAssertLessThan(simd_length(kit.cardPositions[1]-(positions[1]+shift)),0.001)
+        let identities=kit.root.children.map{ObjectIdentifier($0)}
+        for n in 0..<20 {
+            game.simulation.state.distance=Double(n*1600+60)
+            game.simulation.state.activeTicks += 60
+            game.simulation.streamChunks();r.render(game.run,equipped:game.profile.equipped)
+            XCTAssertEqual(kit.root.children.map{ObjectIdentifier($0)},identities)
+            XCTAssertLessThanOrEqual(kit.activeCardCount,18)
+        }
+        for version:UInt16 in [1,2] {
+            game.labCollage(index:0);game.simulation.state.identity.contentVersion=version
+            game.simulation.state.id=UUID()
+            var timings:[Double]=[]
+            for tick in 0..<720 {
+                game.simulation.state.distance=400+Double(tick)*12.25/60
+                game.simulation.state.activeTicks=UInt64(1800+tick)
+                game.simulation.streamChunks()
+                let start=CFAbsoluteTimeGetCurrent()
+                r.render(game.run,equipped:game.profile.equipped)
+                if tick>=60 {timings.append((CFAbsoluteTimeGetCurrent()-start)*1000)}
+            }
+            timings.sort()
+            print("COLLAGE_CPU_C\(version) samples=\(timings.count) median_ms=\(timings[timings.count/2]) p95_ms=\(timings[Int(Double(timings.count)*0.95)]) max_ms=\(timings.last!) entities=\(r.renderEntities) cards=\(kit.activeCardCount)")
+        }
+    }
+    @MainActor func testCollageReviewClearsInitialGapsAndCannotEarn() throws {
+        let game=GameModel()
+        game.labCollage(index:2)
+        let wallet=game.profile.balance
+        for _ in 0..<1200 {_=game.simulation.step(.init())}
+        XCTAssertEqual(game.run.phase,.running)
+        XCTAssertGreaterThan(game.run.distance,290)
+        XCTAssertEqual(game.run.mode,.debug)
+        XCTAssertFalse(game.run.mode.earns)
+        XCTAssertEqual(game.profile.balance,wallet)
+    }
+}
+
+extension Dream_AgainTests {
     @MainActor func testSculptedSurfacesHaveFiniteUnitNormals() throws {
         var g=Geometry()
         g.sculpt([([0,0,0],[0.3,0.4,0.3]),([0,0.35,0],[0.2,0.2,0.2])],min:[-0.5,-0.5,-0.5],max:[0.5,0.7,0.5],step:0.06)
@@ -151,6 +241,7 @@ extension Dream_AgainTests {
     @MainActor func testPaletteBoundaryRetainsWorldAndChangesObjectsGradually() throws {
         let game=GameModel(),r=try XCTUnwrap(game.renderer)
         game.labArt(theme:0,distance:431.9)
+        game.simulation.state.identity.contentVersion=1 // Retained legacy scenery contract.
         let equipped=game.profile.equipped
         for _ in 0..<30 {r.render(game.run,equipped:equipped)}
         let chunks=r.chunks,landmark=try XCTUnwrap(r.art.horizon.children.first)

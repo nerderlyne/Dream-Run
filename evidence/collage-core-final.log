@@ -1,0 +1,31 @@
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Emitting module DreamCore
+[5/6] Compiling DreamCore DreamRepresentations.swift
+[6/9] Emitting module DreamCoreTests
+[7/9] Compiling DreamCoreTests CollageTests.swift
+[7/9] Write Objects.LinkFileList
+[8/9] Linking DreamCorePackageTests
+Build complete! (19.42s)
+Test Suite 'Selected tests' started at 2026-09-14 06:46:03.236.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-14 06:46:03.263.
+Test Suite 'CollageTests' started at 2026-09-14 06:46:03.263.
+Test Case '-[DreamCoreTests.CollageTests testC2PreservesGameplayAndRoundTrips]' started.
+Test Case '-[DreamCoreTests.CollageTests testC2PreservesGameplayAndRoundTrips]' passed (0.153 seconds).
+Test Case '-[DreamCoreTests.CollageTests testDensityIsNonterminalAndRebuilds]' started.
+Test Case '-[DreamCoreTests.CollageTests testDensityIsNonterminalAndRebuilds]' passed (0.007 seconds).
+Test Case '-[DreamCoreTests.CollageTests testFiveRecombinationsAreStableAndDifferent]' started.
+Test Case '-[DreamCoreTests.CollageTests testFiveRecombinationsAreStableAndDifferent]' passed (0.030 seconds).
+Test Case '-[DreamCoreTests.CollageTests testKitCountsAndMetadata]' started.
+Test Case '-[DreamCoreTests.CollageTests testKitCountsAndMetadata]' passed (0.004 seconds).
+Test Suite 'CollageTests' passed at 2026-09-14 06:46:03.459.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.193 (0.195) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-14 06:46:03.459.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.193 (0.196) seconds
+Test Suite 'Selected tests' passed at 2026-09-14 06:46:03.459.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.193 (0.223) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.003 seconds.

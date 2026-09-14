@@ -12,12 +12,13 @@ import simd
     let skyDome=ModelEntity(mesh:.generateSphere(radius:6000),materials:[UnlitMaterial(color:.white)])
     private var skyTextures:[Int:TextureResource]=[:]
     let cloudBanks=CloudBank()
+    let collage=HybridDreamLayers()
     let horizon=Entity()
     private var horizonKey=""
     private var landmarkDistances:[Int:Double]=[:]
     private var hazeOriginals:[ObjectIdentifier:[PhysicallyBasedMaterial]]=[:]
     private var lastHazePosition=SIMD3<Float>(repeating:Float.greatestFiniteMagnitude)
-    func resetHaze() {horizonKey="";hazeQueue.removeAll();hazeCursor=0;hazeCenters.removeAll();hazeAmounts.removeAll();hazeOriginals.removeAll();lastHazePosition=SIMD3(repeating:Float.greatestFiniteMagnitude)}
+    func resetHaze() {horizonKey="";hazeQueue.removeAll();hazeCursor=0;hazeCenters.removeAll();hazeAmounts.removeAll();hazeOriginals.removeAll();lastHazePosition=SIMD3(repeating:Float.greatestFiniteMagnitude);collage.reset()}
     private var hazeQueue:[ModelEntity]=[]
     private var hazeCursor=0
     private var hazeCenters:[ObjectIdentifier:SIMD3<Float>]=[:]
@@ -36,7 +37,7 @@ import simd
         guard var material=skyDome.model?.materials.first as? UnlitMaterial else{return}
         material.color.tint=color;skyDome.model?.materials=[material]
     }
-    func rebase(by shift:SIMD3<Float>) {for child in horizon.children {child.position += shift}}
+    func rebase(by shift:SIMD3<Float>) {for child in horizon.children {child.position += shift};collage.rebase(by:shift)}
     func haze(_ world:Entity,camera:SIMD3<Float>,color:UIColor) {
         hazeColor=color
         if hazeCursor >= hazeQueue.count {
@@ -126,6 +127,7 @@ import simd
         skyDome.model?.materials=[material]
     }
     func decorate(_ root:Entity,chunk:ChunkDescription,generator:WorldGenerator,origin:RouteSample,palette:Int,factory:PrefabFactory,lowPower:Bool) {
+        if generator.identity.contentVersion >= 2 {return}
         let p=factory.palettes[palette],id=chunk.id,night=palette == 4 || palette == 5,aqua=palette == 1 || palette == 6
         func point(_ distance:Double,_ lateral:Double,_ y:Float)->SIMD3<Float> {
             let s=generator.sample(distance)
@@ -177,6 +179,7 @@ extension DreamArtDirection {
     /// No extra world families, gameplay draws, spawn decisions, or collision entities.
     func landscape(run:RunState,origin:RouteSample,palette:Int,factory:PrefabFactory,world:Entity,lowPower:Bool,evolution:PaletteEvolution) {
         let section=Int(run.distance/192),p=factory.palettes[palette]
+        if run.identity.contentVersion >= 2 {return}
         let key="\(run.id)"
         if horizon.parent == nil {world.addChild(horizon)}
         if key != horizonKey {horizon.children.removeAll();landmarkDistances.removeAll();horizonKey=key}

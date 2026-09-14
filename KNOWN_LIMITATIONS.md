@@ -38,3 +38,12 @@ Simulator CPU measurements now exercise 120 renderer updates after warm-up. They
 
 ### Gradual palette evolution
 Sky evolution tints the retained procedural sky texture; it does not regenerate volumetric clouds or interpolate two full environment-lighting maps. Ordinary object colour changes take up to approximately 19 seconds, subject to the bounded material-update queue. Newly encountered scenery can still require synchronous mesh construction; the simulator boundary probe measured 33 ms including streaming, so a strict 60 FPS/device thermal guarantee remains unmet. The mirror's existing crossing presentation is retained; this change blends colours faster there rather than introducing a loading pause. Physical-device transition pacing and the full palette-pair visual matrix remain untested.
+
+### Hybrid collage library
+
+The corrected proof library contains exactly 29 ingredients, covering six of the 42 concepts with alternative 2D representations; all 42 retain procedural 3D implementations. The library must not expand until the proof is accepted. The 3D gameplay horse/rabbit/player and other provisional close assets are unchanged. No meme image ships. Cutout clouds have soft alpha but are not volumetric; camera-facing cards do not reveal new sides as the camera turns. Base skies aspect-fill a camera-relative far plane rather than an equirectangular skybox. Physical-device GPU time, thermal behaviour, measured texture residency, long-duration running, and the complete palette/aspect-ratio matrix remain untested. Simulator CPU measurements do not establish device FPS. Exact alpha audits and runtime capture evidence are separate from subjective art approval.
+
+The native collage tests logged Metal drawable-allocation warnings while exercising multiple
+renderers. Their passing CPU/pool assertions are not a GPU or memory acceptance result.
+The complete original game's physical-device and long-session acceptance criteria remain open;
+this pass verifies the bounded 29-ingredient composition proof only.

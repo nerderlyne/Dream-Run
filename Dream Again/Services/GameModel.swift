@@ -13,7 +13,7 @@ import UIKit
 
 @MainActor final class GameModel:NSObject,ObservableObject {
     @Published var screen="home"
-    @Published var simulation=GameSimulation(identity:DreamIdentity(seed:42))
+    @Published var simulation=GameSimulation(identity:DreamIdentity.current(seed:42))
     @Published var profile=Profile()
     @Published var error:String?
     @Published var notice=""
@@ -31,10 +31,15 @@ import UIKit
     var palettes:[PaletteDefinition]=[]
     var rules=RunRules()
     var renderer:DreamRenderer?
+    #if DEBUG
+    @Published var collageMotion=false
+    @Published var collageSceneIndex:Int?
+    private var collageCaptureSignalled=false
+    #endif
     var store:ProfileStore?
     var commerce:BalloonStore?
     var input=InputFrame()
-    var homeDream=GameSimulation(identity:DreamIdentity(seed:42),mode:.reviewDemo)
+    var homeDream=GameSimulation(identity:DreamIdentity.current(seed:42),mode:.reviewDemo)
     var homeFrames=0
     var motion=MotionInput(), audio=DreamAudio()
     private let displayTarget=DreamDisplayTarget()
@@ -79,6 +84,9 @@ import UIKit
                 let distance=arguments.firstIndex(of:"--art-distance").flatMap{index in arguments.indices.contains(index+1) ? Double(arguments[index+1]) : nil} ?? 37.5
                 let pose=arguments.firstIndex(of:"--art-pose").flatMap{index in arguments.indices.contains(index+1) ? arguments[index+1] : nil} ?? "run"
                 labArt(theme:theme,distance:distance,pose:pose)
+                if let i=arguments.firstIndex(of:"--collage-scene"),arguments.indices.contains(i+1),let n=Int(arguments[i+1]) {
+                    labCollage(index:n);collageMotion=arguments.contains("--collage-moving")
+                }
                 if let index=arguments.firstIndex(of:"--art-transition-to"),arguments.indices.contains(index+1),let target=Int(arguments[index+1]) {
                     let elapsed=arguments.firstIndex(of:"--art-transition-time").flatMap {i in arguments.indices.contains(i+1) ? Double(arguments[i+1]) : nil} ?? 8
                     labPaletteEvolution(to:target,elapsed:elapsed)
@@ -227,7 +235,31 @@ import UIKit
         }
     }
     @objc func frame(_ display:CADisplayLink) {
-        if artReview {previousTime=0;return}
+        if artReview {
+            #if DEBUG
+            if collageMotion,renderer?.art.collage.ready == true {
+                let now=display.timestamp
+                if previousTime>0 {
+                    for _ in 0..<(clock.consume(now-previousTime) ?? 0) {
+                        // Review run uses the real simulation at normal speed; no rewards.
+                        simulation.state.safeUntilDistance=simulation.state.distance+1000
+                        _=simulation.step(input);input.jump=false;input.slide=false
+                    }
+                }
+                previousTime=now
+            } else {previousTime=0}
+            renderer?.render(run,equipped:profile.equipped)
+            if !collageCaptureSignalled,renderer?.art.collage.ready == true,collageSceneIndex != nil {
+                let args=ProcessInfo.processInfo.arguments
+                if let i=args.firstIndex(of:"--collage-capture-token"),args.indices.contains(i+1),let token=UUID(uuidString:args[i+1]) {
+                    let path=URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("collage-ready-\(token.uuidString).txt")
+                    try? Data("29 textures ready; C2; DEBUG no rewards".utf8).write(to:path,options:.atomic)
+                    collageCaptureSignalled=true
+                }
+            }
+            #endif
+            return
+        }
         if screen == "home",let renderer {
             homeFrames += 1
             if homeFrames%2 == 0 {
@@ -270,7 +302,18 @@ import UIKit
         audio.update(active:true,palette:run.paletteIndex,settings:settings)
     }
     #if DEBUG
+    func labCollage(index:Int) {
+        artReview=true;renderer?.artPalette=nil
+        collageSceneIndex=((index%5)+5)%5;collageMotion=false
+        let seed=DreamCollageComposition.proofSeeds[((index%5)+5)%5]
+        simulation=GameSimulation(identity:.current(seed:seed),mode:.debug)
+        simulation.state.distance=60;simulation.state.activeTicks=300;simulation.state.phase = .running
+        simulation.state.safeUntilDistance=1060
+        simulation.state.chunks.removeAll();simulation.state.hazards.removeAll()
+        simulation.streamChunks();screen="gameplay";renderer?.render(run,equipped:profile.equipped)
+    }
     func labArt(theme:Int,distance:Double=37.5,pose:String="run") {
+        collageSceneIndex=nil;collageMotion=false
         artReview=true;renderer?.artPalette=max(0,min(palettes.count-1,theme))
         simulation=GameSimulation(identity:DreamIdentity.current(seed:42),mode:.debug)
         simulation.state.distance=distance.isFinite ? max(0,min(100_000,distance)) : 37.5

@@ -59,7 +59,9 @@ R2 introduced initial forward speed **12.25 m/s** (1.75× the original 7 m/s), a
 
 **R3** narrowed steering to **±0.9 m** (28% narrower), with 6 m/s maximum lateral movement and 40 ms smoothing. Default full steering needs 12° of calibrated tilt. R3 retains the faster 12.25 m/s start; older saved dreams keep their own tuning.
 
-New dreams use **R4**, retaining the faster runner and narrow tilt range while balls approach at **8 m/s**. Sports-ball rotation follows their actual travelled distance. They first become visible already rolling on a 60 m approach.
+New dreams use **G1/R4/C2**, retaining the faster runner and narrow tilt range while balls approach at **8 m/s**. Sports-ball rotation follows their actual travelled distance. They first become visible already rolling on a 60 m approach. C2 adds the 29-piece procedural collage kit; C1 saved dreams remain supported with legacy scenery and the same gameplay RNG.
+
+For the collage proof, open the DEBUG Lab and choose collage 1–5. Use run/freeze to inspect world-space motion. Simulator launch arguments are `--art-review --collage-scene 0` (0–4), optionally `--collage-moving`. All proof runs are DEBUG-only and earn no rewards. Details and exact kit contents: [collage pipeline](docs/HYBRID_COLLAGE_PIPELINE.md).
 
 The visible path continues roughly 6.1 km ahead using simplified distant geometry that blends into the sky. Detailed scenery and gameplay remain streamed nearby.
 

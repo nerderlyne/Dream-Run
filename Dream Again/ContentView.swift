@@ -120,6 +120,15 @@ struct ContentView:View {
                 if game.run.mode == .tutorial {Text(tutorialPrompt).font(.callout).padding().background(.ultraThinMaterial,in:Capsule())}
                 Spacer()
                 if [.luckyTransition,.whiteEnding,.waking].contains(game.run.phase) {Button("skip presentation"){let events=game.simulation.presentationStep(0,skip:true);if events.contains(.ending){game.finish();game.screen="results"}}.padding().disabled(game.run.endingElapsed < (game.run.pigs.count == 3 ? 5 : 0.35)).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.65) : .white)}
+                #if DEBUG
+                if game.artReview,let index=game.collageSceneIndex {
+                    HStack {
+                        Button("Lab"){game.artReview=false;game.collageMotion=false;game.screen="lab";game.previewAsset()}
+                        Button(game.collageMotion ? "freeze":"run"){game.collageMotion.toggle()}
+                        Button("dream \(index+1)/5 →"){game.labCollage(index:index+1)}
+                    }.font(.caption).padding(12).background(.regularMaterial,in:Capsule())
+                }
+                #endif
             }
             if [.ready,.paused].contains(game.run.phase) {
                 VStack(spacing:12){Text(game.run.phase == .ready ? "a little tilt.\na leap. a dream." : "paused").font(.largeTitle).multilineTextAlignment(.center)
@@ -224,6 +233,7 @@ struct ContentView:View {
                 Stepper("Asset",value:$game.labAsset,in:1...42).onChange(of:game.labAsset){_,_ in game.previewAsset()}
                 HStack{Button("palette"){game.labPalette=(game.labPalette+1)%12;game.previewAsset()};Button("material"){game.labStyle=(game.labStyle+1)%8;game.previewAsset()};Button("LOD \(game.labLOD)"){game.labLOD=(game.labLOD+1)%3;game.previewAsset()}}
                 HStack {Button("cloud slice"){game.labArt(theme:0)};Button("aqua slice"){game.labArt(theme:1)};Button("void slice"){game.labArt(theme:5)}}.font(.caption)
+                HStack {Text("Collage kit");ForEach(0..<5,id:\.self){i in Button("\(i+1)"){game.labCollage(index:i)}}}.font(.caption)
                 Toggle("Show role bounds",isOn:$game.labColliders).onChange(of:game.labColliders){_,_ in game.previewAsset()}
                 HStack{TextField("Dream ID for world preview",text:$code).font(.caption).textFieldStyle(.roundedBorder);Button("preview"){game.labWorld(code)};Button("+24m"){game.labStep()}}
                 ScrollView(.horizontal){HStack{ForEach(["Rabbit","Nazar","Zebra","Ball","Mirror","Drop","Ordinary pig","Clover pig","Lucky Dream","Three hours","Sparse","Beyond","Void","Waking"],id:\.self){event in Button(event){game.labEvent(event)}.buttonStyle(.bordered)}}}
