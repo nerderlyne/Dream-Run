@@ -2,6 +2,21 @@ import Foundation
 
 /// Atmospheric image reuse is a separate compositional role, not a semantic scale event.
 /// These translucent fragments transform the canvas while semantic props keep their hierarchy.
+public enum DreamAtmosphericArrangement:Int,CaseIterable,Sendable {
+    case aperture,canopy,submerged,suspended
+}
+
+public struct DreamAtmosphericComposition:Equatable,Sendable {
+    public let arrangement:DreamAtmosphericArrangement
+    public let side:Float
+    public static func plan(identity:DreamIdentity,distance:Double)->Self {
+        var rng=identity.stream("atmospheric-arrangement",Int(max(0,distance)/1280))
+        return .init(arrangement:DreamAtmosphericArrangement(rawValue:Int(rng.below(4)))!,side:rng.below(2)==0 ? -1:1)
+    }
+    /// Dense silhouettes need a quieter walking surface; open water can carry more pattern.
+    public var solidTrackWeight:UInt64 {arrangement == .submerged ? 40:65}
+}
+
 public enum DreamAtmosphere {
     public static let slotCount=3
     public static func period(slot:Int)->Double {[1280,1024,768][slot]}
@@ -14,11 +29,25 @@ public enum DreamAtmosphere {
     }
     public static func placement(identity:DreamIdentity,distance:Double,slot:Int)->DreamCollagePlacement {
         let period=period(slot:slot),cell=cell(distance:distance,slot:slot)
-        let groups=[
-            ["house_brutal","window_aqua","arch_ruined","house_photo","window_pink","house_stilt"],
-            ["tree_oak","tree_fuzzy","tree_blue","flower_orchid","jellyfish_lilac","tree_dead"],
-            ["ribbon_iridescent","fog_lavender","cloud_tower","water_curtain","fog_silver","cloud_pink"]
-        ]
+        // Sample the arrangement at this card's birth, not every frame. Staggered
+        // replacement preserves gradual evolution instead of rebuilding the whole scene.
+        let composition=DreamAtmosphericComposition.plan(identity:identity,distance:Double(cell)*period)
+        let primary:[String],secondary:[String]
+        switch composition.arrangement {
+        case .aperture:
+            primary=["arch_ruined","arch_glass","window_aqua","window_pink"]
+            secondary=["tree_dead","tree_painted","tree_blue"]
+        case .canopy:
+            primary=["tree_oak","tree_blue","tree_fuzzy","flower_orchid"]
+            secondary=["window_aqua","house_stilt","arch_ruined"]
+        case .submerged:
+            primary=["water_curtain","jellyfish_lilac","ribbon_iridescent"]
+            secondary=["arch_ruined","house_brutal","window_aqua"]
+        case .suspended:
+            primary=["house_brutal","house_photo","house_stilt"]
+            secondary=["tree_oak","tree_dead","flower_orchid"]
+        }
+        let groups=[primary,secondary,["fog_lavender","cloud_tower","fog_silver","cloud_pink"]]
         var rng=identity.stream("atmospheric-collage-\(slot)",cell)
         let choices=groups[slot]
         let selectedID=choices[Int(rng.below(UInt64(choices.count)))]
@@ -26,11 +55,20 @@ public enum DreamAtmosphere {
         let depth=Float(period)+Float(180+rng.below(180))
         // Longest dimension frequently spans a substantial part of the frame, even
         // before approach. Alpha preserves superposition instead of an opaque landmark.
-        let extent:Float=[0.72,0.62,0.95][slot]+Float(rng.below(20))/100
+        let extent:Float=[composition.arrangement == .canopy ? 1.0:0.80,0.64,0.95][slot]+Float(rng.below(16))/100
         let height=depth*extent/max(1,asset.aspect)
-        let side:Float=(slot+Int(rng.below(2)))%2==0 ? -1:1
-        let lateral=side*depth*(slot==2 ? 0.035:0.19)
-        let elevation:Float=slot==2 ? depth*0.03:slot==0 ? depth*0.10:depth*0.18
-        return .init(representation:asset,cell:cell,anchorDistance:Double(cell)*period-offset(slot:slot),depth:depth,lateral:lateral,elevation:elevation,height:height,mirrored:rng.below(2)==0,roll:Float(Int(rng.below(21))-10)*0.012,opacity:[0.27,0.22,0.20][slot])
+        let side=slot==1 ? -composition.side:composition.side
+        let lateral=side*depth*(slot==2 ? 0.035:slot==0 ? 0.21:0.28)
+        let primaryElevation:Float
+        switch composition.arrangement {
+        case .aperture:primaryElevation=0.14
+        case .canopy:primaryElevation=0.32
+        case .submerged:primaryElevation = -0.02
+        case .suspended:primaryElevation=0.30
+        }
+        let elevation=depth*(slot==0 ? primaryElevation:slot==1 ? 0.16:0.03)
+        // A legible anchor, a quieter counterweight, and a barely perceived veil.
+        // All remain large: hierarchy comes from placement and contrast, not miniaturization.
+        return .init(representation:asset,cell:cell,anchorDistance:Double(cell)*period-offset(slot:slot),depth:depth,lateral:lateral,elevation:elevation,height:height,mirrored:rng.below(2)==0,roll:Float(Int(rng.below(21))-10)*0.012,opacity:[0.32,0.12,0.09][slot])
     }
 }

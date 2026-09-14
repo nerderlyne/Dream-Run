@@ -118,8 +118,10 @@ import UIKit
                     if let value=Int(arg("--scale-event","-1")),let event=DreamScaleEvent(rawValue:value) {labScale(event,framing:DreamScaleFraming(rawValue:Int(arg("--scale-framing","-1")) ?? -1))}
                     collageMotion=arguments.contains("--collage-moving")
                 }
-
-
+                if let i=arguments.firstIndex(of:"--composition-seed"),arguments.indices.contains(i+1),let seed=UInt64(arguments[i+1]) {
+                    labCollage(index:0,seed:seed)
+                    renderer?.artPalette=nil
+                }
             }
 
             #endif
@@ -377,12 +379,12 @@ import UIKit
         renderer?.lastRun=nil
         renderer?.render(run,equipped:artEquipped ?? [:],menu:artIdle)
     }
-    func labCollage(index:Int) {
+    func labCollage(index:Int,seed:UInt64?=nil) {
         obstacleReview=nil;renderer?.art.collage.previewVignette=nil;renderer?.art.collage.previewScale=nil;renderer?.art.collage.previewFraming=nil
         artEquipped=nil;artIdle=false;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
-        artReview=true;renderer?.artPalette=[0,2,4,6,1][((index%5)+5)%5]
+        artReview=true;renderer?.artPalette=seed == nil ? [0,2,4,6,1][((index%5)+5)%5]:nil
         collageSceneIndex=((index%5)+5)%5;collageMotion=false
-        let seed=DreamCollageComposition.proofSeeds[((index%5)+5)%5]
+        let seed=seed ?? DreamCollageComposition.proofSeeds[((index%5)+5)%5]
         simulation=GameSimulation(identity:.current(seed:seed),mode:.debug)
         simulation.state.distance=60;simulation.state.activeTicks=300;simulation.state.phase = .running
         simulation.state.safeUntilDistance=1060

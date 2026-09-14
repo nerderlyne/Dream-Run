@@ -1,5 +1,7 @@
 # Known limitations
 
+- Composition refinement: eight fixed-distance simulator samples do not establish a measured improvement in player preference. Color matching and silhouette visibility on route bends are not image-aware; some combinations remain weaker. No new physical-device performance measurements.
+
 - Swipe timing fix (September 15): deterministic tests verify recognition before release and next-tick jump onset. Actual finger-to-display latency and feel on a physical iPhone have not been measured; main-thread rendering stalls could still delay touch processing.
 
 - Large translucent atmospheric cards increase overdraw; physical-device GPU cost and sustained

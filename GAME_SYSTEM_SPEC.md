@@ -1,5 +1,7 @@
 ## Creator override — atmospheric scale correction (September 15, 2026)
 
+Creator-reference composition refinement (September 15, 2026): learn from `references/app_target_01.jpeg` through cropped environmental forms, transparent overlap, tiny context and a quieter route. Use varied seeded atmospheric arrangements with unequal visual emphasis, not a repeated arch/cosmos preset. Atmospheric scale remains independent of semantic giant events. Prefer solid track surfaces when dense silhouettes already supply visual complexity; retain patterned alternatives.
+
 Three independent compositional systems are required: semantic scenery retains relative scale
 hierarchy; atmospheric collage frequently uses 1–3 very large, cropped, translucent overlapping
 architecture/trees/fabric/cloud/organic fragments; rare scale events make one recognizable semantic

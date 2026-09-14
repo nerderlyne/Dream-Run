@@ -113,3 +113,9 @@ The broad route-overlap attenuation is conservative; it is not a per-pixel corri
 
 Current simulator comparison: `evidence/atmosphere-gallery.html`.
 Capture using `python3 tools/capture_atmosphere.py DEVICE_ID` after installing the DEBUG build.
+
+## Composition hierarchy from the owner reference
+
+See `COMPOSITION_REVIEW.md` for the analysis of `app_target_01.jpeg`. Atmospheric selection now uses four arrangements with a strong primary form, a lower-contrast opposing form and a faint veil. Base opacity is 0.32 / 0.12 / 0.09 (superseding the equal-emphasis values above); large scale remains common. Each slot adopts its arrangement only at replacement, preserving staggered evolution. Track surface probabilities favor solid surfaces for dense silhouettes while retaining stripes and checker. The 25-card pool and 55 textures are unchanged.
+
+`tools/capture_composition.py <simulator-UUID>` records seeds 0–7 using the DEBUG `--composition-seed` option. It sets no sky, track, palette or scale-event override and grants no production rewards. Review `evidence/composition-gallery.html`.

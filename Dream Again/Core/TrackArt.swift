@@ -8,8 +8,9 @@ public enum TrackArt {
     }
     public static func pattern(identity:DreamIdentity,distance:Double)->TrackPattern {
         var rng=identity.stream("track-surface",Int(max(0,distance)/192))
-        let draw=rng.below(20)
-        return draw<15 ? .checker : draw<18 ? .stripes:.solid
+        let draw=rng.below(100)
+        let quiet=DreamAtmosphericComposition.plan(identity:identity,distance:floor(max(0,distance)/192)*192).solidTrackWeight
+        return draw<quiet ? .solid : draw<quiet+20 ? .stripes:.checker
     }
     public static func isLight(_ pattern:TrackPattern,distance:Int,column:Int)->Bool {
         switch pattern {case .checker:return (distance+column)%2 == 0;case .stripes:return column%2 == 0;case .solid:return false}

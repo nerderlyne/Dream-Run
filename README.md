@@ -104,3 +104,5 @@ Use `--scale-event 4 --scale-framing 2` with the art-review flags for the crown-
 The current atmosphere uses independent large translucent layers over sky plates, alongside
 semantic scale diversity. [Current atmospheric comparison](evidence/atmosphere-gallery.html)
 shows normal seeded dreams and a scene with a separate rare landmark.
+
+Composition refinement: [reasoning](docs/COMPOSITION_REVIEW.md) and [eight consecutive simulator seeds](evidence/composition-gallery.html).

@@ -5,6 +5,15 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 The locked pig/continue probabilities and nonterminal three-hour evolution are unchanged.
 
+## Composition hierarchy refinement — September 15, 2026
+
+- Analyzed the owner's successful `app_target_01.jpeg`: cropped architecture, sky/stone superposition, tiny context and a quiet route. Full reasoning and limitations: `docs/COMPOSITION_REVIEW.md`.
+- Four deterministic atmospheric arrangements now coordinate primary, opposing secondary and veil roles. Large atmospheric imagery and semantic scale diversity remain separate. No additional cards/textures/assets; existing staggered lifetimes and fades remain.
+- Track surfaces favor solid fields where dense atmospheric silhouettes provide complexity. Pattern selection remains stable within 192 m surface segments.
+- Verification: 16 targeted Release package tests passed, covering atmosphere, semantic scale, collage and track stability (0.640 seconds). 23 native simulator tests passed (72.915 seconds). A subsequent final Debug simulator build passed after the review palette correction and surface-boundary stabilization. Native suite was not repeated after those small corrections; the core suite covers surface stability and final captures exercise the review palette correction.
+- Eight consecutive DEBUG seeds 0–7 at 60 m are recorded in `evidence/composition-gallery.html`; no hand-selected plates, palettes, track patterns or scale events. These static samples do not prove preference, moving-scene readability or device performance. Existing CAMetalLayer warnings remain.
+- Specification validation: 51 checks passed. Test/build logs are under `evidence/composition-*.log`. No full core soak, UI automation, Release iOS build or physical-device performance pass for this visual change.
+
 ## Swipe response correction — September 15, 2026
 
 - Fixed jump/slide waiting for finger release and silently rejecting gestures lasting over 450 ms. Recognition now commits while moving at 24 points with 1.2× vertical dominance, once per contact. Cancellation, completion and phase changes clear gesture state; simulator steering still resets on release.
