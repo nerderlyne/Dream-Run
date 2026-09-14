@@ -64,17 +64,15 @@
       "checkpoints": [
         {
           "checkpoint": 1,
-          "nominal_seconds": 780,
-          "presence_draw": 1,
+          "nominal_seconds": 180,
           "clover_draw": 1,
-          "pig_present": false,
-          "has_clover": false,
+          "pig_present": true,
+          "has_clover": true,
           "continued_has_clover": false
         },
         {
           "checkpoint": 2,
-          "nominal_seconds": 1560,
-          "presence_draw": 0,
+          "nominal_seconds": 360,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -82,8 +80,7 @@
         },
         {
           "checkpoint": 3,
-          "nominal_seconds": 2340,
-          "presence_draw": 0,
+          "nominal_seconds": 540,
           "clover_draw": 4,
           "pig_present": true,
           "has_clover": false,
@@ -91,17 +88,15 @@
         },
         {
           "checkpoint": 4,
-          "nominal_seconds": 3120,
-          "presence_draw": 1,
+          "nominal_seconds": 720,
           "clover_draw": 2,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 5,
-          "nominal_seconds": 3900,
-          "presence_draw": 0,
+          "nominal_seconds": 900,
           "clover_draw": 4,
           "pig_present": true,
           "has_clover": false,
@@ -109,8 +104,7 @@
         },
         {
           "checkpoint": 6,
-          "nominal_seconds": 4680,
-          "presence_draw": 0,
+          "nominal_seconds": 1080,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -118,8 +112,7 @@
         },
         {
           "checkpoint": 7,
-          "nominal_seconds": 5460,
-          "presence_draw": 0,
+          "nominal_seconds": 1260,
           "clover_draw": 3,
           "pig_present": true,
           "has_clover": false,
@@ -127,35 +120,31 @@
         },
         {
           "checkpoint": 8,
-          "nominal_seconds": 6240,
-          "presence_draw": 1,
+          "nominal_seconds": 1440,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         },
         {
           "checkpoint": 9,
-          "nominal_seconds": 7020,
-          "presence_draw": 1,
+          "nominal_seconds": 1620,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         },
         {
           "checkpoint": 10,
-          "nominal_seconds": 7800,
-          "presence_draw": 1,
+          "nominal_seconds": 1800,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 11,
-          "nominal_seconds": 8580,
-          "presence_draw": 0,
+          "nominal_seconds": 1980,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -163,8 +152,7 @@
         },
         {
           "checkpoint": 12,
-          "nominal_seconds": 9360,
-          "presence_draw": 0,
+          "nominal_seconds": 2160,
           "clover_draw": 3,
           "pig_present": true,
           "has_clover": false,
@@ -172,8 +160,7 @@
         },
         {
           "checkpoint": 13,
-          "nominal_seconds": 10140,
-          "presence_draw": 0,
+          "nominal_seconds": 2340,
           "clover_draw": 5,
           "pig_present": true,
           "has_clover": false,
@@ -181,17 +168,15 @@
         },
         {
           "checkpoint": 14,
-          "nominal_seconds": 10920,
-          "presence_draw": 1,
+          "nominal_seconds": 2520,
           "clover_draw": 2,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 15,
-          "nominal_seconds": 11700,
-          "presence_draw": 0,
+          "nominal_seconds": 2700,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -199,17 +184,15 @@
         },
         {
           "checkpoint": 16,
-          "nominal_seconds": 12480,
-          "presence_draw": 1,
+          "nominal_seconds": 2880,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 17,
-          "nominal_seconds": 13260,
-          "presence_draw": 0,
+          "nominal_seconds": 3060,
           "clover_draw": 4,
           "pig_present": true,
           "has_clover": false,
@@ -217,8 +200,7 @@
         },
         {
           "checkpoint": 18,
-          "nominal_seconds": 14040,
-          "presence_draw": 0,
+          "nominal_seconds": 3240,
           "clover_draw": 3,
           "pig_present": true,
           "has_clover": false,
@@ -226,17 +208,15 @@
         },
         {
           "checkpoint": 19,
-          "nominal_seconds": 14820,
-          "presence_draw": 1,
+          "nominal_seconds": 3420,
           "clover_draw": 2,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 20,
-          "nominal_seconds": 15600,
-          "presence_draw": 0,
+          "nominal_seconds": 3600,
           "clover_draw": 1,
           "pig_present": true,
           "has_clover": true,
@@ -249,35 +229,31 @@
       "checkpoints": [
         {
           "checkpoint": 1,
-          "nominal_seconds": 780,
-          "presence_draw": 1,
+          "nominal_seconds": 180,
           "clover_draw": 2,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 2,
-          "nominal_seconds": 1560,
-          "presence_draw": 1,
+          "nominal_seconds": 360,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 3,
-          "nominal_seconds": 2340,
-          "presence_draw": 1,
+          "nominal_seconds": 540,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 4,
-          "nominal_seconds": 3120,
-          "presence_draw": 0,
+          "nominal_seconds": 720,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -285,8 +261,7 @@
         },
         {
           "checkpoint": 5,
-          "nominal_seconds": 3900,
-          "presence_draw": 0,
+          "nominal_seconds": 900,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -294,8 +269,7 @@
         },
         {
           "checkpoint": 6,
-          "nominal_seconds": 4680,
-          "presence_draw": 0,
+          "nominal_seconds": 1080,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -303,26 +277,23 @@
         },
         {
           "checkpoint": 7,
-          "nominal_seconds": 5460,
-          "presence_draw": 1,
+          "nominal_seconds": 1260,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         },
         {
           "checkpoint": 8,
-          "nominal_seconds": 6240,
-          "presence_draw": 1,
+          "nominal_seconds": 1440,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         },
         {
           "checkpoint": 9,
-          "nominal_seconds": 7020,
-          "presence_draw": 0,
+          "nominal_seconds": 1620,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -330,17 +301,15 @@
         },
         {
           "checkpoint": 10,
-          "nominal_seconds": 7800,
-          "presence_draw": 1,
+          "nominal_seconds": 1800,
           "clover_draw": 3,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 11,
-          "nominal_seconds": 8580,
-          "presence_draw": 0,
+          "nominal_seconds": 1980,
           "clover_draw": 4,
           "pig_present": true,
           "has_clover": false,
@@ -348,26 +317,23 @@
         },
         {
           "checkpoint": 12,
-          "nominal_seconds": 9360,
-          "presence_draw": 1,
+          "nominal_seconds": 2160,
           "clover_draw": 1,
-          "pig_present": false,
-          "has_clover": false,
+          "pig_present": true,
+          "has_clover": true,
           "continued_has_clover": false
         },
         {
           "checkpoint": 13,
-          "nominal_seconds": 10140,
-          "presence_draw": 1,
+          "nominal_seconds": 2340,
           "clover_draw": 3,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 14,
-          "nominal_seconds": 10920,
-          "presence_draw": 0,
+          "nominal_seconds": 2520,
           "clover_draw": 4,
           "pig_present": true,
           "has_clover": false,
@@ -375,8 +341,7 @@
         },
         {
           "checkpoint": 15,
-          "nominal_seconds": 11700,
-          "presence_draw": 0,
+          "nominal_seconds": 2700,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -384,26 +349,23 @@
         },
         {
           "checkpoint": 16,
-          "nominal_seconds": 12480,
-          "presence_draw": 1,
+          "nominal_seconds": 2880,
           "clover_draw": 2,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 17,
-          "nominal_seconds": 13260,
-          "presence_draw": 1,
+          "nominal_seconds": 3060,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 18,
-          "nominal_seconds": 14040,
-          "presence_draw": 0,
+          "nominal_seconds": 3240,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -411,21 +373,19 @@
         },
         {
           "checkpoint": 19,
-          "nominal_seconds": 14820,
-          "presence_draw": 1,
+          "nominal_seconds": 3420,
           "clover_draw": 1,
-          "pig_present": false,
-          "has_clover": false,
+          "pig_present": true,
+          "has_clover": true,
           "continued_has_clover": false
         },
         {
           "checkpoint": 20,
-          "nominal_seconds": 15600,
-          "presence_draw": 1,
+          "nominal_seconds": 3600,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         }
       ]
     },
@@ -434,8 +394,7 @@
       "checkpoints": [
         {
           "checkpoint": 1,
-          "nominal_seconds": 780,
-          "presence_draw": 0,
+          "nominal_seconds": 180,
           "clover_draw": 3,
           "pig_present": true,
           "has_clover": false,
@@ -443,17 +402,15 @@
         },
         {
           "checkpoint": 2,
-          "nominal_seconds": 1560,
-          "presence_draw": 1,
+          "nominal_seconds": 360,
           "clover_draw": 2,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 3,
-          "nominal_seconds": 2340,
-          "presence_draw": 0,
+          "nominal_seconds": 540,
           "clover_draw": 3,
           "pig_present": true,
           "has_clover": false,
@@ -461,8 +418,7 @@
         },
         {
           "checkpoint": 4,
-          "nominal_seconds": 3120,
-          "presence_draw": 0,
+          "nominal_seconds": 720,
           "clover_draw": 4,
           "pig_present": true,
           "has_clover": false,
@@ -470,8 +426,7 @@
         },
         {
           "checkpoint": 5,
-          "nominal_seconds": 3900,
-          "presence_draw": 0,
+          "nominal_seconds": 900,
           "clover_draw": 1,
           "pig_present": true,
           "has_clover": true,
@@ -479,8 +434,7 @@
         },
         {
           "checkpoint": 6,
-          "nominal_seconds": 4680,
-          "presence_draw": 0,
+          "nominal_seconds": 1080,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -488,8 +442,7 @@
         },
         {
           "checkpoint": 7,
-          "nominal_seconds": 5460,
-          "presence_draw": 0,
+          "nominal_seconds": 1260,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -497,8 +450,7 @@
         },
         {
           "checkpoint": 8,
-          "nominal_seconds": 6240,
-          "presence_draw": 0,
+          "nominal_seconds": 1440,
           "clover_draw": 1,
           "pig_present": true,
           "has_clover": true,
@@ -506,17 +458,15 @@
         },
         {
           "checkpoint": 9,
-          "nominal_seconds": 7020,
-          "presence_draw": 1,
+          "nominal_seconds": 1620,
           "clover_draw": 4,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 10,
-          "nominal_seconds": 7800,
-          "presence_draw": 0,
+          "nominal_seconds": 1800,
           "clover_draw": 1,
           "pig_present": true,
           "has_clover": true,
@@ -524,8 +474,7 @@
         },
         {
           "checkpoint": 11,
-          "nominal_seconds": 8580,
-          "presence_draw": 0,
+          "nominal_seconds": 1980,
           "clover_draw": 3,
           "pig_present": true,
           "has_clover": false,
@@ -533,17 +482,15 @@
         },
         {
           "checkpoint": 12,
-          "nominal_seconds": 9360,
-          "presence_draw": 1,
+          "nominal_seconds": 2160,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         },
         {
           "checkpoint": 13,
-          "nominal_seconds": 10140,
-          "presence_draw": 0,
+          "nominal_seconds": 2340,
           "clover_draw": 4,
           "pig_present": true,
           "has_clover": false,
@@ -551,26 +498,23 @@
         },
         {
           "checkpoint": 14,
-          "nominal_seconds": 10920,
-          "presence_draw": 1,
+          "nominal_seconds": 2520,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 15,
-          "nominal_seconds": 11700,
-          "presence_draw": 1,
+          "nominal_seconds": 2700,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 16,
-          "nominal_seconds": 12480,
-          "presence_draw": 0,
+          "nominal_seconds": 2880,
           "clover_draw": 5,
           "pig_present": true,
           "has_clover": false,
@@ -578,8 +522,7 @@
         },
         {
           "checkpoint": 17,
-          "nominal_seconds": 13260,
-          "presence_draw": 0,
+          "nominal_seconds": 3060,
           "clover_draw": 5,
           "pig_present": true,
           "has_clover": false,
@@ -587,26 +530,23 @@
         },
         {
           "checkpoint": 18,
-          "nominal_seconds": 14040,
-          "presence_draw": 1,
+          "nominal_seconds": 3240,
           "clover_draw": 4,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 19,
-          "nominal_seconds": 14820,
-          "presence_draw": 1,
+          "nominal_seconds": 3420,
           "clover_draw": 4,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 20,
-          "nominal_seconds": 15600,
-          "presence_draw": 0,
+          "nominal_seconds": 3600,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -619,8 +559,7 @@
       "checkpoints": [
         {
           "checkpoint": 1,
-          "nominal_seconds": 780,
-          "presence_draw": 0,
+          "nominal_seconds": 180,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -628,17 +567,15 @@
         },
         {
           "checkpoint": 2,
-          "nominal_seconds": 1560,
-          "presence_draw": 1,
+          "nominal_seconds": 360,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 3,
-          "nominal_seconds": 2340,
-          "presence_draw": 0,
+          "nominal_seconds": 540,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -646,8 +583,7 @@
         },
         {
           "checkpoint": 4,
-          "nominal_seconds": 3120,
-          "presence_draw": 0,
+          "nominal_seconds": 720,
           "clover_draw": 3,
           "pig_present": true,
           "has_clover": false,
@@ -655,17 +591,15 @@
         },
         {
           "checkpoint": 5,
-          "nominal_seconds": 3900,
-          "presence_draw": 1,
+          "nominal_seconds": 900,
           "clover_draw": 1,
-          "pig_present": false,
-          "has_clover": false,
+          "pig_present": true,
+          "has_clover": true,
           "continued_has_clover": false
         },
         {
           "checkpoint": 6,
-          "nominal_seconds": 4680,
-          "presence_draw": 0,
+          "nominal_seconds": 1080,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -673,17 +607,15 @@
         },
         {
           "checkpoint": 7,
-          "nominal_seconds": 5460,
-          "presence_draw": 1,
+          "nominal_seconds": 1260,
           "clover_draw": 1,
-          "pig_present": false,
-          "has_clover": false,
+          "pig_present": true,
+          "has_clover": true,
           "continued_has_clover": false
         },
         {
           "checkpoint": 8,
-          "nominal_seconds": 6240,
-          "presence_draw": 0,
+          "nominal_seconds": 1440,
           "clover_draw": 1,
           "pig_present": true,
           "has_clover": true,
@@ -691,17 +623,15 @@
         },
         {
           "checkpoint": 9,
-          "nominal_seconds": 7020,
-          "presence_draw": 1,
+          "nominal_seconds": 1620,
           "clover_draw": 3,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 10,
-          "nominal_seconds": 7800,
-          "presence_draw": 0,
+          "nominal_seconds": 1800,
           "clover_draw": 1,
           "pig_present": true,
           "has_clover": true,
@@ -709,17 +639,15 @@
         },
         {
           "checkpoint": 11,
-          "nominal_seconds": 8580,
-          "presence_draw": 1,
+          "nominal_seconds": 1980,
           "clover_draw": 2,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 12,
-          "nominal_seconds": 9360,
-          "presence_draw": 0,
+          "nominal_seconds": 2160,
           "clover_draw": 3,
           "pig_present": true,
           "has_clover": false,
@@ -727,8 +655,7 @@
         },
         {
           "checkpoint": 13,
-          "nominal_seconds": 10140,
-          "presence_draw": 0,
+          "nominal_seconds": 2340,
           "clover_draw": 5,
           "pig_present": true,
           "has_clover": false,
@@ -736,17 +663,15 @@
         },
         {
           "checkpoint": 14,
-          "nominal_seconds": 10920,
-          "presence_draw": 1,
+          "nominal_seconds": 2520,
           "clover_draw": 1,
-          "pig_present": false,
-          "has_clover": false,
+          "pig_present": true,
+          "has_clover": true,
           "continued_has_clover": false
         },
         {
           "checkpoint": 15,
-          "nominal_seconds": 11700,
-          "presence_draw": 0,
+          "nominal_seconds": 2700,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -754,44 +679,39 @@
         },
         {
           "checkpoint": 16,
-          "nominal_seconds": 12480,
-          "presence_draw": 1,
+          "nominal_seconds": 2880,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 17,
-          "nominal_seconds": 13260,
-          "presence_draw": 1,
+          "nominal_seconds": 3060,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 18,
-          "nominal_seconds": 14040,
-          "presence_draw": 1,
+          "nominal_seconds": 3240,
           "clover_draw": 3,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 19,
-          "nominal_seconds": 14820,
-          "presence_draw": 1,
+          "nominal_seconds": 3420,
           "clover_draw": 1,
-          "pig_present": false,
-          "has_clover": false,
+          "pig_present": true,
+          "has_clover": true,
           "continued_has_clover": false
         },
         {
           "checkpoint": 20,
-          "nominal_seconds": 15600,
-          "presence_draw": 0,
+          "nominal_seconds": 3600,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -804,26 +724,23 @@
       "checkpoints": [
         {
           "checkpoint": 1,
-          "nominal_seconds": 780,
-          "presence_draw": 1,
+          "nominal_seconds": 180,
           "clover_draw": 1,
-          "pig_present": false,
-          "has_clover": false,
+          "pig_present": true,
+          "has_clover": true,
           "continued_has_clover": false
         },
         {
           "checkpoint": 2,
-          "nominal_seconds": 1560,
-          "presence_draw": 1,
+          "nominal_seconds": 360,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 3,
-          "nominal_seconds": 2340,
-          "presence_draw": 0,
+          "nominal_seconds": 540,
           "clover_draw": 0,
           "pig_present": true,
           "has_clover": true,
@@ -831,8 +748,7 @@
         },
         {
           "checkpoint": 4,
-          "nominal_seconds": 3120,
-          "presence_draw": 0,
+          "nominal_seconds": 720,
           "clover_draw": 4,
           "pig_present": true,
           "has_clover": false,
@@ -840,17 +756,15 @@
         },
         {
           "checkpoint": 5,
-          "nominal_seconds": 3900,
-          "presence_draw": 1,
+          "nominal_seconds": 900,
           "clover_draw": 4,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 6,
-          "nominal_seconds": 4680,
-          "presence_draw": 0,
+          "nominal_seconds": 1080,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -858,8 +772,7 @@
         },
         {
           "checkpoint": 7,
-          "nominal_seconds": 5460,
-          "presence_draw": 0,
+          "nominal_seconds": 1260,
           "clover_draw": 1,
           "pig_present": true,
           "has_clover": true,
@@ -867,26 +780,23 @@
         },
         {
           "checkpoint": 8,
-          "nominal_seconds": 6240,
-          "presence_draw": 1,
+          "nominal_seconds": 1440,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         },
         {
           "checkpoint": 9,
-          "nominal_seconds": 7020,
-          "presence_draw": 1,
+          "nominal_seconds": 1620,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         },
         {
           "checkpoint": 10,
-          "nominal_seconds": 7800,
-          "presence_draw": 0,
+          "nominal_seconds": 1800,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -894,44 +804,39 @@
         },
         {
           "checkpoint": 11,
-          "nominal_seconds": 8580,
-          "presence_draw": 1,
+          "nominal_seconds": 1980,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         },
         {
           "checkpoint": 12,
-          "nominal_seconds": 9360,
-          "presence_draw": 1,
+          "nominal_seconds": 2160,
           "clover_draw": 5,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 13,
-          "nominal_seconds": 10140,
-          "presence_draw": 1,
+          "nominal_seconds": 2340,
           "clover_draw": 0,
-          "pig_present": false,
-          "has_clover": false,
-          "continued_has_clover": false
+          "pig_present": true,
+          "has_clover": true,
+          "continued_has_clover": true
         },
         {
           "checkpoint": 14,
-          "nominal_seconds": 10920,
-          "presence_draw": 1,
+          "nominal_seconds": 2520,
           "clover_draw": 4,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 15,
-          "nominal_seconds": 11700,
-          "presence_draw": 0,
+          "nominal_seconds": 2700,
           "clover_draw": 1,
           "pig_present": true,
           "has_clover": true,
@@ -939,8 +844,7 @@
         },
         {
           "checkpoint": 16,
-          "nominal_seconds": 12480,
-          "presence_draw": 0,
+          "nominal_seconds": 2880,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -948,26 +852,23 @@
         },
         {
           "checkpoint": 17,
-          "nominal_seconds": 13260,
-          "presence_draw": 1,
+          "nominal_seconds": 3060,
           "clover_draw": 4,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 18,
-          "nominal_seconds": 14040,
-          "presence_draw": 1,
+          "nominal_seconds": 3240,
           "clover_draw": 4,
-          "pig_present": false,
+          "pig_present": true,
           "has_clover": false,
           "continued_has_clover": false
         },
         {
           "checkpoint": 19,
-          "nominal_seconds": 14820,
-          "presence_draw": 0,
+          "nominal_seconds": 3420,
           "clover_draw": 2,
           "pig_present": true,
           "has_clover": false,
@@ -975,11 +876,10 @@
         },
         {
           "checkpoint": 20,
-          "nominal_seconds": 15600,
-          "presence_draw": 1,
+          "nominal_seconds": 3600,
           "clover_draw": 1,
-          "pig_present": false,
-          "has_clover": false,
+          "pig_present": true,
+          "has_clover": true,
           "continued_has_clover": false
         }
       ]
@@ -987,60 +887,53 @@
   ],
   "probabilities": [
     {
-      "minutes": 39,
+      "minutes": 9,
       "checkpoints": 3,
-      "clean_exact": "1/216",
-      "clean_percentage": 0.4629629629629629,
-      "continued_from_start_percentage": 0.057870370370370364
+      "clean_exact": "1/27",
+      "clean_percentage": 3.7037037037037033,
+      "continued_from_start_percentage": 0.4629629629629629
     },
     {
-      "minutes": 52,
+      "minutes": 12,
       "checkpoints": 4,
-      "clean_exact": "7/432",
-      "clean_percentage": 1.6203703703703702,
-      "continued_from_start_percentage": 0.2170138888888889
+      "clean_exact": "1/9",
+      "clean_percentage": 11.11111111111111,
+      "continued_from_start_percentage": 1.6203703703703702
     },
     {
-      "minutes": 65,
+      "minutes": 15,
       "checkpoints": 5,
-      "clean_exact": "23/648",
-      "clean_percentage": 3.5493827160493825,
-      "continued_from_start_percentage": 0.5087770061728395
+      "clean_exact": "17/81",
+      "clean_percentage": 20.98765432098765,
+      "continued_from_start_percentage": 3.5493827160493825
     },
     {
-      "minutes": 78,
+      "minutes": 18,
       "checkpoints": 6,
-      "clean_exact": "1453/23328",
-      "clean_percentage": 6.228566529492455,
-      "continued_from_start_percentage": 0.9545262131344308
+      "clean_exact": "233/729",
+      "clean_percentage": 31.961591220850483,
+      "continued_from_start_percentage": 6.228566529492455
     },
     {
-      "minutes": 104,
+      "minutes": 24,
       "checkpoints": 8,
-      "clean_exact": "75497/559872",
-      "clean_percentage": 13.484689357567445,
-      "continued_from_start_percentage": 2.3539929941575934
+      "clean_exact": "1163/2187",
+      "clean_percentage": 53.17786922725194,
+      "continued_from_start_percentage": 13.484689357567445
     },
     {
-      "minutes": 130,
-      "checkpoints": 10,
-      "clean_exact": "566299/2519424",
-      "clean_percentage": 22.477320212874055,
-      "continued_from_start_percentage": 4.448369375084592
+      "minutes": 27,
+      "checkpoints": 9,
+      "clean_exact": "12259/19683",
+      "clean_percentage": 62.28217243306406,
+      "continued_from_start_percentage": 17.8259594256465
     },
     {
-      "minutes": 180,
-      "checkpoints": 13,
-      "clean_exact": "202398709/544195584",
-      "clean_percentage": 37.192273320615556,
-      "continued_from_start_percentage": 8.801132741791752
-    },
-    {
-      "minutes": 234,
+      "minutes": 54,
       "checkpoints": 18,
-      "clean_exact": "15166600495229/25389989167104",
-      "clean_percentage": 59.73456859477232,
-      "continued_from_start_percentage": 18.536599956183586
+      "clean_exact": "374772041/387420489",
+      "clean_percentage": 96.73521448681048,
+      "continued_from_start_percentage": 59.73456859477232
     }
   ],
   "notes": [

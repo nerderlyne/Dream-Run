@@ -169,7 +169,7 @@ Maintain `activeTicks: UInt64` at 60 simulation ticks/second, `routeDistanceMete
 
 Collecting clover pig #3 freezes the scored time and distance at contact. The white sequence is presentation, not free survival time. A mirror/drop never resets time, difficulty, pig checkpoints, clovers, mode, or continue penalty. A safe-drop transition lasts at most three active seconds; it cannot be used to wait safely for pig rolls.
 
-Use active time rather than phone wall-clock time. Moving the device clock, leaving the app open in a menu, watching an ad, or taking a lunch break must not progress toward thirteen-minute rolls or mastery.
+Use active time rather than phone wall-clock time. Moving the device clock, leaving the app open in a menu, watching an ad, or taking a lunch break must not progress toward three-minute rolls or mastery.
 
 ### 3.2 Event precedence
 
@@ -385,7 +385,7 @@ No retroactive rescue roll after a missed ordinary jump. No changing an already 
 
 ### 8.1 Separate deterministic streams and responsibilities
 
-Use separate seeded domains for `route`, `hazards`, `scenery`, `palette`, `mood`, `mirror`, `drop`, `pigPresence`, `pigClover`, and `audio`. Event/cosmetic particles may have their own disposable stream. Rendering fewer decorations on a slower device must never change pig odds, obstacles, currency placements or the underlying saved dream.
+Use separate seeded domains for `route`, `hazards`, `scenery`, `palette`, `mood`, `mirror`, `drop`, `pigClover`, and `audio`. Event/cosmetic particles may have their own disposable stream. Rendering fewer decorations on a slower device must never change pig odds, obstacles, currency placements or the underlying saved dream.
 
 Pipeline: select route family → certify next gameplay segment → choose/continue visual state → compose scenery around exclusion volumes → add material/palette/lighting treatment → validate readability → stream entities. Safe gameplay wins if a beautiful composition would cover the next gap.
 
@@ -446,7 +446,7 @@ Optional distance computation is integrated route travel, not a score multiplier
 
 ### 10.1 The rule must be literal
 
-Checkpoints occur at **13:00, 26:00, 39:00, 52:00, 65:00…** of active gameplay. At each ordinal `k ≥ 1`, draw pig presence with probability 1/2. If present, clover probability is 1/3 before a continue, 1/6 after one. Overall clover-pig probabilities are therefore 1/6 and 1/12 per checkpoint.
+Checkpoints occur at **3:00, 6:00, 9:00, 12:00, 15:00…** of active gameplay. At each ordinal `k ≥ 1`, a pig appears. Its clover probability is 1/3 before a continue and 1/6 after one.
 
 No pity system, no bad-luck protection, no improved probability after earlier clovers, no guaranteed third pig, no odds boosts from hats, purchases, ads watched elsewhere or device setting. A regular pig appearance is not itself a clover. Missing a collectable pig does not reroll it. Pig/clover counters reset on a genuinely new run, never on a mirror or safe drop.
 
@@ -454,7 +454,7 @@ Outside these scheduled events, do not randomly spawn pig/clover imagery in norm
 
 ### 10.2 Deterministic sampling
 
-Create two independent keyed draws for each ordinal: `pigPresence(k)` uniformly in 0..<2 and `pigClover(k)` uniformly in 0..<6. Pig exists when presence is 0. It is lucky in a clean run when clover draw is 0 or 1; after continue it is lucky only when draw is 0. This makes the continued lucky set an exact subset of the clean set while preserving the specified probabilities.
+Create one keyed draw for each ordinal: `pigClover(k)` uniformly in 0..<6. A pig always exists. It is lucky in a clean run when clover draw is 0 or 1; after continue it is lucky only when draw is 0. This makes the continued lucky set an exact subset of the clean set while preserving the specified probabilities.
 
 This is a design algorithm, not a security protocol. Use the versioned RNG in `docs/REFERENCE_ALGORITHMS.md` and conformance vectors, not Swift's randomized `Hasher` or a render-loop random call. Draws are indexed; changing the number of clouds cannot advance the pig stream.
 
@@ -462,17 +462,15 @@ This is a design algorithm, not a security protocol. Use the versioned RNG in `d
 
 To give a readable approach, commit a checkpoint result approximately six active seconds before its nominal encounter and reserve a safe runway. Persist the commitment and its event ordinal immediately. Its probability policy is fixed at commitment; a continue must not recolour a visibly promised clover pig into an ordinary pig. Only future uncommitted events get the reduced odds. Explicitly test the six-second boundary.
 
-The target encounter is the exact thirteen-minute checkpoint, but a mirror, certified descent or recovery may defer the physical runway by at most ten active seconds. Do not reroll, duplicate, skip or move the next nominal checkpoint because of the delay. The rare-event roll still belongs to its scheduled ordinal. If the player wakes before reaching the event, there is no earned pig.
+The target encounter is the exact three-minute checkpoint, but a mirror, certified descent or recovery may defer the physical runway by at most ten active seconds. Do not reroll, duplicate, skip or move the next nominal checkpoint because of the delay. The rare-event roll still belongs to its scheduled ordinal. If the player wakes before reaching the event, there is no earned pig.
 
 The pig runway guarantees a viable route both to collect and to bypass the pig at the current maximum speed. Place no competing mandatory hazard until the encounter/recovery completes. Ordinary pig footprint leaves a lateral safe route. Clover pig uses a forgiving but visible pickup envelope and no damage collider. Collecting it stores an appearance descriptor, adds one of three tiny pig/clover markers to the HUD, plays a gentle response, and persists progress. Collecting three starts Lucky Dream immediately.
 
 ### 10.4 What the brutality mathematically means
 
-With independent clean checkpoints and perfect collection/survival, expected checkpoints for three lucky pigs = `3 / (1/6) = 18`, or **234 minutes (3 h 54 m)**. Minimum possible nominal completion is **39 minutes**. Through 65 minutes there are five opportunities; probability of at least three lucky pigs is about **3.55%**. These are conditional on living long enough and collecting every lucky appearance, not the chance an ordinary attempt wins.
+With independent clean checkpoints and perfect collection/survival, the expected time to three lucky pigs is **27 active minutes** (nine checkpoints), with an earliest nominal ending at **9 minutes**. By 15 minutes the ideal probability of at least three lucky pigs is **17/81 ≈ 20.99%**.
 
-If the lower odds apply from the start, expected checkpoint time is **468 minutes (7 h 48 m)**. A continue used halfway through produces a mixed-probability process, not that simple all-continued calculation. Survival failure and missed pigs lower the practical success probability further. Preserve these consequences; do not silently “fix” them to an hour-long ending.
-
-Pausing is free and can safely suspend a multi-hour run. The game must not require the phone to remain actively running for hours just to protect a chance at a rare ending.
+If all checkpoints use the reduced 1/6 odds, the expected nominal time is **54 minutes**. An actual continue creates mixed probabilities; already committed results do not change. These calculations assume survival and collection, not practical human win rates.
 
 ## 11. Waking, continuing and terminal sequences
 
@@ -492,7 +490,7 @@ A successful rewarded callback grants a single continuation entitlement for this
 
 On return, restore at a validated supported checkpoint at or just beyond the fatal location, removing only the already-resolved fatal obstacle. Do not rewind the game clock or event index. Preserve collected balloons, previously collected pigs and committed event results. Supply a two-second safe recovery lead-in; no new pickups/pig events or scored time during this protected lead-in. Then resume at the proper difficulty.
 
-Set `continueCount = 1`, `freshUnbrokenEligible = false`, and future uncommitted clover selection to the reduced rule. Ordinary pig probability stays 50%. A continued fresh run may still earn **Lucky Dream**, but never **Lucky Dream — Unbroken** or the clean three-hour mastery award. Do not falsely describe a continue as equivalent to a clean run.
+Set `continueCount = 1`, `freshUnbrokenEligible = false`, and future uncommitted clover selection to the reduced rule. Pig appearance stays guaranteed at each checkpoint. A continued fresh run may still earn **Lucky Dream**, but never **Lucky Dream — Unbroken** or the clean three-hour mastery award. Do not falsely describe a continue as equivalent to a clean run.
 
 ### 11.3 Lucky Dream
 
@@ -512,7 +510,7 @@ For all nonterminal runs reaching the time (including revisits/continued), enter
 
 Then gradually enable the post-mastery palette families: acid cobalt, red/cyan, ink/lime, violet/orange, harsher matte surfaces, stranger architectural repetition. The same 42 assets remain; do not add a 43rd “secret asset pack.” The nazar/balloon/clover/track semantic markers still obey readability rules.
 
-Beyond this, continue composing indefinitely at capped difficulty. A further thinning/rebuilding cycle may occur every additional three active hours as a default, without stacking more mastery achievements. Do not run out of legal palettes or crash after an enum's final state. Lucky Dream takes priority if a third pig is collected during any deep phase. Future pig rolls still occur every thirteen active minutes, including sparse phases; reserve them as the focal event rather than hiding them.
+Beyond this, continue composing indefinitely at capped difficulty. A further thinning/rebuilding cycle may occur every additional three active hours as a default, without stacking more mastery achievements. Do not run out of legal palettes or crash after an enum's final state. Lucky Dream takes priority if a third pig is collected during any deep phase. Future pig rolls still occur every three active minutes, including sparse phases; reserve them as the focal event rather than hiding them.
 
 
 ## 12. Seeds, saved dreams, reproducibility and eligibility
@@ -812,7 +810,7 @@ Use the detailed `ACCEPTANCE_TESTS.md` as the completion checklist. At minimum:
 
 **Generation:** connected sockets/supports; valid slopes/curves; lookahead at capped closing speed; no obstructed marker; safe drop landing exists; at least one survivable route per certified template/horizon; bounded fallback; no more than 42 registered families.
 
-**Rare rules:** exactly thirteen-minute ordinals; no roll at time zero; correct presence/conditional clover tables; no pity; continue halves future uncommitted clovers only; three **collected**, not merely spawned pigs; RNG results persist; white ending and mastery coexist correctly.
+**Rare rules:** exactly three-minute ordinals; no roll at time zero; correct presence/conditional clover tables; no pity; continue halves future uncommitted clovers only; three **collected**, not merely spawned pigs; RNG results persist; white ending and mastery coexist correctly.
 
 **Economy:** verified purchase idempotence; pending/cancelled/unverified no grant; debit+ownership atomic; achievement item not buyable; repeated result/share no duplicate settlement; currency after continue grants only delta; no negative balance; refund/revocation handling; unavailable services do not block play.
 
@@ -846,7 +844,7 @@ Release preflight fails if mock currency grants are enabled, product IDs remain 
 
 Expose speed, movement filter, jump/slide timing, gap lengths, reaction windows, encounter cadence, material intensity, palette transition lengths and currency/cosmetic prices as versioned data. Label playtest-driven changes in `IMPLEMENTATION_STATUS.md` and bump rules/content versions where they affect saved dreams.
 
-Do **not** adjust thirteen-minute pig timing, 50% presence, 1/3 conditional clover, 50% continue penalty, three pigs, no-pity rule, non-ending three-hour evolution, 42 registry count, or currency-only cosmetic benefits without creator approval. Performance degradation must not change any of these.
+Do **not** adjust three-minute pig timing, guaranteed presence, 1/3 conditional clover, 50% continue penalty, three pigs, no-pity rule, non-ending three-hour evolution, 42 registry count, or currency-only cosmetic benefits without creator approval. Performance degradation must not change any of these.
 
 Keep the readable play ribbon stable even in non-dreamcore palettes. Mystery never authorizes an undisclosed purchase penalty, incorrect collision bounds, corrupt save, changed seed or forced advertisement.
 
@@ -992,7 +990,7 @@ Seed a domain/index stream with **FNV-1a 64** of this literal ASCII string:
 DR1|G{g}|R{r}|C{c}|{seed_as_16_uppercase_hex_digits}|{domain}|{index}
 ```
 
-Versions/index are unpadded decimal. No spaces/newline. Domain is a stable ASCII name such as `pigPresence`, `pigClover`, `route`, `hazards`, `scenery`, `palette`, `mood`, `mirror`, `drop`, `audio`. FNV-1a uses initial 14695981039346656037; for each UTF-8/ASCII byte, XOR the byte then multiply by 1099511628211 with UInt64 wrapping. The resulting hash is the initial SplitMix64 state, before its first increment.
+Versions/index are unpadded decimal. No spaces/newline. Domain is a stable ASCII name such as `pigClover`, `route`, `hazards`, `scenery`, `palette`, `mood`, `mirror`, `drop`, `audio`. FNV-1a uses initial 14695981039346656037; for each UTF-8/ASCII byte, XOR the byte then multiply by 1099511628211 with UInt64 wrapping. The resulting hash is the initial SplitMix64 state, before its first increment.
 
 For slot-specific chunk work, either derive a domain that includes a documented fixed numeric sub-index via the index field, or use a stable ordered local stream. Never allocate randomness by enumerating an unordered dictionary. Adding a decorative slot must not consume another system's stream. Version changes to the domain grammar are generator changes.
 
@@ -1016,20 +1014,19 @@ JSON stores UInt64 seeds as hex or decimal **strings**, not an assumed JavaScrip
 
 ## 4. Pig decision truth table
 
-For checkpoint `k`, independently obtain `presence = stream(pigPresence,k).below(2)` and `clover = stream(pigClover,k).below(6)`.
+For checkpoint `k`, obtain `clover = stream(pigClover,k).below(6)`. A pig always appears; no presence draw is needed.
 
-| Presence draw | Clover draw | Before continue | After continue |
-|---|---:|---|---|
-| 1 | any | No pig | No pig |
-| 0 | 0 | Clover pig | Clover pig |
-| 0 | 1 | Clover pig | Ordinary pig |
-| 0 | 2–5 | Ordinary pig | Ordinary pig |
+| Clover draw | Before continue | After continue |
+|---:|---|---|
+| 0 | Clover pig | Clover pig |
+| 1 | Clover pig | Ordinary pig |
+| 2–5 | Ordinary pig | Ordinary pig |
 
-There are 12 equally likely draw pairs. Two are clean clover pairs, one is a continued clover pair. This yields 1/6 and 1/12 per checkpoint, while presence remains 1/2 in both cases. There is no pity mechanism.
+There are six equally likely draws. Two are clean lucky outcomes, one is a continued lucky outcome: 1/3 and 1/6 per checkpoint. There is no lucky-pig pity mechanism.
 
 Compute/checkpoint-commit once per ordinal. A future continue cannot remove a clover from an already telegraphed committed event. Presentation delay does not produce a second draw. Save all commitments across suspend/restore. If a run ends before an event is reached, it yields nothing.
 
-**Nominal checkpoints:** at `k × 780` active seconds. Commit roughly six seconds before the intended presentation to reserve a readable safe runway. Times refer to active play, never device wall clock.
+**Nominal checkpoints:** at `k × 180` active seconds. Commit roughly six seconds before the intended presentation to reserve a readable safe runway. Times refer to active play, never device wall clock.
 
 ## 5. Probability calculations
 
@@ -1039,18 +1036,17 @@ If all `n` independent opportunities have clover probability `p`, the chance tha
 P(X >= 3) = Σ [ C(n,k) × p^k × (1-p)^(n-k) ], k=3...n
 ```
 
-The expected opportunities until the third success are `3/p`. Thus clean expected nominal active time is 234 minutes; all-lowered-odds expected nominal time is 468 minutes. These condition on continued survival and successfully collecting every appearance. Ordinary players may never survive long enough, so this is not the average number of attempted runs before an ending.
+The expected opportunities until the third success are `3/p`. Thus clean expected nominal active time is 27 minutes; all-lowered-odds expected nominal time is 54 minutes. These condition on continued survival and successfully collecting every appearance. Ordinary players may never survive long enough, so this is not the average number of attempted runs before an ending.
 
 | Nominal elapsed | Checkpoints | Clean probability of ≥3 | Lower odds at every checkpoint |
 |---|---:|---:|---:|
-| 39 min | 3 | 0.4630% | 0.0579% |
-| 52 min | 4 | 1.6204% | 0.2170% |
-| 65 min | 5 | 3.5494% | 0.5088% |
-| 78 min | 6 | 6.2286% | 0.9545% |
-| 104 min | 8 | 13.4847% | 2.3540% |
-| 130 min | 10 | 22.4773% | 4.4484% |
-| 180 min | 13 | 37.1923% | 8.8011% |
-| 234 min | 18 | 59.7346% | 18.5366% |
+| 9 min | 3 | 3.7037% | 0.4630% |
+| 12 min | 4 | 11.1111% | 1.6204% |
+| 15 min | 5 | 20.9877% | 3.5494% |
+| 18 min | 6 | 31.9616% | 6.2286% |
+| 24 min | 8 | 53.1779% | 13.4847% |
+| 27 min | 9 | 62.2822% | 17.8260% |
+| 54 min | 18 | 96.7352% | 59.7346% |
 
 When a continue occurs later, use a small dynamic program for mixed probabilities: keep probabilities of 0, 1, 2 and at least 3 clovers. For each actual checkpoint policy `p_i`, move each state into fail/success next states, with the >=3 state absorbing. No approximation is necessary. Existing clovers are not erased by a continue.
 

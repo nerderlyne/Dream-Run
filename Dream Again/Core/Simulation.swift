@@ -88,7 +88,7 @@ public struct GameSimulation: Sendable {
     init(certification:RunState,slope:Double) {state=certification;certificationSlope=slope}
     public init(identity: DreamIdentity, mode: RunMode = .fresh, rules: RunRules? = nil) { state = RunState(identity: identity, mode: mode); if let rules {state.rules=rules}; streamChunks() }
     public init(snapshot: RunState) throws {
-        guard snapshot.schema == 1, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-46800, snapshot.player.lateral.isFinite, abs(snapshot.player.lateral) <= 2.5, snapshot.player.knockbackVelocity.isFinite, abs(snapshot.player.knockbackVelocity)<=8, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
+        guard snapshot.schema == 1, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-RunRules.pigIntervalTicks, snapshot.player.lateral.isFinite, abs(snapshot.player.lateral) <= 2.5, snapshot.player.knockbackVelocity.isFinite, abs(snapshot.player.knockbackVelocity)<=8, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
         state = snapshot
     }
     public mutating func resume() { if state.phase == .paused || state.phase == .ready { state.phase = state.resumePhase } }
@@ -199,7 +199,7 @@ public struct GameSimulation: Sendable {
             if state.player.height < -1.6 { wake("gap"); return [.waking] }
         }
         if certificationSlope == nil && Int(oldDistance/24) != Int(state.distance/24) { streamChunks() }
-        let ordinal = Int((state.activeTicks + 360) / 46800)
+        let ordinal = Int((state.activeTicks + 360) / RunRules.pigIntervalTicks)
         if ordinal > state.lastPigOrdinal && ordinal > 0 {
             let decision = PigDecision(identity: state.identity, ordinal: ordinal, continued: state.continueCount > 0)
             state.pendingPig = decision; state.lastPigOrdinal = ordinal
@@ -279,11 +279,11 @@ public struct GameSimulation: Sendable {
         return events
     }
     #if DEBUG
-    public mutating func debugTime(_ seconds: Double) { state.mode = .debug; state.activeTicks = UInt64(max(0,seconds)*60); state.lastPigOrdinal = Int(seconds/780) }
+    public mutating func debugTime(_ seconds: Double) { state.mode = .debug; state.activeTicks = UInt64(max(0,seconds)*60); state.lastPigOrdinal = Int(seconds/Double(RunRules.pigIntervalSeconds)) }
     public mutating func debugPig(third: Bool) {
         state.mode = .debug
         if third { state.pigs = [CollectedPig(ordinal:1,hue:0),CollectedPig(ordinal:2,hue:1),CollectedPig(ordinal:3,hue:0)]; state.phase = .luckyTransition; state.endingElapsed=0 }
-        else { state.hazards.append(HazardDescription(id:"debug:pig:\(state.activeTicks)",asset:.pig,encounter:.dodge,distance:state.distance+30,lateral:0,radius:0.65,height:0.65,pig:PigDecision(ordinal:99,presence:0,clover:0,continued:false))) }
+        else { state.hazards.append(HazardDescription(id:"debug:pig:\(state.activeTicks)",asset:.pig,encounter:.dodge,distance:state.distance+30,lateral:0,radius:0.65,height:0.65,pig:PigDecision(ordinal:99,clover:0,continued:false))) }
     }
     #endif
 }

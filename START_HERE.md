@@ -39,7 +39,7 @@ The spec identifies these as defaults, not things you explicitly decided: one re
 
 The counted unit is **42 registered world prefab families**, not exactly 42 raw mesh buffers. A sports ball may share primitive sphere geometry with another ball; a clover pig composes existing pig and clover families. Hats, avatar, textures, palettes, lights and implementation effects do not consume world slots. The build cannot hide extra decorative objects outside the registry.
 
-Your pig rule is unchanged. With perfect survival/collection, three clean lucky pigs take 234 minutes on average, not one hour; the earliest nominal possibility is 39 minutes. A continue halves future uncommitted clover odds. The spec deliberately adds no mercy system.
+The updated pig rule guarantees a pig every three active minutes. With perfect survival/collection, three clean lucky pigs take 27 minutes on average; the earliest nominal possibility is nine minutes. A continue halves future uncommitted clover odds. The spec deliberately adds no mercy system.
 
 ## What “one shot” targets
 

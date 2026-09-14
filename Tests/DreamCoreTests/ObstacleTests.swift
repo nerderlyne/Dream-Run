@@ -70,7 +70,7 @@ final class ObstacleTests:XCTestCase {
     }
     func testOrdinaryPigRemainsASoftObstacle() {
         var s=scenario(.animals)
-        s.state.hazards=[.init(id:"ordinary-pig",asset:.pig,encounter:.dodge,distance:0.1,lateral:0,radius:0.65,height:0.65,pig:PigDecision(ordinal:1,presence:0,clover:2,continued:false))]
+        s.state.hazards=[.init(id:"ordinary-pig",asset:.pig,encounter:.dodge,distance:0.1,lateral:0,radius:0.65,height:0.65,pig:PigDecision(ordinal:1,clover:2,continued:false))]
         XCTAssertTrue(s.step().contains(.stumble));XCTAssertEqual(s.state.pigs.count,0)
     }
     func testSwingUsesContinuousSharedTrajectory() {

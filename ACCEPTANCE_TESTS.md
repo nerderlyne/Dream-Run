@@ -92,9 +92,9 @@ Record **PASS / FAIL / NOT RUN**, test name, command/device and relevant output 
 
 ## F. Pig system and endings
 
-**F01 — Schedule.** Zero opportunities at time zero, ordinal 1 at 13:00, ordinal 2 at 26:00. Commit/presentation lead-in behaves as specified. Pause, ad and result animations cannot manufacture time.
+**F01 — Schedule.** Zero opportunities at time zero, ordinal 1 at 3:00, ordinal 2 at 6:00. Commit/presentation lead-in behaves as specified. Pause, ad and result animations cannot manufacture time.
 
-**F02 — Exact odds.** Exhaustively test all 12 presence/clover pairs: six pig appearances, two clean clover pairs, one continued clover pair. This tests the rule exactly; do not rely only on Monte Carlo.
+**F02 — Exact odds.** Exhaustively test all six clover draws: six pig appearances, two clean lucky outcomes, one continued lucky outcome. This tests the rule exactly; do not rely only on Monte Carlo.
 
 **F03 — No pity.** Feed many unlucky outcomes and two previous clovers. Neither state changes the next distribution. Purchases/hats change nothing.
 
@@ -106,7 +106,7 @@ Record **PASS / FAIL / NOT RUN**, test name, command/device and relevant output 
 
 **F07 — Collision ordering.** Earlier pickup before fatal hit is recorded; exact-tie fatal wins. Event dedup prevents multiple clovers from one pig.
 
-**F08 — Nominal probability checks.** Verify 39 min = 1/216 possibility with ideal survival/collection, 65 min = 23/648, clean expectation = 234 min, all-lowered expectation = 468 min. These tests do not assert practical human win rates.
+**F08 — Nominal probability checks.** Verify 9 min = 1/27 possibility with ideal survival/collection, 15 min = 17/81, clean expectation = 27 min, all-lowered expectation = 54 min. These tests do not assert practical human win rates.
 
 **F09 — Mastery.** Advance a fresh clean run to 10,800 active seconds: mastery unlocks and stripping begins, game continues. Continued/Revisit can see the phase but do not get fresh-unbroken prestige.
 

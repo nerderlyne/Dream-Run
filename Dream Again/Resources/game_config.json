@@ -75,15 +75,15 @@
     "fatal_hits_ignore_soft_immunity": true
   },
   "pigs": {
-    "checkpoint_seconds": 780,
+    "checkpoint_seconds": 180,
     "presence_numerator": 1,
-    "presence_denominator": 2,
+    "presence_denominator": 1,
     "clover_given_pig_numerator": 1,
     "clover_given_pig_denominator": 3,
     "after_continue_clover_given_pig_denominator": 6,
     "required_clover_pigs": 3,
     "pity_system": false,
-    "guaranteed_checkpoint": false,
+    "guaranteed_checkpoint": true,
     "reset_at_mirror": false,
     "roll_commit_lead_seconds": 6,
     "max_safe_presentation_delay_seconds": 10

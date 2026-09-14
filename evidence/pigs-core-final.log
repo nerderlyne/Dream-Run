@@ -1,0 +1,54 @@
+Building for production...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.24s)
+Test Suite 'Selected tests' started at 2026-09-15 03:57:45.384.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-15 03:57:45.385.
+Test Suite 'CoreTests' started at 2026-09-15 03:57:45.385.
+Test Case '-[DreamCoreTests.CoreTests testAllGoldenVectors]' started.
+Test Case '-[DreamCoreTests.CoreTests testAllGoldenVectors]' passed (0.004 seconds).
+Test Case '-[DreamCoreTests.CoreTests testCurrentSpeedCurveAndSnapshot]' started.
+Test Case '-[DreamCoreTests.CoreTests testCurrentSpeedCurveAndSnapshot]' passed (0.148 seconds).
+Test Case '-[DreamCoreTests.CoreTests testEverySportsBallStumblesSlowsAndRecovers]' started.
+Test Case '-[DreamCoreTests.CoreTests testEverySportsBallStumblesSlowsAndRecovers]' passed (0.005 seconds).
+Test Case '-[DreamCoreTests.CoreTests testExactProbability]' started.
+Test Case '-[DreamCoreTests.CoreTests testExactProbability]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testFastRollingBallTravelSpinAndTelegraph]' started.
+Test Case '-[DreamCoreTests.CoreTests testFastRollingBallTravelSpinAndTelegraph]' passed (0.003 seconds).
+Test Case '-[DreamCoreTests.CoreTests testFramePacingAndStall]' started.
+Test Case '-[DreamCoreTests.CoreTests testFramePacingAndStall]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testHeldSlideCannotRemainLowForever]' started.
+Test Case '-[DreamCoreTests.CoreTests testHeldSlideCannotRemainLowForever]' passed (0.026 seconds).
+Test Case '-[DreamCoreTests.CoreTests testIDsRejectBadInput]' started.
+Test Case '-[DreamCoreTests.CoreTests testIDsRejectBadInput]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testMotionNormalization]' started.
+Test Case '-[DreamCoreTests.CoreTests testMotionNormalization]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testMovementAndPauseSnapshot]' started.
+Test Case '-[DreamCoreTests.CoreTests testMovementAndPauseSnapshot]' passed (0.002 seconds).
+Test Case '-[DreamCoreTests.CoreTests testNarrowFastSteeringAndSnapshotBounds]' started.
+Test Case '-[DreamCoreTests.CoreTests testNarrowFastSteeringAndSnapshotBounds]' passed (0.096 seconds).
+Test Case '-[DreamCoreTests.CoreTests testNarrowRunCanBypassScheduledClover]' started.
+Test Case '-[DreamCoreTests.CoreTests testNarrowRunCanBypassScheduledClover]' passed (0.073 seconds).
+Test Case '-[DreamCoreTests.CoreTests testPigCommitAndDeepNonterminal]' started.
+Test Case '-[DreamCoreTests.CoreTests testPigCommitAndDeepNonterminal]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testRegistryAndGeneration]' started.
+Test Case '-[DreamCoreTests.CoreTests testRegistryAndGeneration]' passed (0.497 seconds).
+Test Case '-[DreamCoreTests.CoreTests testRenderingHitchesDoNotPauseOrBankTime]' started.
+Test Case '-[DreamCoreTests.CoreTests testRenderingHitchesDoNotPauseOrBankTime]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CoreTests testSoftFatalSlideAndDedup]' started.
+Test Case '-[DreamCoreTests.CoreTests testSoftFatalSlideAndDedup]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CoreTests testThreeMinutePigScheduleCommitsOnceAndSurvivesPause]' started.
+Test Case '-[DreamCoreTests.CoreTests testThreeMinutePigScheduleCommitsOnceAndSurvivesPause]' passed (0.005 seconds).
+Test Case '-[DreamCoreTests.CoreTests testVisibleFootballTipMakesContact]' started.
+Test Case '-[DreamCoreTests.CoreTests testVisibleFootballTipMakesContact]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testWalletTransactionsRefundAndDebug]' started.
+Test Case '-[DreamCoreTests.CoreTests testWalletTransactionsRefundAndDebug]' passed (0.010 seconds).
+Test Suite 'CoreTests' passed at 2026-09-15 03:57:46.260.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.873 (0.875) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-15 03:57:46.260.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.873 (0.875) seconds
+Test Suite 'Selected tests' passed at 2026-09-15 03:57:46.260.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.873 (0.877) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

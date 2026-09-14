@@ -53,7 +53,7 @@ final class TraversalTests:XCTestCase {
     }
     func testThirdPigContactFreezesAndResumeEnding() throws {
         var s=GameSimulation(identity:DreamIdentity(seed:5)); s.resume(); s.state.pigs=[CollectedPig(ordinal:1,hue:0),CollectedPig(ordinal:2,hue:1)]
-        let pig=PigDecision(ordinal:3,presence:0,clover:0,continued:false)
+        let pig=PigDecision(ordinal:3,clover:0,continued:false)
         s.state.hazards=[HazardDescription(id:"third",asset:.pig,encounter:.dodge,distance:0.1,lateral:0,radius:0.65,height:0.65,pig:pig)]
         _=s.step(); XCTAssertEqual(s.state.pigs.count,3); XCTAssertEqual(s.state.phase,.luckyTransition)
         let ticks=s.state.activeTicks; for _ in 0..<100 { _=s.step() }; XCTAssertEqual(s.state.activeTicks,ticks)
@@ -63,7 +63,7 @@ final class TraversalTests:XCTestCase {
     }
     func testFatalTieBeatsThirdPig() {
         var s=GameSimulation(identity:DreamIdentity(seed:2));s.resume();s.state.pigs=[CollectedPig(ordinal:1,hue:0),CollectedPig(ordinal:2,hue:0)]
-        s.state.hazards=[HazardDescription(id:"pig",asset:.pig,encounter:.dodge,distance:0.1,lateral:0,radius:0.65,height:0.7,pig:PigDecision(ordinal:3,presence:0,clover:0,continued:false)),HazardDescription(id:"rabbit",asset:.rabbit,encounter:.dodge,distance:0.1,lateral:0,radius:0.65,height:0.7)]
+        s.state.hazards=[HazardDescription(id:"pig",asset:.pig,encounter:.dodge,distance:0.1,lateral:0,radius:0.65,height:0.7,pig:PigDecision(ordinal:3,clover:0,continued:false)),HazardDescription(id:"rabbit",asset:.rabbit,encounter:.dodge,distance:0.1,lateral:0,radius:0.65,height:0.7)]
         _=s.step();XCTAssertEqual(s.state.phase,.waking);XCTAssertEqual(s.state.pigs.count,2)
     }
     func testContinueGrantSurvivesCrashAndCannotDuplicate() throws {

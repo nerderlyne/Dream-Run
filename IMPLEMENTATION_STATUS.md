@@ -3,7 +3,17 @@
 Native SwiftUI + non-AR RealityKit first playable, with a separate deterministic Swift core,
 shared Xcode scheme, offline progression, save/share, suspend/resume, achievements and audio.
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
-The locked pig/continue probabilities and nonterminal three-hour evolution are unchanged.
+Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
+
+## Three-minute pigs — September 15, 2026
+
+- Creator override: a pig is guaranteed every 180 active seconds. Lucky chance is exactly 1/3, reduced to 1/6 for future uncommitted events after a continue. Removed the presence RNG draw; retained the independent six-outcome clover stream, no lucky pity, three-collected-pig ending and nonterminal three-hour evolution.
+- Updated runtime/config guards, DEBUG clock indexing, source and bundled contracts, all three golden fixture copies, Python reference/validator, acceptance criteria and authoring instructions. Existing six-second commitment/runway lead remains, with pause/restore and dedup regression coverage. Current prerelease rules replace the old tuning; no legacy gameplay branch was added.
+- Exact probabilities: earliest nominal ending nine minutes (1/27 under ideal survival/collection); expected clean nominal time 27 minutes, all-reduced-odds time 54 minutes. These are not practical player win-rate claims.
+- Full Release core suite: 58 tests executed in 181.763 seconds; 57 passed and one stale old-timestamp assertion failed. Corrected that assertion, then all 19 CoreTests passed in 0.873 seconds. The other 39 tests already passed unchanged. An accidentally broad second rerun was stopped before repeating the completed soak; it is not counted as a completed suite.
+- Completed six-hour logical traversal for 20 seeds: 120 pig checkpoints per seed; bounded maxima 13 chunks / 13 hazards / 6 pickup-dedup entries. This is simulated logic, not physical-device or GPU endurance.
+- Debug iPhone 16 Pro Max simulator build and all 23 native tests passed (73.640 seconds). Specification validator: 51 checks passed. Evidence: `evidence/pigs-core-initial.log`, `evidence/pigs-core-final.log`, `evidence/pigs-native.log`, `evidence/pigs-spec.log`.
+- No physical-device timing, Release iOS build or UI automation in this pass. Existing simulator CAMetalLayer warnings remain.
 
 ## Ribbon trail removal — September 15, 2026
 

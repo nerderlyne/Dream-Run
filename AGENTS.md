@@ -16,7 +16,7 @@ Exactly 42 registered world-asset families. Pig is #42. Humanoid/cosmetics/UI/ma
 
 Balloons are the sole currency; earned or purchased currency buys cosmetics only. Achievement rewards are never purchasable. Cute rabbit and blue nazar end a run on contact; ordinary sports balls cause a soft stumble; horses/zebras have slide-through leg clearance. No anatomical eyeball.
 
-Every 780 active seconds: 1/2 chance of pig, conditional 1/3 chance of clover. After one continue: conditional 1/6 for future uncommitted events. No pity. Three collected clover pigs trigger Lucky Dream/white fainting ending with three pigs. Three hours triggers visual stripping and later alien-palette rebuilding, NOT an ending.
+Every 180 active seconds: guaranteed pig, 1/3 chance of clover. After one continue: conditional 1/6 for future uncommitted events. No pity. Three collected clover pigs trigger Lucky Dream/white fainting ending with three pigs. Three hours triggers visual stripping and later alien-palette rebuilding, NOT an ending.
 
 Mirrors lead through reflected void into a visual-state change. Safe drops always have a consistent cue and a prevalidated landing. Surreal scenery never excuses unfair gameplay or unreadable hazards. Saved dreams are versioned seeds; live run suspension is distinct from revisiting.
 

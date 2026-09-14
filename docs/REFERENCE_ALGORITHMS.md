@@ -33,7 +33,7 @@ Seed a domain/index stream with **FNV-1a 64** of this literal ASCII string:
 DR1|G{g}|R{r}|C{c}|{seed_as_16_uppercase_hex_digits}|{domain}|{index}
 ```
 
-Versions/index are unpadded decimal. No spaces/newline. Domain is a stable ASCII name such as `pigPresence`, `pigClover`, `route`, `hazards`, `scenery`, `palette`, `mood`, `mirror`, `drop`, `audio`. FNV-1a uses initial 14695981039346656037; for each UTF-8/ASCII byte, XOR the byte then multiply by 1099511628211 with UInt64 wrapping. The resulting hash is the initial SplitMix64 state, before its first increment.
+Versions/index are unpadded decimal. No spaces/newline. Domain is a stable ASCII name such as `pigClover`, `route`, `hazards`, `scenery`, `palette`, `mood`, `mirror`, `drop`, `audio`. FNV-1a uses initial 14695981039346656037; for each UTF-8/ASCII byte, XOR the byte then multiply by 1099511628211 with UInt64 wrapping. The resulting hash is the initial SplitMix64 state, before its first increment.
 
 For slot-specific chunk work, either derive a domain that includes a documented fixed numeric sub-index via the index field, or use a stable ordered local stream. Never allocate randomness by enumerating an unordered dictionary. Adding a decorative slot must not consume another system's stream. Version changes to the domain grammar are generator changes.
 
@@ -57,20 +57,19 @@ JSON stores UInt64 seeds as hex or decimal **strings**, not an assumed JavaScrip
 
 ## 4. Pig decision truth table
 
-For checkpoint `k`, independently obtain `presence = stream(pigPresence,k).below(2)` and `clover = stream(pigClover,k).below(6)`.
+For checkpoint `k`, obtain `clover = stream(pigClover,k).below(6)`. A pig always appears; no presence draw is needed.
 
-| Presence draw | Clover draw | Before continue | After continue |
-|---|---:|---|---|
-| 1 | any | No pig | No pig |
-| 0 | 0 | Clover pig | Clover pig |
-| 0 | 1 | Clover pig | Ordinary pig |
-| 0 | 2–5 | Ordinary pig | Ordinary pig |
+| Clover draw | Before continue | After continue |
+|---:|---|---|
+| 0 | Clover pig | Clover pig |
+| 1 | Clover pig | Ordinary pig |
+| 2–5 | Ordinary pig | Ordinary pig |
 
-There are 12 equally likely draw pairs. Two are clean clover pairs, one is a continued clover pair. This yields 1/6 and 1/12 per checkpoint, while presence remains 1/2 in both cases. There is no pity mechanism.
+There are six equally likely draws. Two are clean lucky outcomes, one is a continued lucky outcome: 1/3 and 1/6 per checkpoint. There is no lucky-pig pity mechanism.
 
 Compute/checkpoint-commit once per ordinal. A future continue cannot remove a clover from an already telegraphed committed event. Presentation delay does not produce a second draw. Save all commitments across suspend/restore. If a run ends before an event is reached, it yields nothing.
 
-**Nominal checkpoints:** at `k × 780` active seconds. Commit roughly six seconds before the intended presentation to reserve a readable safe runway. Times refer to active play, never device wall clock.
+**Nominal checkpoints:** at `k × 180` active seconds. Commit roughly six seconds before the intended presentation to reserve a readable safe runway. Times refer to active play, never device wall clock.
 
 ## 5. Probability calculations
 
@@ -80,18 +79,17 @@ If all `n` independent opportunities have clover probability `p`, the chance tha
 P(X >= 3) = Σ [ C(n,k) × p^k × (1-p)^(n-k) ], k=3...n
 ```
 
-The expected opportunities until the third success are `3/p`. Thus clean expected nominal active time is 234 minutes; all-lowered-odds expected nominal time is 468 minutes. These condition on continued survival and successfully collecting every appearance. Ordinary players may never survive long enough, so this is not the average number of attempted runs before an ending.
+The expected opportunities until the third success are `3/p`. Thus clean expected nominal active time is 27 minutes; all-lowered-odds expected nominal time is 54 minutes. These condition on continued survival and successfully collecting every appearance. Ordinary players may never survive long enough, so this is not the average number of attempted runs before an ending.
 
 | Nominal elapsed | Checkpoints | Clean probability of ≥3 | Lower odds at every checkpoint |
 |---|---:|---:|---:|
-| 39 min | 3 | 0.4630% | 0.0579% |
-| 52 min | 4 | 1.6204% | 0.2170% |
-| 65 min | 5 | 3.5494% | 0.5088% |
-| 78 min | 6 | 6.2286% | 0.9545% |
-| 104 min | 8 | 13.4847% | 2.3540% |
-| 130 min | 10 | 22.4773% | 4.4484% |
-| 180 min | 13 | 37.1923% | 8.8011% |
-| 234 min | 18 | 59.7346% | 18.5366% |
+| 9 min | 3 | 3.7037% | 0.4630% |
+| 12 min | 4 | 11.1111% | 1.6204% |
+| 15 min | 5 | 20.9877% | 3.5494% |
+| 18 min | 6 | 31.9616% | 6.2286% |
+| 24 min | 8 | 53.1779% | 13.4847% |
+| 27 min | 9 | 62.2822% | 17.8260% |
+| 54 min | 18 | 96.7352% | 59.7346% |
 
 When a continue occurs later, use a small dynamic program for mixed probabilities: keep probabilities of 0, 1, 2 and at least 3 clovers. For each actual checkpoint policy `p_i`, move each state into fail/success next states, with the >=3 state absorbing. No approximation is necessary. Existing clovers are not erased by a continue.
 

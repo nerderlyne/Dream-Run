@@ -98,16 +98,15 @@ public struct DreamFile: Codable, Sendable {
 }
 public struct PigDecision: Codable, Equatable, Sendable {
     public let ordinal: Int
-    public let presenceDraw: UInt64
     public let cloverDraw: UInt64
     public let continued: Bool
-    public var present: Bool { presenceDraw == 0 }
-    public var clover: Bool { present && cloverDraw < (continued ? 1 : 2) }
+    public var present: Bool { true }
+    public var clover: Bool { cloverDraw < (continued ? 1 : 2) }
     public init(identity: DreamIdentity, ordinal: Int, continued: Bool) {
-        var p = identity.stream("pigPresence", ordinal), c = identity.stream("pigClover", ordinal)
-        self.ordinal = ordinal; presenceDraw = p.below(2); cloverDraw = c.below(6); self.continued = continued
+        var c = identity.stream("pigClover", ordinal)
+        self.ordinal = ordinal; cloverDraw = c.below(6); self.continued = continued
     }
-    public init(ordinal: Int, presence: UInt64, clover: UInt64, continued: Bool) { self.ordinal = ordinal; presenceDraw = presence; cloverDraw = clover; self.continued = continued }
+    public init(ordinal: Int, clover: UInt64, continued: Bool) { self.ordinal = ordinal; cloverDraw = clover; self.continued = continued }
     public static func probabilityAtLeastThree(_ probabilities: [Double]) -> Double {
         var distribution = [1.0, 0, 0, 0]
         for p in probabilities { distribution = [distribution[0]*(1-p), distribution[1]*(1-p)+distribution[0]*p, distribution[2]*(1-p)+distribution[1]*p, distribution[3]+distribution[2]*p] }

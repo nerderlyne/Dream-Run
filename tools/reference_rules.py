@@ -64,16 +64,13 @@ def keyed_stream(seed: int, domain: str, index: int, *, g: int = 1, r: int = 1, 
 def pig_event(seed: int, checkpoint: int, continued: bool = False) -> dict:
     if checkpoint < 1:
         raise ValueError('first pig checkpoint is 1, not 0')
-    present_draw = keyed_stream(seed, 'pigPresence', checkpoint).below(2)
     clover_draw = keyed_stream(seed, 'pigClover', checkpoint).below(6)
-    present = present_draw == 0
     return {
         'checkpoint': checkpoint,
-        'nominal_seconds': checkpoint * 780,
-        'presence_draw': present_draw,
+        'nominal_seconds': checkpoint * 180,
         'clover_draw': clover_draw,
-        'pig_present': present,
-        'has_clover': present and clover_draw < (1 if continued else 2),
+        'pig_present': True,
+        'has_clover': clover_draw < (1 if continued else 2),
     }
 
 
@@ -126,7 +123,7 @@ def decode_dream_id(text: str) -> dict:
     return {'seed': seed, 'generator_version': g, 'rules_version': r, 'content_version': c, 'canonical': canonical}
 
 
-def clover_chance_at_least_three(checkpoints: int, p: Fraction = Fraction(1, 6)) -> Fraction:
+def clover_chance_at_least_three(checkpoints: int, p: Fraction = Fraction(1, 3)) -> Fraction:
     if checkpoints < 0 or not 0 <= p <= 1:
         raise ValueError('invalid checkpoints/probability')
     return sum((Fraction(comb(checkpoints, k)) * p ** k * (1-p) ** (checkpoints-k)
@@ -134,19 +131,17 @@ def clover_chance_at_least_three(checkpoints: int, p: Fraction = Fraction(1, 6))
 
 
 def validate_truth_table() -> None:
-    # Exactly 12 equally likely (presence, clover) draw pairs.
-    pairs = [(presence, clover) for presence in range(2) for clover in range(6)]
-    assert sum(presence == 0 for presence, _ in pairs) == 6
-    assert sum(presence == 0 and clover < 2 for presence, clover in pairs) == 2
-    assert sum(presence == 0 and clover < 1 for presence, clover in pairs) == 1
+    # Six equally likely lucky draws, with a pig present at every checkpoint.
+    assert sum(draw < 2 for draw in range(6)) == 2
+    assert sum(draw < 1 for draw in range(6)) == 1
 
 
 if __name__ == '__main__':
     validate_truth_table()
     print('Reference rules only — these do not test the rendered Swift game.')
-    print('Clean expected nominal minutes:', 3 * 6 * 13)
-    print('Lower odds from beginning, expected nominal minutes:', 3 * 12 * 13)
-    for minutes in (39, 52, 65, 78, 104, 130, 180, 234):
-        n = minutes // 13
-        print(f'{minutes:3} minutes | {n:2} checkpoints | clean {100*float(clover_chance_at_least_three(n)):.6f}% | lower {100*float(clover_chance_at_least_three(n,Fraction(1,12))):.6f}%')
+    print('Clean expected nominal minutes:', 3 * 3 * 3)
+    print('Lower odds from beginning, expected nominal minutes:', 3 * 6 * 3)
+    for minutes in (9, 12, 15, 18, 24, 27, 54):
+        n = minutes // 3
+        print(f'{minutes:3} minutes | {n:2} checkpoints | clean {100*float(clover_chance_at_least_three(n)):.6f}% | lower {100*float(clover_chance_at_least_three(n,Fraction(1,6))):.6f}%')
     print('Example Dream ID:', encode_dream_id(42))

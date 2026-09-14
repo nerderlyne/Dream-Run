@@ -1,6 +1,8 @@
 import Foundation
 /// Current prerelease tuning; obsolete development tuning is not retained.
 public struct RunRules:Codable,Equatable,Sendable {
+    public static let pigIntervalSeconds=180
+    public static let pigIntervalTicks:UInt64=10800
     public var baseSpeed=12.25,maximumSpeed=22.0
     public var lateralLimit=0.9,lateralSpeed=6.0,smoothing=0.04
     public var jumpVelocity=8.0,gravity=22.0
@@ -11,7 +13,7 @@ public struct RunRules:Codable,Equatable,Sendable {
         self.init()
         guard let root=try JSONSerialization.jsonObject(with:configData) as? [String:Any],let simulation=root["simulation"] as? [String:Any],let movement=root["movement"] as? [String:Any],let pigs=root["pigs"] as? [String:Any],let deep=root["deep_dream"] as? [String:Any] else {throw DreamError.corruptStore}
         func number(_ object:[String:Any],_ key:String)throws->Double {guard let number=object[key] as? NSNumber,number.doubleValue.isFinite else {throw DreamError.corruptStore};return number.doubleValue}
-        guard try number(pigs,"checkpoint_seconds") == 780,try number(pigs,"presence_denominator") == 2,try number(pigs,"clover_given_pig_denominator") == 3,try number(pigs,"after_continue_clover_given_pig_denominator") == 6,pigs["pity_system"] as? Bool == false,deep["end_run"] as? Bool == false else {throw DreamError.unsupportedVersion}
+        guard try number(pigs,"checkpoint_seconds") == Double(Self.pigIntervalSeconds),try number(pigs,"presence_denominator") == 1,try number(pigs,"clover_given_pig_denominator") == 3,try number(pigs,"after_continue_clover_given_pig_denominator") == 6,pigs["pity_system"] as? Bool == false,deep["end_run"] as? Bool == false else {throw DreamError.unsupportedVersion}
         baseSpeed=try number(simulation,"base_speed_mps");maximumSpeed=try number(simulation,"max_speed_mps")
         lateralLimit=try number(movement,"max_lateral_offset_m");lateralSpeed=try number(movement,"max_lateral_speed_mps");smoothing=try number(movement,"tilt_smoothing_seconds")
         jumpVelocity=try number(movement,"jump_velocity_mps");gravity=try number(movement,"gravity_mps2");slideTicks=Int((try number(movement,"slide_seconds")*60).rounded())

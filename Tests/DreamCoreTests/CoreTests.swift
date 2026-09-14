@@ -37,7 +37,7 @@ final class CoreTests: XCTestCase {
             let id=DreamIdentity(seed:UInt64(trace["seed_decimal_string"] as! String)!)
             for row in trace["checkpoints"] as! [[String:Any]] {
                 let k=row["checkpoint"] as! Int, a=PigDecision(identity:id,ordinal:k,continued:false), b=PigDecision(identity:id,ordinal:k,continued:true)
-                XCTAssertEqual(a.presenceDraw,UInt64(row["presence_draw"] as! Int)); XCTAssertEqual(a.cloverDraw,UInt64(row["clover_draw"] as! Int)); XCTAssertEqual(a.clover,row["has_clover"] as! Bool); XCTAssertEqual(b.clover,row["continued_has_clover"] as! Bool)
+                XCTAssertEqual(a.present,row["pig_present"] as! Bool); XCTAssertEqual(a.cloverDraw,UInt64(row["clover_draw"] as! Int)); XCTAssertEqual(a.clover,row["has_clover"] as! Bool); XCTAssertEqual(b.clover,row["continued_has_clover"] as! Bool)
             }
         }
     }
@@ -80,7 +80,7 @@ final class CoreTests: XCTestCase {
         var simulation=GameSimulation(identity:DreamIdentity.current(seed:0));simulation.resume()
         // Locate a real deterministic clover, then commit its normal scheduled runway.
         let ordinal=(1...100).first{PigDecision(identity:simulation.state.identity,ordinal:$0,continued:false).clover}!
-        simulation.state.activeTicks=UInt64(ordinal*46800-361)
+        simulation.state.activeTicks=UInt64(ordinal*Int(RunRules.pigIntervalTicks)-361)
         _=simulation.step()
         let pig=simulation.state.hazards.first{$0.pig?.clover == true}!
         simulation.state.distance=pig.distance-0.1;simulation.state.player.lateral = -0.9
@@ -90,12 +90,29 @@ final class CoreTests: XCTestCase {
     }
     func testExactProbability() {
         var present=0, clean=0, continued=0
-        for p in 0..<2 { for c in 0..<6 { let a=PigDecision(ordinal:1,presence:UInt64(p),clover:UInt64(c),continued:false), b=PigDecision(ordinal:1,presence:UInt64(p),clover:UInt64(c),continued:true); present += a.present ? 1 : 0; clean += a.clover ? 1 : 0; continued += b.clover ? 1 : 0 } }
+        for c in 0..<6 { let a=PigDecision(ordinal:1,clover:UInt64(c),continued:false), b=PigDecision(ordinal:1,clover:UInt64(c),continued:true); present += a.present ? 1 : 0; clean += a.clover ? 1 : 0; continued += b.clover ? 1 : 0 }
         XCTAssertEqual(present,6); XCTAssertEqual(clean,2); XCTAssertEqual(continued,1)
-        XCTAssertEqual(PigDecision.probabilityAtLeastThree(Array(repeating:1.0/6,count:3)),1.0/216,accuracy:1e-12)
-        XCTAssertEqual(PigDecision.probabilityAtLeastThree(Array(repeating:1.0/6,count:5)),23.0/648,accuracy:1e-12)
-        XCTAssertEqual(3/(1.0/6)*13,234); XCTAssertEqual(3/(1.0/12)*13,468)
+        XCTAssertEqual(PigDecision.probabilityAtLeastThree(Array(repeating:1.0/3,count:3)),1.0/27,accuracy:1e-12)
+        XCTAssertEqual(PigDecision.probabilityAtLeastThree(Array(repeating:1.0/3,count:5)),17.0/81,accuracy:1e-12)
+        XCTAssertEqual(3/(1.0/3)*3,27); XCTAssertEqual(3/(1.0/6)*3,54)
     }
+    func testThreeMinutePigScheduleCommitsOnceAndSurvivesPause() throws {
+        for ordinal in 1...5 {
+            var s=safe();s.state.lastPigOrdinal=ordinal-1
+            s.state.activeTicks=UInt64(ordinal)*RunRules.pigIntervalTicks-362
+            XCTAssertFalse(s.step().contains(.pigCommitted))
+            XCTAssertTrue(s.step().contains(.pigCommitted))
+            XCTAssertEqual(s.state.hazards.filter{$0.pig?.ordinal == ordinal}.count,1)
+            let pending=s.state.pendingPig
+            s.pause();for _ in 0..<600 {_=s.step()}
+            let restored=try JSONDecoder().decode(RunState.self,from:JSONEncoder().encode(s.state))
+            var r=try GameSimulation(snapshot:restored);r.resume()
+            XCTAssertFalse(r.step().contains(.pigCommitted))
+            XCTAssertEqual(r.state.pendingPig,pending)
+            XCTAssertEqual(r.state.lastPigOrdinal,ordinal)
+        }
+    }
+
     func safe() -> GameSimulation { var s=GameSimulation(identity:DreamIdentity(seed:42)); s.state.phase = .running; s.state.safeUntilDistance=1e9; return s }
     func testMovementAndPauseSnapshot() throws {
         var s=safe(); for _ in 0..<90 { _=s.step(InputFrame(steering:1)) }; XCTAssertEqual(s.state.player.lateral,0.9,accuracy:0.0001)
@@ -157,7 +174,7 @@ final class CoreTests: XCTestCase {
         XCTAssertEqual(simulation.state.instabilityUntil-simulation.state.activeTicks,300)
     }
     func testPigCommitAndDeepNonterminal() throws {
-        var s=safe(); s.state.activeTicks=46439; _=s.step(); XCTAssertEqual(s.state.pendingPig?.ordinal,1)
+        var s=safe(); s.state.activeTicks=RunRules.pigIntervalTicks-361; _=s.step(); XCTAssertEqual(s.state.pendingPig?.ordinal,1)
         let p=s.state.pendingPig; s.wake("test"); XCTAssertTrue(s.continueRun()); XCTAssertEqual(s.state.pendingPig,p)
         s.state.phase = .running; s.state.activeTicks=647999; _=s.step(); XCTAssertEqual(s.state.visual,.deepStripping); XCTAssertNotEqual(s.state.phase,.finished)
         XCTAssertEqual(VisualPhase.at(seconds:11050),.deepSparse); XCTAssertEqual(VisualPhase.at(seconds:11200),.deepRebuilding); XCTAssertEqual(VisualPhase.at(seconds:12000),.beyond); XCTAssertEqual(VisualPhase.at(seconds:21600),.deepStripping)

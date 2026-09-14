@@ -41,11 +41,11 @@ def main() -> None:
     require(all(f"`{x['id']}`" in spec for x in assets), 'Full specification names all 42 stable IDs')
     cfg = load('game_config.json')
     p = cfg['pigs']
-    require(p['checkpoint_seconds'] == 780 and p['required_clover_pigs'] == 3, 'Pig timing and three-pig requirement preserved')
-    require(Fraction(p['presence_numerator'],p['presence_denominator']) == Fraction(1,2), 'Pig presence is exactly one half')
+    require(p['checkpoint_seconds'] == 180 and p['required_clover_pigs'] == 3, 'Pig timing and three-pig requirement preserved')
+    require(Fraction(p['presence_numerator'],p['presence_denominator']) == Fraction(1,1), 'Pig presence is guaranteed')
     require(Fraction(p['clover_given_pig_numerator'],p['clover_given_pig_denominator']) == Fraction(1,3), 'Clean conditional clover probability is one third')
     require(Fraction(p['clover_given_pig_numerator'],p['after_continue_clover_given_pig_denominator']) == Fraction(1,6), 'Continued conditional clover probability is one sixth')
-    require(not p['pity_system'] and not p['guaranteed_checkpoint'], 'No pity or guaranteed checkpoint')
+    require(not p['pity_system'] and p['guaranteed_checkpoint'], 'Guaranteed pig checkpoint without lucky pity')
     require(cfg['deep_dream']['threshold_seconds'] == 10800 and not cfg['deep_dream']['end_run'], 'Three-hour transition is not an ending')
     require(cfg['currency']['id'] == 'balloons' and cfg['currency']['purchasable'], 'Balloons are the purchasable currency')
     require(cfg['continues']['max_per_run'] == 1, 'One-continue default consistent')
@@ -84,10 +84,10 @@ def main() -> None:
                 raise AssertionError('Continued lucky set is not subset of clean set')
     require(True,'All 100 pig checkpoints reproduce; continued lucky set is subset')
     validate_truth_table()
-    require(True,'Exact twelve-pair pig truth table validated')
-    require(clover_chance_at_least_three(3)==Fraction(1,216), 'Earliest nominal ending probability is 1/216')
-    require(clover_chance_at_least_three(5)==Fraction(23,648), '65-minute clean probability is exactly 23/648')
-    require(3*6*13==234 and 3*12*13==468, 'Expected nominal times are 234 and 468 minutes')
+    require(True,'Exact six-draw pig truth table validated')
+    require(clover_chance_at_least_three(3)==Fraction(1,27), 'Earliest nominal ending probability is 1/27')
+    require(clover_chance_at_least_three(5)==Fraction(17,81), '15-minute clean probability is exactly 17/81')
+    require(3*3*3==27 and 3*6*3==54, 'Expected nominal times are 27 and 54 minutes')
     for bad in ['', 'DR1-G1-R1-C1-000000000001A-0000', 'X'*129, 'DR1-G1-R1-C1-ZZZZZZZZZZZZZ-0000']:
         try:
             decode_dream_id(bad)
@@ -112,8 +112,8 @@ def main() -> None:
     print(f'PASS: {len(checks)} specification/reference consistency checks')
     print('NOT TESTED HERE: Swift compilation, actual iOS gameplay, rendered assets, device tilt, StoreKit or ads.')
     for i,name in enumerate(checks,1): print(f'{i:02}. {name}')
-    report='# Specification-pack validation report\n\nDate: 13 September 2026.\n\n'
-    report+='**Artifact status:** Specification, structured data and reference algorithms only. No iOS app has been built in this environment.\n\n'
+    report='# Specification data validation report\n\nPig rules: guaranteed three-minute encounters; 1/3 lucky, 1/6 after continue.\n\n'
+    report+='**Artifact status:** This script checks specification data and reference algorithms only. See IMPLEMENTATION_STATUS.md for separate Swift and simulator results.\n\n'
     report+=f'**Executed:** `python3 tools/validate_spec.py` — {len(checks)} checks passed.\n\n'
     report+='## Checks passed\n\n'+''.join(f'{i}. {n}\n' for i,n in enumerate(checks,1))
     report+='\n## Not tested / not claimed\n\nSwift/Xcode compilation; native rendering; actual 42-asset mesh implementation; physical-device motion, frame rate, battery/thermal behaviour; live StoreKit purchases, ad rewards, Game Center or cloud recovery; human playtesting and final art quality. Those are implementing-agent/release acceptance tasks, not completed work in this pack.\n'
