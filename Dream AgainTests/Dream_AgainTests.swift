@@ -484,3 +484,23 @@ extension Dream_AgainTests {
         XCTAssertLessThanOrEqual(kit.residentPlateCount,3)
     }
 }
+
+extension Dream_AgainTests {
+    @MainActor func testStormTextureThreatAndLightingRecovery() async throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        await r.storm.waitUntilReady();XCTAssertNil(r.storm.loadError)
+        game.labObstacle(.lightning)
+        let h=try XCTUnwrap(game.run.hazards.first),e=try XCTUnwrap(r.obstacleModel(h))
+        XCTAssertNotNil(e.findEntity(named:"storm-photo"))
+        XCTAssertNotNil(e.findEntity(named:"storm-rain"))
+        XCTAssertNil(e.findEntity(named:"strike-outline"))
+        game.simulation.state.distance=h.distance-10;r.render(game.run,equipped:[:])
+        XCTAssertLessThan(r.daylight.light.intensity,2000)
+        var strike=game.run;strike.activeTicks=h.strikeTick
+        r.animateObstacle(e,h:h,run:strike)
+        XCTAssertGreaterThan(try XCTUnwrap(e.findEntity(named:"storm-flash") as? PointLight).light.intensity,0)
+        game.simulation.state.hazards=[];r.render(game.run,equipped:[:])
+        XCTAssertEqual(r.daylight.light.intensity,4200)
+        XCTAssertEqual(r.ambientFill.light.intensity,750)
+    }
+}

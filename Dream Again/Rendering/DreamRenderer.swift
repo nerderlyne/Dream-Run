@@ -12,6 +12,8 @@ import simd
     let art=DreamArtDirection()
     let evolution=PaletteEvolution()
     let wardrobeLight=PointLight()
+    let storm=StormVFX()
+    let daylight=DirectionalLight(),ambientFill=PointLight()
     var chunks: [Int:Entity]=[:], hazards: [String:Entity]=[:], pickups: [String:Entity]=[:]
     var legs:[Entity]=[], arms:[Entity]=[], knees:[Entity]=[], elbows:[Entity]=[]
     var factory: PrefabFactory
@@ -33,8 +35,8 @@ import simd
         view.scene.addAnchor(anchor); anchor.addChild(world); anchor.addChild(runner); anchor.addChild(camera)
         camera.camera.fieldOfViewInDegrees=62
         camera.camera.far=8000
-        let light=DirectionalLight(); light.light.intensity=4200; light.light.color=UIColor(hex:"#FFF0E4"); light.look(at:[0,0,0],from:[-6,10,8],relativeTo:nil); light.shadow = .init();anchor.addChild(light)
-        let fill=PointLight(); fill.light.intensity=750; fill.light.attenuationRadius=80; fill.position=[4,9,8]; anchor.addChild(fill)
+        let light=daylight; light.light.intensity=4200; light.light.color=UIColor(hex:"#FFF0E4"); light.look(at:[0,0,0],from:[-6,10,8],relativeTo:nil); light.shadow = .init();anchor.addChild(light)
+        let fill=ambientFill; fill.light.intensity=750; fill.light.attenuationRadius=80; fill.position=[4,9,8]; anchor.addChild(fill)
         wardrobeLight.light.intensity=1600;wardrobeLight.light.attenuationRadius=12;wardrobeLight.position=[-1,2.5,-3];wardrobeLight.isEnabled=false;anchor.addChild(wardrobeLight)
         buildStrawDoll()
     }
@@ -60,6 +62,11 @@ import simd
     func render(_ run:RunState,equipped:[String:String],menu:Bool = false,lowPower:Bool = false) {
         let surfacePalettes=vividPalettes
         wardrobeLight.isEnabled=false
+        let threat=run.hazards.filter{$0.encounter == .lightning}.map {h -> Float in
+            let d=h.distance-run.distance
+            return d < -5 ? 0:Float(max(0,min(1,(42-d)/30)))
+        }.max() ?? 0
+        daylight.light.intensity=4200-2900*threat;ambientFill.light.intensity=750-550*threat
         dress(equipped)
         if gallery?.name != "ending-pigs" || run.pigs.count != 3 { gallery?.removeFromParent(); gallery=nil }
         let cinematic = run.pigs.count == 3

@@ -167,7 +167,7 @@ struct ContentView:View {
             Text("best unbroken · \(game.time(game.profile.records["unbroken",default:0]))").font(.caption)
             Text(game.run.identity.code).font(.caption2.monospaced()).textSelection(.enabled)
             if !game.notice.isEmpty {Text(game.notice).font(.caption).multilineTextAlignment(.center)}
-            Spacer();button("dream again"){game.start(mode:.fresh)}
+            Spacer();button("Dream On"){game.start(mode:.fresh)}
             HStack{button("save dream"){game.saveDream()};button("share"){game.share()}}
             button("revisit this dream"){game.start(identity:game.run.identity,mode:.revisit)}
             if game.provider.available && game.run.continueCount == 0 && game.run.pigs.count < 3 {button(game.provider.label){continueWarning=true}}

@@ -5,6 +5,14 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Storm threat and post-death label — September 15, 2026
+
+- Corrected the requested scope: only the post-death restart button says **Dream On**. The title, app display name, share text and seed description remain Dream Again; the interrupted broader rename was reverted before this build.
+- Replaced the lightning encounter's toy cloud with an original 1536 × 1024 transparent photographic storm sprite, preloaded once and shared between instances. Preserves its 3:2 aspect. Added local animated rain, soft low-opacity ground shade, approach-based daylight/fill reduction and a strike point light. Dim broken ground fissures replace the bright warning ring; existing strike timing and thunder remain.
+- Two targeted native simulator tests passed (5.576 seconds), covering lightning animation, loaded cloud texture, local lighting and restoration. Final Debug simulator build succeeded after the aspect-ratio correction; tests were not repeated for that fixed transform change. Specification validation passed 54 checks. Logs: `evidence/storm-native.log`, `evidence/storm-build.log`, `evidence/storm-spec.log`.
+- Visually inspected actual approach and strike captures: `evidence/obstacle-lightning.png`, `evidence/obstacle-lightning-strike.png`. Capture script: `tools/capture_storm.py`. Image-generation tool, exact prompt and resource path: `docs/STORM_VFX.md`.
+- This is a photographic card with local VFX, not volumetric weather. Physical-device realism/readability and transparency performance remain untested. Simulator render-pipeline warnings occurred; no full native/UI/Release iOS or core rerun in this renderer-only pass.
+
 ## Protect visual reality and earned void — September 15, 2026
 
 - Fixed black palette selection erasing the entire ordinary background. Before 30 minutes, ordinary plates stay fully visible and palette black cannot suppress collage density. Later ordinary darkness retains at least 18% plate visibility and some imagery. Existing three-hour stripping, sparse void and rebuilding remain; lucky white is separate.

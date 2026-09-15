@@ -1,5 +1,9 @@
 # Known limitations
 
+## Storm threat presentation — September 15, 2026
+
+The storm is a photographic alpha VFX card with procedural rain, local shade and lighting, not a volumetric weather simulation. Physical-device transparency cost, reduced-visibility dodge readability and subjective realism/threat remain unverified. The original generated PNG and complete prompt are recorded in `docs/STORM_VFX.md`.
+
 ## Background continuity — September 15, 2026
 
 The last-resort background is a non-black lavender field when no valid photograph has loaded. It prevents black error flashes but is not a photographic substitute. Plate transitions use alpha overlap rather than image masks. Device loading latency, thermal behavior and every source-photo crop remain unverified; simulated missing-photo recovery is tested separately.

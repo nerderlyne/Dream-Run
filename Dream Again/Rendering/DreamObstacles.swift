@@ -15,16 +15,33 @@ extension DreamRenderer {
         }
         if h.encounter == .step {return root} // The raised staircase is the actual chunk surface.
         if h.encounter == .lightning {
-            var ring=Geometry(),dark=Geometry(),bolt=Geometry()
-            let points=(0...48).map {i in let a=Float(i)/48*2*Float.pi;return SIMD3<Float>(cos(a)*0.65,0.035,sin(a)*0.65)}
-            dark.tube(points,radius:0.06,segments:5);ring.tube(points.map{$0+[0,0.08,0]},radius:0.035,segments:5)
-            add(dark,"#282039","strike-outline",true);add(ring,"#FFF1AE","strike-warning",true)
-            bolt.tube([[0,7,0],[0.2,5.8,0],[-0.35,4.9,0],[0.23,3.8,0],[-0.16,2.5,0],[0.22,1.4,0],[0,0.04,0]],radius:0.055,segments:6)
-            bolt.tube([[0.23,3.8,0],[0.9,3.2,0],[1.15,2.4,0]],radius:0.025,segments:5)
+            var warning=Geometry(),bolt=Geometry(),rain=Geometry()
+            // Broken, dim ground fissures preserve a dodge cue without a target-circle graphic.
+            for i in 0..<5 {
+                let a=Float(i)*1.256
+                warning.tube([[cos(a)*0.2,0.045,sin(a)*0.2],[cos(a+0.12)*0.44,0.045,sin(a+0.12)*0.44],[cos(a)*0.64,0.045,sin(a)*0.64]],radius:0.012,segments:5)
+            }
+            add(warning,"#B8C3D5","strike-warning",true)
+            bolt.tube([[0,7,0],[0.2,5.8,0],[-0.35,4.9,0],[0.23,3.8,0],[-0.16,2.5,0],[0.22,1.4,0],[0,0.04,0]],radius:0.045,segments:6)
+            bolt.tube([[0.23,3.8,0],[0.9,3.2,0],[1.15,2.4,0]],radius:0.02,segments:5)
             add(bolt,"#EEE5FF","lightning-bolt",true)
-            let cloud=factory.build(.cloud,palette:0,lod:2);cloud.scale=[1.1,1.4,1];cloud.position=[0,7,0]
-            for child in cloud.children {if let model=child as? ModelEntity {model.model?.materials=[factory.material(UIColor(hex:"#898599"),style:0)]}}
-            root.addChild(cloud)
+            root.addChild(storm.cloud())
+            for i in 0..<90 {
+                let x=Float(sin(Double(i)*2.399))*2.8,z=Float(cos(Double(i)*4.13))*1.6,y=Float(i%13)*0.34+0.8
+                rain.tube([[x,y,z],[x-0.08,y-0.5,z]],radius:0.006,segments:3)
+            }
+            add(rain,"#8A9AAE","storm-rain",true)
+            for n in 0..<6 {
+                var shade=Geometry()
+                let inner=Float(n)*0.5,outer=inner+0.5
+                for i in 0..<40 {
+                    let a=Float(i)/40*2*Float.pi,b=Float(i+1)/40*2*Float.pi
+                    shade.quad([cos(a)*inner,0.025,sin(a)*inner],[cos(b)*inner,0.025,sin(b)*inner],[cos(b)*outer,0.025,sin(b)*outer],[cos(a)*outer,0.025,sin(a)*outer])
+                }
+                add(shade,"#0D1422","storm-shade-\(n)",true)
+                root.findEntity(named:"storm-shade-\(n)")?.components.set(OpacityComponent(opacity:0.32-Float(n)*0.047))
+            }
+            let flash=PointLight();flash.name="storm-flash";flash.position=[0,3,0];flash.light.color=UIColor(hex:"#CADFFF");flash.light.attenuationRadius=12;flash.light.intensity=0;root.addChild(flash)
         } else if h.encounter == .swing {
             var head=Geometry(),spikes=Geometry(),chain=Geometry(),collar=Geometry()
             let center=SIMD3<Float>(0,0.85,0)
@@ -89,7 +106,10 @@ extension DreamRenderer {
             e.findEntity(named:"lightning-bolt")?.isEnabled=h.striking(at:run.activeTicks)
             let visible=h.strikeTick == UInt64.max || run.activeTicks<h.strikeTick+24
             e.findEntity(named:"strike-warning")?.isEnabled=visible
-            e.findEntity(named:"strike-outline")?.isEnabled=visible
+            e.findEntity(named:"strike-warning")?.components.set(OpacityComponent(opacity:0.28+0.12*Float(sin(run.seconds*4))))
+            if let cloud=e.findEntity(named:"storm-cloud") {cloud.orientation=camera.orientation(relativeTo:e)}
+            if let rain=e.findEntity(named:"storm-rain") {rain.position.y = -Float(run.seconds.truncatingRemainder(dividingBy:0.7))*1.4;rain.components.set(OpacityComponent(opacity:0.23))}
+            (e.findEntity(named:"storm-flash") as? PointLight)?.light.intensity=h.striking(at:run.activeTicks) ? 14000:0
         }
         if let ribbon=e.findEntity(named:"mace-chain") {
             let offset=Float(h.lateral(at:run.activeTicks)-h.lateral)
