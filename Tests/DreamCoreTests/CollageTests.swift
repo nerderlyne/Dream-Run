@@ -4,8 +4,8 @@ import XCTest
 final class CollageTests:XCTestCase {
     func testKitCountsAndMetadata() {
         let kit=DreamCollageKit.assets
-        XCTAssertEqual(kit.count,55);XCTAssertEqual(Set(kit.map(\.id )).count,55)
-        XCTAssertEqual(kit.filter(\.isPlate).count,9)
+        XCTAssertEqual(kit.count,46+DreamPlateLibrary.assets.count);XCTAssertEqual(Set(kit.map(\.id )).count,kit.count)
+        XCTAssertEqual(kit.filter(\.isPlate).count,DreamPlateLibrary.assets.count)
         for (concept,count) in [(AssetID.horse,5),(.tree,5),(.house,5),(.cloud,6),(.moon,3),(.arch,3),(.window,2)] {
             XCTAssertEqual(kit.filter{$0.concept == concept}.count,count)
         }
@@ -13,7 +13,7 @@ final class CollageTests:XCTestCase {
             XCTAssertFalse(asset.interactive);XCTAssertTrue(asset.backgroundOnly)
             XCTAssertEqual(asset.alphaBounds.count,4);XCTAssertEqual(asset.pixelSize.count,2)
             XCTAssertFalse(asset.depths.contains(.gameplay))
-            XCTAssertLessThanOrEqual(asset.pixelSize.max()!,asset.isPlate ? 1024:768)
+            XCTAssertLessThanOrEqual(asset.pixelSize.max()!,asset.isPlate ? 2048:768)
             if !asset.isPlate {
                 XCTAssertGreaterThan(asset.alphaBounds[0],0);XCTAssertGreaterThan(asset.alphaBounds[1],0)
                 XCTAssertLessThan(asset.alphaBounds[2],asset.pixelSize[0]-1)

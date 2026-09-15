@@ -1,5 +1,13 @@
 # Known limitations
 
+## Curated background integration — September 15, 2026
+
+- Current batch includes 102 unique images from the 103 source files present at verification. Later copied photos require rerunning `swift tools/import_dream_plates.swift` and rebuilding. Originals are untouched.
+- Optimized backgrounds add approximately 97 MiB of JPEG resources. The runtime cache holds at most three photos, but device GPU memory, frame pacing and thermal behavior have not been measured in this pass.
+- Aspect fill deliberately crops wide images on portrait screens. Backgrounds are photographic cards, so perspective inside a source photograph does not change with the runner; existing foreground/collage layers provide motion and depth.
+- Source filenames and hashes are recorded. Per-photo Unsplash URLs and photographer credits were not supplied.
+- This pass does not establish physical tilt, iPad visual quality, Release-device performance or App Store readiness.
+
 - Three-minute pig schedule: nominal encounters retain the existing six-second visible approach/runway reservation; timing is active simulation time. Physical-device encounter timing has not been measured in this pass. Current prerelease pig tuning replaces the old policy.
 
 - Composition refinement: eight fixed-distance simulator samples do not establish a measured improvement in player preference. Color matching and silhouette visibility on route bends are not image-aware; some combinations remain weaker. No new physical-device performance measurements.

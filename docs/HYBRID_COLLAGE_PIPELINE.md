@@ -1,11 +1,11 @@
 # Current collage pipeline
 
 There is one visual pipeline and one runtime catalog: `DreamCollageKit.swift`.
-55 shipping images provide 46 transparent objects and nine atmosphere-only backdrops.
-The six new backdrops depict space, underwater light, aurora, desert mirage, lavender mist
-and opal dawn. The supplied mood references are never production resources.
+148 shipping images provide 46 transparent objects and 102 owner-curated background plates.
+The nine generated backdrops have been removed. See `DREAM_PLATES.md` for importing photos,
+source records and the bounded on-demand photo cache. The supplied mood references are never production resources.
 
-`HybridDreamLayers` retains 20 world-space object cards and two camera-relative sky cards.
+`HybridDreamLayers` retains 20 semantic object cards, three atmospheric cards and two camera-relative sky cards.
 Perspective and parallax follow the real runner camera. Texture loading is asynchronous,
 sequential and cached. Cards share a back-to-front sort group with a deferred depth pass;
 transparent regions cannot cut rectangular holes in other layers. Cards cast no shadows.
@@ -17,8 +17,8 @@ The old sky dome, procedural decorative horizon, cloud impostor renderer and pre
 version switches have been removed. The only environment resource supplies neutral lighting;
 it is not a visible solid-color background. There is no alternate old-art path.
 
-The track uses saturated lacquer materials with checkerboard as the dominant pattern,
-plus occasional stripes and solids. Track palette changes use a bounded four-material
+The track uses saturated lacquer materials with solid fields favored around dense atmospheric silhouettes,
+plus checkerboard and stripe variations. Track palette changes use a bounded four-material
 update budget and staggered transitions. Hazards retain their semantic colors.
 
 The straw doll uses one articulated reed/twine rig. Hats, waist ribbons, apron, lace and short

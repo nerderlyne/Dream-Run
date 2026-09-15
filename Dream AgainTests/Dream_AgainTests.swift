@@ -23,7 +23,7 @@ extension Dream_AgainTests {
     }
     @MainActor func testNormalDreamClearsVisualReviewOverrides() throws {
         let game=GameModel(),r=try XCTUnwrap(game.renderer)
-        game.labDesign(theme:3,variant:2,sky:"sky_underwater",pattern:.solid)
+        game.labDesign(theme:3,variant:2,sky:DreamCollageKit.skyIDs[1],pattern:.solid)
         game.labScale(.absurd,framing:.crownOnly)
         game.start()
         XCTAssertNil(r.art.collage.previewScale);XCTAssertNil(r.art.collage.previewFraming)
@@ -55,18 +55,36 @@ extension Dream_AgainTests {
         let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
         await renderer.art.collage.waitForPreload()
         XCTAssertEqual(renderer.art.collage.loadErrors,[])
-        XCTAssertEqual(renderer.art.collage.loadedTextureCount,55)
+        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,49)
         game.labCollage(index:0)
         renderer.render(game.run,equipped:game.profile.equipped)
         XCTAssertGreaterThan(renderer.art.collage.activeCardCount,5)
         XCTAssertGreaterThanOrEqual(renderer.art.collage.activeAtmosphereCount,1)
         XCTAssertEqual(renderer.art.collage.pooledCardCount,25)
         for _ in 0..<30 {renderer.render(game.run,equipped:game.profile.equipped)}
-        XCTAssertEqual(renderer.art.collage.loadedTextureCount,55)
+        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,49)
         XCTAssertTrue(renderer.art.collage.root.children.allSatisfy{$0.components[CollisionComponent.self] == nil})
         for asset in DreamCollageKit.assets {
-            XCTAssertNotNil(Bundle.main.url(forResource:asset.resource,withExtension:"png"))
+            XCTAssertNotNil(Bundle.main.url(forResource:asset.resource,withExtension:asset.resourceExtension))
         }
+    }
+
+    @MainActor func testCuratedPlateCacheRemainsBoundedAndPreservesAspect() async throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer),kit=r.art.collage
+        await kit.waitForPreload()
+        for plate in DreamPlateLibrary.assets.prefix(6) {
+            kit.previewPlate=plate.id
+            r.render(game.run,equipped:[:]);await kit.waitForPreload()
+            game.simulation.state.activeTicks += 1800
+            r.render(game.run,equipped:[:]);await kit.waitForPreload()
+            r.render(game.run,equipped:[:])
+            XCTAssertLessThanOrEqual(kit.residentPlateCount,3)
+            XCTAssertLessThanOrEqual(kit.loadedTextureCount,49)
+            for entity in kit.root.children where entity.name == "collage:\(plate.id)" {
+                XCTAssertEqual(abs(entity.scale.x/entity.scale.y),plate.aspect,accuracy:0.001)
+            }
+        }
+        XCTAssertEqual(kit.loadErrors,[])
     }
 
     @MainActor func testCollageRebaseTransitionsAndCPUProfile() async throws {

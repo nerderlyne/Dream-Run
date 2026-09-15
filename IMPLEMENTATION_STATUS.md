@@ -5,6 +5,17 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Curated DreamPlates — September 15, 2026
+
+- Replaced all nine generated sky plates with **102 unique owner-curated backgrounds**, imported from 103 files (one exact duplicate). Reviewed all five contact sheets. Original source files remain untouched and outside the app bundle; optimized JPEGs, source hashes and generated catalog are included.
+- Importer applies orientation, caps the longest side at 2048 pixels and deduplicates by full source SHA-256. Current optimized resources total approximately 97 MiB. Later arrivals require rerunning the importer and rebuilding; the current source hashes exactly match the manifest.
+- Seeded shuffled selection visits the entire library before repeating, including no adjacent repeat across deck boundaries. Ordinary 24-second and mirror/drop 1.8-second crossfades remain. The 46 cutouts, independent atmospheric layers, clean gameplay corridor and void behavior remain.
+- Photos load asynchronously on demand with at most three resident cached photo textures. Retired sky materials release their texture references. Aspect-fill uses each photo's true dimensions instead of stretching it. The 25-card pool is unchanged.
+- Final targeted Release core suite: **13 tests passed**, zero failures, 1.028 seconds. Final Debug iPhone 16 Pro Max / iOS 26.5 simulator suite: **24 tests passed**, zero failures, 92.022 seconds; Xcode reported TEST SUCCEEDED. Specification validator: **54 checks passed**. Logs: `evidence/plates-core.log`, `evidence/plates-native.log`, `evidence/plates-spec.log`.
+- Simulator still emitted CAMetalLayer allocation warnings. Tests establish bounded application cache and geometry behavior, not GPU memory, frame rate or device thermal performance. No physical-device, iPad, Release iOS or UI-automation test in this pass.
+- Captured and visually inspected four actual simulator views: clouds, underwater, architecture and space. Gallery uses DEBUG previews with no rewards; these are static captures, not an endurance run.
+- Import/build instructions and provenance limits: `docs/DREAM_PLATES.md`. Current background review: `evidence/plates-gallery.html`.
+
 ## Three-minute pigs — September 15, 2026
 
 - Creator override: a pig is guaranteed every 180 active seconds. Lucky chance is exactly 1/3, reduced to 1/6 for future uncommitted events after a continue. Removed the presence RNG draw; retained the independent six-outcome clover stream, no lucky pity, three-collected-pig ending and nonterminal three-hour evolution.

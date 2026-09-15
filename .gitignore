@@ -5,3 +5,6 @@ DerivedData/
 .DS_Store
 __pycache__/
 *.pyc
+
+# Owner originals; optimized app resources and source manifest are versioned.
+/DreamPlates/

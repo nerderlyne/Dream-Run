@@ -112,7 +112,7 @@ import UIKit
                 }
                 if arguments.contains("--design-review") {
                     func arg(_ key:String,_ fallback:String)->String {arguments.firstIndex(of:key).flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1]:nil} ?? fallback}
-                    labDesign(theme:theme,pose:pose,variant:Int(arg("--variant","0")) ?? 0,sky:arg("--sky","sky_cosmos"),pattern:TrackPattern(rawValue:arg("--pattern","checker")) ?? .checker,mirror:arguments.contains("--design-mirror"),contrast:arguments.contains("--design-contrast"))
+                    labDesign(theme:theme,pose:pose,variant:Int(arg("--variant","0")) ?? 0,sky:arg("--sky",DreamCollageKit.skyIDs[0]),pattern:TrackPattern(rawValue:arg("--pattern","checker")) ?? .checker,mirror:arguments.contains("--design-mirror"),contrast:arguments.contains("--design-contrast"))
                     if let kind=DreamObstacle(rawValue:arg("--obstacle","")) {labObstacle(kind,striking:arguments.contains("--strike"))}
                     if let value=Int(arg("--vignette","-1")),let vignette=DreamVignette(rawValue:value) {labVignette(vignette)}
                     if let value=Int(arg("--scale-event","-1")),let event=DreamScaleEvent(rawValue:value) {labScale(event,framing:DreamScaleFraming(rawValue:Int(arg("--scale-framing","-1")) ?? -1))}
@@ -282,7 +282,7 @@ import UIKit
                 let args=ProcessInfo.processInfo.arguments
                 if let i=args.firstIndex(of:"--collage-capture-token"),args.indices.contains(i+1),let token=UUID(uuidString:args[i+1]) {
                     let path=URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("collage-ready-\(token.uuidString).txt")
-                    try? Data("55 textures ready; DEBUG no rewards".utf8).write(to:path,options:.atomic)
+                    try? Data("Current plate and collage cutouts ready; DEBUG no rewards".utf8).write(to:path,options:.atomic)
                     collageCaptureSignalled=true
                 }
             }
@@ -363,7 +363,7 @@ import UIKit
         }
         renderer?.lastRun=nil;renderer?.render(run,equipped:profile.equipped)
     }
-    func labDesign(theme:Int,pose:String="run",variant:Int=0,sky:String="sky_cosmos",pattern:TrackPattern = .checker,mirror:Bool=false,contrast:Bool=false) {
+    func labDesign(theme:Int,pose:String="run",variant:Int=0,sky:String=DreamCollageKit.skyIDs[0],pattern:TrackPattern = .checker,mirror:Bool=false,contrast:Bool=false) {
         labCollage(index:0)
         renderer?.artPalette=max(0,min(palettes.count-1,theme));renderer?.artPattern=pattern
         renderer?.art.collage.previewPlate=sky

@@ -106,3 +106,5 @@ semantic scale diversity. [Current atmospheric comparison](evidence/atmosphere-g
 shows normal seeded dreams and a scene with a separate rare landmark.
 
 Composition refinement: [reasoning](docs/COMPOSITION_REVIEW.md) and [eight consecutive simulator seeds](evidence/composition-gallery.html).
+
+Curated photographic backgrounds: see [DreamPlates import and runtime](docs/DREAM_PLATES.md).

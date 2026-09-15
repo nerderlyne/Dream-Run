@@ -21,6 +21,7 @@ public struct DreamRepresentation:Codable,Equatable,Sendable {
     public let pixelSize:[Int]
     public let recommendedScaleRange:[Double]
     public var resource:String {id}
+    public var resourceExtension:String {isPlate ? "jpg":"png"}
     public var isPlate:Bool {concept == nil}
     public var aspect:Float {Float(pixelSize[0])/Float(pixelSize[1])}
 }
@@ -60,11 +61,19 @@ public enum DreamCollageComposition {
     public static func cell(distance:Double,slot:Int)->Int {Int(floor((distance+(slot>=16 ? 0:Double(slot)*period(slot:slot)/16))/period(slot:slot)))}
     public static let proofSeeds:[UInt64]=[42,117,802,2026,9001]
     public static func plate(identity:DreamIdentity,section:Int,transition:Int=0)->DreamRepresentation {
-        var rng=identity.stream("collage-sky",section)
-        let plates=DreamCollageKit.assets.filter(\.isPlate)
-        let initial=Int(rng.below(UInt64(plates.count)))
-        return plates[(initial+transition*4)%plates.count]
+        let plates=DreamPlateLibrary.assets
+        let ordinal=max(0,section)+max(0,transition)
+        let cycle=ordinal/plates.count
+        func deck(_ index:Int)->[DreamRepresentation] {
+            var values=plates,rng=identity.stream("collage-sky-deck",index)
+            for i in stride(from:values.count-1,through:1,by:-1) {values.swapAt(i,Int(rng.below(UInt64(i+1))))}
+            return values
+        }
+        var values=deck(cycle)
+        if cycle>0 && values.first?.id == deck(cycle-1).last?.id {values.swapAt(0,1)}
+        return values[ordinal%plates.count]
     }
+
     public static func placement(identity:DreamIdentity,distance:Double,slot:Int,scaleEvent:DreamScaleEvent?=nil,framing:DreamScaleFraming?=nil)->DreamCollagePlacement {
         let scale=DreamScaleComposition.plan(identity:identity,distance:distance,override:scaleEvent,framing:framing)
         if slot>=16 {return DreamVignette.selected(identity:identity,cell:cell(distance:distance,slot:slot)).placement(identity:identity,distance:distance,part:slot-16,scaleEvent:scaleEvent)}

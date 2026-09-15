@@ -27,7 +27,11 @@ def main() -> None:
     json_paths = sorted((ROOT/'data').glob('*.json'))
     for path in json_paths:
         json.loads(path.read_text())
-    require(len(json_paths) == 7, 'All seven JSON contract files parse')
+    require(len(json_paths) == 8, 'All eight JSON contract and asset manifest files parse')
+    plates = load('dream_plates.json')
+    require(bool(plates) and len({p['id'] for p in plates}) == len(plates), 'Curated plate IDs are unique and nonempty')
+    require(all(0 < p['width'] <= 2048 and 0 < p['height'] <= 2048 for p in plates), 'Curated photos respect the 2048 pixel limit')
+    require(all((ROOT/'Dream Again/Resources/DreamPlates'/f"{p['id']}.jpg").is_file() for p in plates), 'Every curated photo has a bundled resource')
     assets = load('asset_catalog.json')['assets']
     require(len(assets) == 42, 'Exactly 42 world-asset families')
     require([x['number'] for x in assets] == list(range(1,43)), 'Ordinals are exactly 1...42')

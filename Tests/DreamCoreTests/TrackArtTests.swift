@@ -9,12 +9,23 @@ final class TrackArtTests:XCTestCase {
         XCTAssertGreaterThan(patterns.filter{$0 == .solid}.count,450)
         for i in 0..<100 {XCTAssertEqual(TrackArt.pattern(identity:id,distance:Double(i)*192),TrackArt.pattern(identity:id,distance:Double(i)*192+191))}
     }
-    func testNineSkiesAndMirrorChange() {
-        XCTAssertEqual(DreamCollageKit.assets.count,55)
-        XCTAssertEqual(DreamCollageKit.assets.filter(\.isPlate).count,9)
+    func testCuratedSkiesAndMirrorChange() {
+        XCTAssertEqual(DreamCollageKit.assets.count,46+DreamPlateLibrary.assets.count)
+        XCTAssertEqual(DreamCollageKit.assets.filter(\.isPlate).count,DreamPlateLibrary.assets.count)
         let id=DreamIdentity.current(seed:42)
         for section in 0..<50 {
             XCTAssertNotEqual(DreamCollageComposition.plate(identity:id,section:section),DreamCollageComposition.plate(identity:id,section:section,transition:1))
         }
     }
+    func testPlateDeckVisitsEveryPhotoWithoutRepeatingAtBoundaries() {
+        let count=DreamPlateLibrary.assets.count
+        XCTAssertGreaterThan(count,0)
+        for seed:UInt64 in 0..<12 {
+            let identity=DreamIdentity.current(seed:seed)
+            let draws=(0..<(count*3)).map{DreamCollageComposition.plate(identity:identity,section:$0).id}
+            for cycle in 0..<3 {XCTAssertEqual(Set(draws[(cycle*count)..<((cycle+1)*count)]).count,count)}
+            for i in 1..<draws.count {XCTAssertNotEqual(draws[i],draws[i-1])}
+        }
+    }
+
 }

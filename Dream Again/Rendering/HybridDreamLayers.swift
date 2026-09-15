@@ -6,6 +6,7 @@ import UIKit
     @MainActor private final class Slot {
         let model:ModelEntity
         var key=""
+        var imageAspect:Float=1
         var placement:DreamCollagePlacement?
         var basePosition=SIMD3<Float>.zero
         init(mesh:MeshResource) {
@@ -20,13 +21,20 @@ import UIKit
     private let sortGroup=ModelSortGroup(depthPass:.postPass)
     private var textures:[String:TextureResource]=[:]
     private var preload:Task<Void,Never>?
+    private var skyLoad:Task<Void,Never>?
+    private var requestedSky=""
+    private var cutoutsReady=false
+    var residentPlateCount:Int {textures.keys.filter{$0.hasPrefix("plate_")}.count}
     private var skyIndex=0
+    private var selectionKey=""
+    private var selectedIdentity:DreamIdentity?
+    private var selectedSky:DreamRepresentation?
     private var skyStarted:Double?
     private var skyDuration=24.0
     private(set) var loadErrors:[String]=[]
     private(set) var loadedTextureCount=0
     private(set) var activeCardCount=0
-    var ready:Bool {loadedTextureCount == DreamCollageKit.assets.count}
+    var ready:Bool {cutoutsReady && (requestedSky.isEmpty || textures[requestedSky] != nil)}
     var previewPlate:String?
     var previewVignette:DreamVignette?
     var reducedMotion=false
@@ -51,11 +59,11 @@ import UIKit
             for slot in skies+slots+atmosphere {root.addChild(slot.model)}
         } catch {loadErrors.append("Quad: \(error)")}
         preload=Task { [weak self] in
-            let assets=DreamCollageKit.assets.filter(\.isPlate)+DreamCollageKit.assets.filter{!$0.isPlate}
+            let assets=DreamCollageKit.assets.filter{!$0.isPlate}
             for asset in assets {
                 guard !Task.isCancelled else{return}
-                guard let url=Bundle.main.url(forResource:asset.resource,withExtension:"png") else {
-                    self?.loadErrors.append("Missing \(asset.resource).png");continue
+                guard let url=Bundle.main.url(forResource:asset.resource,withExtension:asset.resourceExtension) else {
+                    self?.loadErrors.append("Missing \(asset.resource).\(asset.resourceExtension)");continue
                 }
                 do {
                     let texture=try await TextureResource(contentsOf:url,options:.init(semantic:.color))
@@ -63,9 +71,30 @@ import UIKit
                     self?.loadedTextureCount=self?.textures.count ?? 0
                 } catch {self?.loadErrors.append("\(asset.id): \(error)")}
             }
+            self?.cutoutsReady=true
         }
     }
-    func waitForPreload() async {await preload?.value}
+    func waitForPreload() async {await preload?.value;await skyLoad?.value}
+    private func requestPlate(_ asset:DreamRepresentation) {
+        requestedSky=asset.id
+        guard textures[asset.id] == nil,skyLoad == nil else {return}
+        skyLoad=Task { [weak self] in
+            guard let url=Bundle.main.url(forResource:asset.resource,withExtension:asset.resourceExtension) else {
+                self?.loadErrors.append("Missing plate \(asset.id)");self?.skyLoad=nil;return
+            }
+            do {
+                let texture=try await TextureResource(contentsOf:url,options:.init(semantic:.color))
+                guard let self else {return}
+                self.textures[asset.id]=texture
+                let pinned=Set(self.skies.map(\.key)+[self.requestedSky])
+                for id in self.textures.keys.sorted() where id.hasPrefix("plate_") && !pinned.contains(id) {
+                    self.textures.removeValue(forKey:id)
+                }
+                self.loadedTextureCount=self.textures.count
+            } catch {self?.loadErrors.append("Plate \(asset.id): \(error)")}
+            self?.skyLoad=nil
+        }
+    }
     func reset() {
         for slot in slots+atmosphere+skies {slot.key="";slot.placement=nil;slot.model.isEnabled=false}
         skyStarted=nil;skyIndex=0;activeCardCount=0
@@ -77,6 +106,7 @@ import UIKit
         material.color = .init(tint:.white,texture:.init(texture))
         material.blending = .transparent(opacity:.init(floatLiteral:1))
         material.faceCulling = .none
+        slot.imageAspect=asset.aspect
         slot.model.model?.materials=[material];slot.model.name="collage:\(asset.id)"
         return true
     }
@@ -89,7 +119,13 @@ import UIKit
         if root.parent == nil {world.addChild(root)}
         root.isEnabled=true
         let density=DreamCollageComposition.density(seconds:run.seconds,visual:run.visual,voidWeight:voidWeight)
-        let sky=DreamCollageKit.assets.first{$0.id == previewPlate && $0.isPlate} ?? DreamCollageComposition.plate(identity:run.identity,section:Int(run.distance/1600),transition:run.mirrorCount+run.dropCount)
+        let nextSelection="\(Int(run.distance/1600)):\(run.mirrorCount+run.dropCount):\(previewPlate ?? "")"
+        if nextSelection != selectionKey || selectedIdentity != run.identity || selectedSky == nil {
+            selectedSky=DreamPlateLibrary.assets.first{$0.id == previewPlate} ?? DreamCollageComposition.plate(identity:run.identity,section:Int(run.distance/1600),transition:run.mirrorCount+run.dropCount)
+            selectionKey=nextSelection;selectedIdentity=run.identity
+        }
+        guard let sky=selectedSky else {return}
+        requestPlate(sky)
         let current=skies[skyIndex],incoming=skies[1-skyIndex]
         if current.key.isEmpty,assign(sky,to:current) {current.key=sky.id}
         if current.key != sky.id && skyStarted == nil && !current.key.isEmpty,assign(sky,to:incoming) {
@@ -101,13 +137,14 @@ import UIKit
         for (i,slot) in skies.enumerated() {
             let depth:Float=i == skyIndex ? 5000:4999
             let height=2*depth*tan(camera.camera.fieldOfViewInDegrees * .pi/360)*1.08
-            let width=max(height*(682.0/1024.0),height*max(0.1,aspect))
-            slot.model.scale=[width,width/(682.0/1024.0),1]
+            let plateAspect=slot.key.isEmpty ? sky.aspect:slot.imageAspect
+            let width=max(height*plateAspect,height*max(0.1,aspect))
+            slot.model.scale=[width,width/plateAspect,1]
             slot.model.orientation=camera.orientation
             slot.model.position=camera.position+camera.orientation.act([0,0,-depth])
             opacity(slot,slot.key.isEmpty ? 0 : skyVisibility*(i == skyIndex ? 1:fade))
         }
-        if fade>=1 {opacity(current,0);current.key="";skyIndex=1-skyIndex;skyStarted=nil}
+        if fade>=1 {opacity(current,0);current.model.model?.materials=[];current.key="";skyIndex=1-skyIndex;skyStarted=nil}
         let generator=WorldGenerator(run.identity)
         let layers=slots+atmosphere
         for i in layers.indices {
