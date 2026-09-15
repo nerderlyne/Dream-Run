@@ -5,6 +5,16 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Protect visual reality and earned void — September 15, 2026
+
+- Fixed black palette selection erasing the entire ordinary background. Before 30 minutes, ordinary plates stay fully visible and palette black cannot suppress collage density. Later ordinary darkness retains at least 18% plate visibility and some imagery. Existing three-hour stripping, sparse void and rebuilding remain; lucky white is separate.
+- Replaced the black error/startup fallback with a non-black lavender field, restored every frame after leaving void. Its brightness follows only the protected progression, so legitimate deep void remains black.
+- The current opaque photo stays behind its incoming replacement. Standard overlaps use smooth 24-second alpha; one third of section choices linger for 48 seconds with both realities visible. Mirror/drop overlap remains 1.8 seconds. No fade-through-black.
+- Stable scenes asynchronously preload their next deterministic photo, with cached selection and the existing maximum three-photo cache. Missing/failed plates are excluded for the session and a deterministic valid alternative is requested. Current imagery remains visible through failures. DEBUG-only fault injection does not affect production rewards.
+- Final Release core checks: 15 tests passed, 0.427 seconds. Final Debug iPhone 16 Pro Max simulator build/test: two targeted tests passed, 9.205 seconds, including injected missing-photo recovery with no empty frame and eventual replacement, cache bounds and aspect ratio. Specification: 54 checks passed. Logs: `evidence/reality-core.log`, `evidence/reality-native.log`, `evidence/reality-spec.log`.
+- Initial build caught a Float/CGFloat conversion, corrected before passing verification. Simulator emitted CAMetalLayer warnings; no physical-device loading/performance, full native suite, Release iOS or UI-automation pass. Transitions use alpha rather than spatial masks. The last-resort field is intentionally simple.
+- Early black-palette DEBUG capture: `evidence/reality-black-palette.png`, reproducible using `tools/capture_reality.py`.
+
 ## Toy zebra, jail door and mace — September 15, 2026
 
 - Replaced zebra hoop stripes with smooth, flush black/ivory surface bands, a rounded glossy toy silhouette, stout striped legs, hooves, muzzle, eyes, ears, upright mane and tufted tail. The open belly retains slide clearance. Removed the rejected zebra geometry.

@@ -80,7 +80,9 @@ import simd
             base=newBase
         }
         evolution.request(targetPalette,seconds:run.seconds,accelerated:run.phase == .mirrorCrossing || run.phase == .safeDrop,palettes:surfacePalettes,art:art)
-        if run.visual == .deepSparse && lastVisual != .deepSparse {view.environment.background = .color(.black)}
+        // Always restore the emergency reality after void, even when a photo load fails.
+        let visibility=DreamCollageComposition.plateVisibility(seconds:run.seconds,visual:run.visual,voidWeight:evolution.voidWeight(seconds:run.seconds))
+        view.environment.background = .color(mix(.black,UIColor(hex:"#77748F"),CGFloat(visibility)))
         palette=targetPalette;lastVisual=run.visual
         let active=Set(run.chunks.map(\.id))
         for (id,e) in chunks where !active.contains(id) { e.removeFromParent(); chunks.removeValue(forKey:id);terrainKeys.removeValue(forKey:id) }

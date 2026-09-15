@@ -25,7 +25,7 @@ import UIKit
             }
             if let cg=image.cgImage {illumination=try? EnvironmentResource(equirectangular:cg)}
         }
-        view.environment.background = .color(.black)
+        view.environment.background = .color(UIColor(hex:"#77748F"))
         view.environment.lighting.resource=illumination
         view.environment.lighting.intensityExponent = -0.5
         applied=true;environmentApplications += 1

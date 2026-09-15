@@ -23,12 +23,25 @@ import UIKit
     private var preload:Task<Void,Never>?
     private var skyLoad:Task<Void,Never>?
     private var requestedSky=""
+    private var failedPlates=Set<String>()
+    private var lingeringSky=false
     private var cutoutsReady=false
+    #if DEBUG
+    var unavailablePlateIDs=Set<String>()
+    #endif
+    var visiblePlateIDs:[String] {skies.filter{$0.model.isEnabled && !$0.key.isEmpty}.map(\.key)}
+    private func plateURL(_ asset:DreamRepresentation)->URL? {
+        #if DEBUG
+        if unavailablePlateIDs.contains(asset.id) {return nil}
+        #endif
+        return Bundle.main.url(forResource:asset.resource,withExtension:asset.resourceExtension)
+    }
     var residentPlateCount:Int {textures.keys.filter{$0.hasPrefix("plate_")}.count}
     private var skyIndex=0
     private var selectionKey=""
     private var selectedIdentity:DreamIdentity?
     private var selectedSky:DreamRepresentation?
+    private var standbySky:DreamRepresentation?
     private var skyStarted:Double?
     private var skyDuration=24.0
     private(set) var loadErrors:[String]=[]
@@ -75,23 +88,23 @@ import UIKit
         }
     }
     func waitForPreload() async {await preload?.value;await skyLoad?.value}
-    private func requestPlate(_ asset:DreamRepresentation) {
-        requestedSky=asset.id
-        guard textures[asset.id] == nil,skyLoad == nil else {return}
+    private func requestPlate(_ asset:DreamRepresentation,foreground:Bool=true) {
+        if foreground {requestedSky=asset.id}
+        guard textures[asset.id] == nil,skyLoad == nil,!failedPlates.contains(asset.id) else {return}
         skyLoad=Task { [weak self] in
-            guard let url=Bundle.main.url(forResource:asset.resource,withExtension:asset.resourceExtension) else {
-                self?.loadErrors.append("Missing plate \(asset.id)");self?.skyLoad=nil;return
+            guard let url=self?.plateURL(asset) else {
+                self?.loadErrors.append("Missing plate \(asset.id)");self?.failedPlates.insert(asset.id);self?.skyLoad=nil;return
             }
             do {
                 let texture=try await TextureResource(contentsOf:url,options:.init(semantic:.color))
                 guard let self else {return}
                 self.textures[asset.id]=texture
-                let pinned=Set(self.skies.map(\.key)+[self.requestedSky])
+                let pinned=Set(self.skies.map(\.key)+[self.requestedSky]+(foreground ? []:[asset.id]))
                 for id in self.textures.keys.sorted() where id.hasPrefix("plate_") && !pinned.contains(id) {
                     self.textures.removeValue(forKey:id)
                 }
                 self.loadedTextureCount=self.textures.count
-            } catch {self?.loadErrors.append("Plate \(asset.id): \(error)")}
+            } catch {self?.loadErrors.append("Plate \(asset.id): \(error)");self?.failedPlates.insert(asset.id)}
             self?.skyLoad=nil
         }
     }
@@ -122,18 +135,27 @@ import UIKit
         let nextSelection="\(Int(run.distance/1600)):\(run.mirrorCount+run.dropCount):\(previewPlate ?? "")"
         if nextSelection != selectionKey || selectedIdentity != run.identity || selectedSky == nil {
             selectedSky=DreamPlateLibrary.assets.first{$0.id == previewPlate} ?? DreamCollageComposition.plate(identity:run.identity,section:Int(run.distance/1600),transition:run.mirrorCount+run.dropCount)
+            standbySky=DreamCollageComposition.plate(identity:run.identity,section:Int(run.distance/1600)+1,transition:run.mirrorCount+run.dropCount)
             selectionKey=nextSelection;selectedIdentity=run.identity
         }
-        guard let sky=selectedSky else {return}
+        guard var sky=selectedSky else {return}
+        if failedPlates.contains(sky.id) {
+            let section=Int(run.distance/1600)
+            if let fallback=(1...DreamPlateLibrary.assets.count).lazy.map({DreamCollageComposition.plate(identity:run.identity,section:section+$0,transition:run.mirrorCount+run.dropCount)}).first(where:{!failedPlates.contains($0.id)}) {
+                sky=fallback
+            }
+        }
         requestPlate(sky)
         let current=skies[skyIndex],incoming=skies[1-skyIndex]
         if current.key.isEmpty,assign(sky,to:current) {current.key=sky.id}
         if current.key != sky.id && skyStarted == nil && !current.key.isEmpty,assign(sky,to:incoming) {
             incoming.key=sky.id;skyStarted=run.seconds
-            skyDuration=run.phase == .mirrorCrossing || run.phase == .safeDrop ? 1.8:24
+            let abrupt=run.phase == .mirrorCrossing || run.phase == .safeDrop
+            lingeringSky = !abrupt && (Int(run.distance/1600)+Int(run.identity.seed%3))%3 == 0
+            skyDuration=abrupt ? 1.8:lingeringSky ? 48:24
         }
-        let fade=skyStarted.map{Float(min(1,max(0,(run.seconds-$0)/skyDuration)))} ?? 0
-        let skyVisibility:Float=run.pigs.count>=3 ? max(0,1-Float(run.endingElapsed/12)) : min(1,density*3)
+        let fade=skyStarted.map{DreamCollageComposition.plateBlend(elapsed:run.seconds-$0,duration:skyDuration,lingering:lingeringSky)} ?? 0
+        let skyVisibility:Float=run.pigs.count>=3 ? max(0,1-Float(run.endingElapsed/12)) : DreamCollageComposition.plateVisibility(seconds:run.seconds,visual:run.visual,voidWeight:voidWeight)
         for (i,slot) in skies.enumerated() {
             let depth:Float=i == skyIndex ? 5000:4999
             let height=2*depth*tan(camera.camera.fieldOfViewInDegrees * .pi/360)*1.08
@@ -145,6 +167,10 @@ import UIKit
             opacity(slot,slot.key.isEmpty ? 0 : skyVisibility*(i == skyIndex ? 1:fade))
         }
         if fade>=1 {opacity(current,0);current.model.model?.materials=[];current.key="";skyIndex=1-skyIndex;skyStarted=nil}
+        // One standby photo while a stable reality is visible; never evict either blending card.
+        if skyStarted == nil && skies[skyIndex].key == sky.id,let next=standbySky {
+            requestPlate(next,foreground:false)
+        }
         let generator=WorldGenerator(run.identity)
         let layers=slots+atmosphere
         for i in layers.indices {

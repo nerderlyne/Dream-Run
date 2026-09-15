@@ -106,13 +106,29 @@ public enum DreamCollageComposition {
         let elevation=concept == .moon ? depth*(0.20+Float(rng.below(180))/1000) : concept == .cloud ? depth*Float(rng.below(200))/1000 : height*0.42-12+depth*Float(rng.below(100))/1000
         return scale.compose(.init(representation:asset,cell:cell,anchorDistance:anchor,depth:depth,lateral:lateral,elevation:elevation,height:height,mirrored:rng.below(2)==0,roll:concept == .house && rng.below(4)==0 ? .pi : 0,opacity:concept == .moon ? 0.52 : concept == .cloud ? 0.28 : slot<8 ? 0.88 : 0.96),slot:slot)
     }
+    /// Palette black is not permission to erase the world. Only earned deep phases strip it.
+    public static func plateVisibility(seconds:Double,visual:VisualPhase,voidWeight:Double)->Float {
+        switch visual {
+        case .deepStripping,.deepSparse,.deepRebuilding,.luckyWhite:
+            return min(1,density(seconds:seconds,visual:visual,voidWeight:voidWeight)*3)
+        default:return seconds<1800 ? 1:Float(1-0.82*min(1,max(0,voidWeight)))
+        }
+    }
+    public static func plateBlend(elapsed:Double,duration:Double,lingering:Bool)->Float {
+        let t=max(0,min(1,elapsed/duration))
+        if !lingering {return Float(t*t*(3-2*t))}
+        // Both realities remain legible through a long, slow middle section.
+        if t<0.25 {return Float(t/0.25*0.4)}
+        if t<0.8 {return Float(0.4+(t-0.25)/0.55*0.3)}
+        return Float(0.7+(t-0.8)/0.2*0.3)
+    }
     public static func density(seconds:Double,visual:VisualPhase,voidWeight:Double)->Float {
         let cycle=seconds.truncatingRemainder(dividingBy:10800)
         switch visual {
         case .luckyWhite,.deepSparse:return 0
         case .deepStripping:return Float(max(0,1-cycle/240))
         case .deepRebuilding:return Float(min(1,max(0,(cycle-300)/300)))
-        default:return Float((0.64+0.36*cos(seconds/190))*(1-voidWeight))
+        default:return Float((0.64+0.36*cos(seconds/190))*(1-(seconds<1800 ? 0:min(0.85,max(0,voidWeight)))))
         }
     }
 }

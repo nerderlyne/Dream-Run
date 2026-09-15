@@ -1,0 +1,62 @@
+[0/1] Planning build
+Building for production...
+[0/5] Write sources
+[2/5] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Compiling DreamCore BalloonMotion.swift
+[5/7] Compiling DreamCoreTests AtmosphereTests.swift
+[6/8] Compiling DreamCorePackageTests runner.swift
+[6/8] Write Objects.LinkFileList
+[7/8] Linking DreamCorePackageTests
+Build complete! (57.92s)
+Test Suite 'Selected tests' started at 2026-09-15 22:17:20.863.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-15 22:17:20.870.
+Test Suite 'AtmosphereTests' started at 2026-09-15 22:17:20.870.
+Test Case '-[DreamCoreTests.AtmosphereTests testDensityControlsAtmosphereIndependentlyAndVoidIsEmpty]' started.
+Test Case '-[DreamCoreTests.AtmosphereTests testDensityControlsAtmosphereIndependentlyAndVoidIsEmpty]' passed (0.003 seconds).
+Test Case '-[DreamCoreTests.AtmosphereTests testLargeTranslucentLayersDoNotChangeSemanticScaleEvents]' started.
+Test Case '-[DreamCoreTests.AtmosphereTests testLargeTranslucentLayersDoNotChangeSemanticScaleEvents]' passed (0.187 seconds).
+Test Case '-[DreamCoreTests.AtmosphereTests testOpeningCompositionHasHierarchyCounterweightAndVariety]' started.
+Test Case '-[DreamCoreTests.AtmosphereTests testOpeningCompositionHasHierarchyCounterweightAndVariety]' passed (0.018 seconds).
+Test Suite 'AtmosphereTests' passed at 2026-09-15 22:17:21.079.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.208 (0.209) seconds
+Test Suite 'BackgroundContinuityTests' started at 2026-09-15 22:17:21.079.
+Test Case '-[DreamCoreTests.BackgroundContinuityTests testBlackPaletteCannotEraseEarlyReality]' started.
+Test Case '-[DreamCoreTests.BackgroundContinuityTests testBlackPaletteCannotEraseEarlyReality]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.BackgroundContinuityTests testBleedIsContinuousAndLingersWithoutDroppingUnderlyingReality]' started.
+Test Case '-[DreamCoreTests.BackgroundContinuityTests testBleedIsContinuousAndLingersWithoutDroppingUnderlyingReality]' passed (0.002 seconds).
+Test Suite 'BackgroundContinuityTests' passed at 2026-09-15 22:17:21.083.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'CollageTests' started at 2026-09-15 22:17:21.083.
+Test Case '-[DreamCoreTests.CollageTests testBackgroundMotionIsBoundedDeterministicAndCanBeDisabled]' started.
+Test Case '-[DreamCoreTests.CollageTests testBackgroundMotionIsBoundedDeterministicAndCanBeDisabled]' passed (0.022 seconds).
+Test Case '-[DreamCoreTests.CollageTests testCurrentSeedRoundTrips]' started.
+Test Case '-[DreamCoreTests.CollageTests testCurrentSeedRoundTrips]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CollageTests testDensityIsNonterminalAndRebuilds]' started.
+Test Case '-[DreamCoreTests.CollageTests testDensityIsNonterminalAndRebuilds]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CollageTests testFiveRecombinationsAreStableAndDifferent]' started.
+Test Case '-[DreamCoreTests.CollageTests testFiveRecombinationsAreStableAndDifferent]' passed (0.005 seconds).
+Test Case '-[DreamCoreTests.CollageTests testKitCountsAndMetadata]' started.
+Test Case '-[DreamCoreTests.CollageTests testKitCountsAndMetadata]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CollageTests testPilotScenesAreLayerableAndApparitionsStayRare]' started.
+Test Case '-[DreamCoreTests.CollageTests testPilotScenesAreLayerableAndApparitionsStayRare]' passed (0.013 seconds).
+Test Case '-[DreamCoreTests.CollageTests testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies]' started.
+Test Case '-[DreamCoreTests.CollageTests testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies]' passed (0.036 seconds).
+Test Suite 'CollageTests' passed at 2026-09-15 22:17:21.162.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.078 (0.079) seconds
+Test Suite 'TrackArtTests' started at 2026-09-15 22:17:21.162.
+Test Case '-[DreamCoreTests.TrackArtTests testCuratedSkiesAndMirrorChange]' started.
+Test Case '-[DreamCoreTests.TrackArtTests testCuratedSkiesAndMirrorChange]' passed (0.002 seconds).
+Test Case '-[DreamCoreTests.TrackArtTests testPlateDeckVisitsEveryPhotoWithoutRepeatingAtBoundaries]' started.
+Test Case '-[DreamCoreTests.TrackArtTests testPlateDeckVisitsEveryPhotoWithoutRepeatingAtBoundaries]' passed (0.129 seconds).
+Test Case '-[DreamCoreTests.TrackArtTests testSurfaceVarietyIsStableAndUsuallyQuiet]' started.
+Test Case '-[DreamCoreTests.TrackArtTests testSurfaceVarietyIsStableAndUsuallyQuiet]' passed (0.006 seconds).
+Test Suite 'TrackArtTests' passed at 2026-09-15 22:17:21.300.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.138 (0.138) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-15 22:17:21.300.
+	 Executed 15 tests, with 0 failures (0 unexpected) in 0.427 (0.430) seconds
+Test Suite 'Selected tests' passed at 2026-09-15 22:17:21.300.
+	 Executed 15 tests, with 0 failures (0 unexpected) in 0.427 (0.437) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

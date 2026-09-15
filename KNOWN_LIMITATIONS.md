@@ -1,5 +1,9 @@
 # Known limitations
 
+## Background continuity — September 15, 2026
+
+The last-resort background is a non-black lavender field when no valid photograph has loaded. It prevents black error flashes but is not a photographic substitute. Plate transitions use alpha overlap rather than image masks. Device loading latency, thermal behavior and every source-photo crop remain unverified; simulated missing-photo recovery is tested separately.
+
 ## Zebra, jail door and mace — September 15, 2026
 
 These are original procedural toy/stylized models, not scanned or rigged photoreal assets. Verified close simulator previews and geometry bounds; physical-device frame pacing and moving-scene visual preference remain untested in this pass. The existing window and moon families supply the new interactive door/mace representations; no family is added.

@@ -460,3 +460,27 @@ extension Dream_AgainTests {
         XCTAssertFalse(audio.thunder.isPlaying)
     }
 }
+
+extension Dream_AgainTests {
+    @MainActor func testMissingPlateKeepsRealityAndRecoversDeterministically() async throws {
+        let game=GameModel(),renderer=try XCTUnwrap(game.renderer),kit=renderer.art.collage
+        game.labCollage(index:0)
+        let first=DreamPlateLibrary.assets[0].id,bad=DreamPlateLibrary.assets[1].id
+        kit.unavailablePlateIDs=[bad];kit.previewPlate=first
+        for _ in 0..<3 {renderer.render(game.run,equipped:[:]);await kit.waitForPreload()}
+        game.simulation.state.activeTicks += 3600
+        renderer.render(game.run,equipped:[:])
+        XCTAssertFalse(kit.visiblePlateIDs.isEmpty)
+        kit.unavailablePlateIDs=[bad];kit.previewPlate=bad
+        for _ in 0..<5 {
+            renderer.render(game.run,equipped:[:]);await kit.waitForPreload()
+            XCTAssertFalse(kit.visiblePlateIDs.isEmpty,"Loading/failure must preserve visible reality")
+            game.simulation.state.activeTicks += 1800
+        }
+        renderer.render(game.run,equipped:[:])
+        XCTAssertFalse(kit.visiblePlateIDs.contains(bad))
+        XCTAssertFalse(kit.visiblePlateIDs.contains(first),"A valid replacement must eventually take over")
+        XCTAssertTrue(kit.loadErrors.contains("Missing plate \(bad)"))
+        XCTAssertLessThanOrEqual(kit.residentPlateCount,3)
+    }
+}
