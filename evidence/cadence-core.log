@@ -1,0 +1,32 @@
+[0/1] Planning build
+Building for production...
+[0/5] Write sources
+[2/5] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Compiling DreamCore BalloonMotion.swift
+[5/7] Compiling DreamCoreTests AtmosphereTests.swift
+[6/8] Compiling DreamCorePackageTests runner.swift
+[6/8] Write Objects.LinkFileList
+[7/8] Linking DreamCorePackageTests
+Build complete! (45.79s)
+Test Suite 'Selected tests' started at 2026-09-15 23:13:05.427.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-15 23:13:05.439.
+Test Suite 'DreamTransitionCadenceTests' started at 2026-09-15 23:13:05.439.
+Test Case '-[DreamCoreTests.DreamTransitionCadenceTests testEarlyTransitionAndBoundedIndependentIntervals]' started.
+Test Case '-[DreamCoreTests.DreamTransitionCadenceTests testEarlyTransitionAndBoundedIndependentIntervals]' passed (28.411 seconds).
+Test Suite 'DreamTransitionCadenceTests' passed at 2026-09-15 23:13:33.850.
+	 Executed 1 test, with 0 failures (0 unexpected) in 28.411 (28.412) seconds
+Test Suite 'TrackTranslucencyTests' started at 2026-09-15 23:13:33.851.
+Test Case '-[DreamCoreTests.TrackTranslucencyTests testChapterBoundaryIsSmoothAndVoidIsConcrete]' started.
+Test Case '-[DreamCoreTests.TrackTranslucencyTests testChapterBoundaryIsSmoothAndVoidIsConcrete]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.TrackTranslucencyTests testHierarchyAndNearFootingAcrossSeedsAndStates]' started.
+Test Case '-[DreamCoreTests.TrackTranslucencyTests testHierarchyAndNearFootingAcrossSeedsAndStates]' passed (0.151 seconds).
+Test Suite 'TrackTranslucencyTests' passed at 2026-09-15 23:13:34.002.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.151 (0.152) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-15 23:13:34.003.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 28.562 (28.564) seconds
+Test Suite 'Selected tests' passed at 2026-09-15 23:13:34.003.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 28.562 (28.576) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.002 seconds.

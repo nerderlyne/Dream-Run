@@ -5,7 +5,7 @@ import simd
 /// Render-only continuation of the registered route families. No hazards, pickups or RNG state.
 @MainActor final class DistantPathRenderer {
     let root=Entity()
-    private struct Section {var start:Double;var entity:Entity;var color:UIColor}
+    private struct Section {var start:Double;var entity:Entity;var color:UIColor;var alpha:Float = -1}
     private var sections:[Int:Section]=[:]
     private let sectionLength=384.0
     private let distanceAhead=6144.0
@@ -24,7 +24,7 @@ import simd
             guard start < end else {continue}
             if sections[id]?.start == start {continue}
             sections.removeValue(forKey:id)?.entity.removeFromParent()
-            var geometry=Geometry(),s=start
+            var geometry=Geometry(),rim=Geometry(),s=start
             var cachedChunk:ChunkDescription?
             func point(_ sample:RouteSample,_ lateral:Double)->SIMD3<Float> {
                 [Float(sample.x-origin.x+lateral*cos(sample.yaw)),Float(sample.y-origin.y),Float(sample.z-origin.z+lateral*sin(sample.yaw))]
@@ -36,10 +36,11 @@ import simd
                 let gap=cachedChunk?.gap.map{$0.lowerBound < next && $0.upperBound > s} ?? false
                 if run.pigs.count == 3 || (!gap && !(local >= 900 && local < 916)) {
                     let a=generator.sample(s),b=generator.sample(next)
-                    let leftA=point(a,-2),rightA=point(a,2),leftB=point(b,-2),rightB=point(b,2)
+                    let width=cachedChunk?.halfWidth ?? 2
+                    let leftA=point(a,-width),rightA=point(a,width),leftB=point(b,-width),rightB=point(b,width)
                     geometry.quad(leftA,rightA,rightB,leftB)
                     // A remote uphill ribbon must remain visible from below too.
-                    geometry.quad(leftA,leftB,rightB,rightA)
+                    rim.tube([leftA,leftB],radius:0.035,segments:3);rim.tube([rightA,rightB],radius:0.035,segments:3)
                 }
                 s=next
             }
@@ -51,9 +52,17 @@ import simd
                 let fade=min(1,max(0,(distance-1800)/3600))
                 let track=blend(UIColor(hex:palette.track_light),UIColor(hex:palette.track_dark),0.5)
                 let color=blend(track,UIColor(hex:palette.sky),fade);sectionColor=color
-                entity.addChild(ModelEntity(mesh:mesh,materials:[UnlitMaterial(color:color)]))
+                var material=UnlitMaterial(color:color);material.blending = .transparent(opacity:.init(floatLiteral:1));material.faceCulling = .none
+                let model=ModelEntity(mesh:mesh,materials:[material]);model.name="distant-base";entity.addChild(model)
+                if let edgeMesh=try? rim.resource() {entity.addChild(ModelEntity(mesh:edgeMesh,materials:[UnlitMaterial(color:UIColor(hex:palette.accent_b))]))}
             }
             root.addChild(entity);sections[id]=Section(start:start,entity:entity,color:sectionColor)
+        }
+        for (id,section) in sections {
+            let alpha=TrackTranslucency.opacity(identity:run.identity,distance:run.distance,seconds:run.seconds,visual:run.visual,transitions:run.mirrorCount+run.dropCount,ahead:section.start-run.distance)
+            if abs(section.alpha-alpha.base)>0.012 {
+                section.entity.findEntity(named:"distant-base")?.components.set(OpacityComponent(opacity:alpha.base));sections[id]?.alpha=alpha.base
+            }
         }
         if run.pigs.count == 3 {
             let amount=min(1,run.endingElapsed/45)

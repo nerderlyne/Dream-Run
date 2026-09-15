@@ -504,3 +504,41 @@ extension Dream_AgainTests {
         XCTAssertEqual(r.ambientFill.light.intensity,750)
     }
 }
+
+extension Dream_AgainTests {
+    @MainActor func testTrackOpacityKeepsPatternAndBoundariesStronger() throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        game.labDesign(theme:1,pattern:.checker)
+        for c in game.run.chunks {
+            let root=try XCTUnwrap(r.chunks[c.id])
+            guard let base=root.findEntity(named:"palette:dark"),let pattern=root.findEntity(named:"palette:light") else {continue}
+            let a=try XCTUnwrap(base.components[OpacityComponent.self]).opacity
+            let b=try XCTUnwrap(pattern.components[OpacityComponent.self]).opacity
+            XCTAssertLessThan(a,1);XCTAssertGreaterThanOrEqual(b,a)
+            XCTAssertNil(root.findEntity(named:"palette:rim")?.components[OpacityComponent.self])
+            let ids=root.children.map{ObjectIdentifier($0)}
+            game.simulation.state.distance += 0.01;r.render(game.run,equipped:[:])
+            XCTAssertEqual(root.children.map{ObjectIdentifier($0)},ids)
+        }
+    }
+}
+
+extension Dream_AgainTests {
+    @MainActor func testTimedRealityBeginsAtTwentySecondsWithoutTravel() async throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer),kit=r.art.collage
+        game.labCollage(index:0);kit.previewPlate=nil
+        game.simulation.state.activeTicks=0
+        for _ in 0..<3 {r.render(game.run,equipped:[:]);await kit.waitForPreload()}
+        let original=DreamCollageComposition.plate(identity:game.run.identity,section:0).id
+        let incoming=DreamCollageComposition.plate(identity:game.run.identity,section:1).id
+        XCTAssertTrue(kit.visiblePlateIDs.contains(original))
+        game.simulation.state.activeTicks=1199;r.render(game.run,equipped:[:])
+        XCTAssertFalse(kit.visiblePlateIDs.contains(incoming))
+        game.simulation.state.activeTicks=1200
+        for _ in 0..<3 {r.render(game.run,equipped:[:]);await kit.waitForPreload()}
+        game.simulation.state.activeTicks=1800;r.render(game.run,equipped:[:])
+        XCTAssertTrue(kit.visiblePlateIDs.contains(original))
+        XCTAssertTrue(kit.visiblePlateIDs.contains(incoming),"Both realities should remain visible during the slow blend")
+        XCTAssertLessThanOrEqual(kit.residentPlateCount,3)
+    }
+}

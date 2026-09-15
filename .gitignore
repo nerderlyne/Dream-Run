@@ -8,3 +8,5 @@ __pycache__/
 
 # Owner originals; optimized app resources and source manifest are versioned.
 /DreamPlates/
+
+/DerivedDataDevice/

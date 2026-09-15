@@ -1,5 +1,9 @@
 # Known limitations
 
+## Track translucency and timed realities — September 15, 2026
+
+Transparency uses non-overlapping base/pattern meshes with opaque rims and stair faces. The water and space simulator captures demonstrate plate bleed-through, but every photo/hazard combination and sustained transparency frame pacing remain unverified. Timed photo changes use active seconds; an unavailable texture can delay a transition while the existing reality stays visible. Scenic props retain independent staggered replacement. Physical iPhone testing is prohibited by the owner; use the simulator for further verification.
+
 ## Storm threat presentation — September 15, 2026
 
 The storm is a photographic alpha VFX card with procedural rain, local shade and lighting, not a volumetric weather simulation. Physical-device transparency cost, reduced-visibility dodge readability and subjective realism/threat remain unverified. The original generated PNG and complete prompt are recorded in `docs/STORM_VFX.md`.

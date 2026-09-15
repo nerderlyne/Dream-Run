@@ -44,6 +44,7 @@ import UIKit
     private var standbySky:DreamRepresentation?
     private var skyStarted:Double?
     private var skyDuration=24.0
+    private var cadence=DreamTransitionCadence.at(identity:.current(seed:0),seconds:0)
     private(set) var loadErrors:[String]=[]
     private(set) var loadedTextureCount=0
     private(set) var activeCardCount=0
@@ -132,15 +133,18 @@ import UIKit
         if root.parent == nil {world.addChild(root)}
         root.isEnabled=true
         let density=DreamCollageComposition.density(seconds:run.seconds,visual:run.visual,voidWeight:voidWeight)
-        let nextSelection="\(Int(run.distance/1600)):\(run.mirrorCount+run.dropCount):\(previewPlate ?? "")"
+        if selectedIdentity != run.identity || run.seconds < cadence.start || run.seconds >= cadence.next {
+            cadence=DreamTransitionCadence.at(identity:run.identity,seconds:run.seconds)
+        }
+        let nextSelection="\(cadence.index):\(run.mirrorCount+run.dropCount):\(previewPlate ?? "")"
         if nextSelection != selectionKey || selectedIdentity != run.identity || selectedSky == nil {
-            selectedSky=DreamPlateLibrary.assets.first{$0.id == previewPlate} ?? DreamCollageComposition.plate(identity:run.identity,section:Int(run.distance/1600),transition:run.mirrorCount+run.dropCount)
-            standbySky=DreamCollageComposition.plate(identity:run.identity,section:Int(run.distance/1600)+1,transition:run.mirrorCount+run.dropCount)
+            selectedSky=DreamPlateLibrary.assets.first{$0.id == previewPlate} ?? DreamCollageComposition.plate(identity:run.identity,section:cadence.index,transition:run.mirrorCount+run.dropCount)
+            standbySky=DreamCollageComposition.plate(identity:run.identity,section:cadence.index+1,transition:run.mirrorCount+run.dropCount)
             selectionKey=nextSelection;selectedIdentity=run.identity
         }
         guard var sky=selectedSky else {return}
         if failedPlates.contains(sky.id) {
-            let section=Int(run.distance/1600)
+            let section=cadence.index
             if let fallback=(1...DreamPlateLibrary.assets.count).lazy.map({DreamCollageComposition.plate(identity:run.identity,section:section+$0,transition:run.mirrorCount+run.dropCount)}).first(where:{!failedPlates.contains($0.id)}) {
                 sky=fallback
             }
@@ -151,8 +155,8 @@ import UIKit
         if current.key != sky.id && skyStarted == nil && !current.key.isEmpty,assign(sky,to:incoming) {
             incoming.key=sky.id;skyStarted=run.seconds
             let abrupt=run.phase == .mirrorCrossing || run.phase == .safeDrop
-            lingeringSky = !abrupt && (Int(run.distance/1600)+Int(run.identity.seed%3))%3 == 0
-            skyDuration=abrupt ? 1.8:lingeringSky ? 48:24
+            lingeringSky = !abrupt && (cadence.index+Int(run.identity.seed%3))%3 == 0
+            skyDuration=abrupt ? 1.8:cadence.overlapDuration
         }
         let fade=skyStarted.map{DreamCollageComposition.plateBlend(elapsed:run.seconds-$0,duration:skyDuration,lingering:lingeringSky)} ?? 0
         let skyVisibility:Float=run.pigs.count>=3 ? max(0,1-Float(run.endingElapsed/12)) : DreamCollageComposition.plateVisibility(seconds:run.seconds,visual:run.visual,voidWeight:voidWeight)

@@ -8,6 +8,7 @@ import simd
     let anchor=AnchorEntity(world:.zero)
     let world=Entity(), runner=Entity(), camera=PerspectiveCamera(), headAttachment=Entity()
     var terrainKeys:[Int:String]=[:]
+    private var trackAlphas:[Int:Float]=[:]
     let distantPath=DistantPathRenderer()
     let art=DreamArtDirection()
     let evolution=PaletteEvolution()
@@ -76,7 +77,7 @@ import simd
         let targetPalette=artPalette ?? (cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex)
         if lastRun != run.id {
             distantPath.reset();art.reset();art.invalidateEnvironment()
-            balloonPops.reset();world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); terrainKeys.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
+            balloonPops.reset();world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); terrainKeys.removeAll();trackAlphas.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
             evolution.reset(palette:palette,definition:surfacePalettes[palette])
             art.environment(view:view)
         } else if newBase != base {
@@ -95,9 +96,10 @@ import simd
         for (id,e) in chunks where !active.contains(id) { e.removeFromParent(); chunks.removeValue(forKey:id);terrainKeys.removeValue(forKey:id) }
         for c in run.chunks {
             let key="\(c.halfWidth)/\(String(describing:c.gap))/\(String(describing:c.step))/\(c.collapsing)"
-            if terrainKeys[c.id] != key {chunks[c.id]?.removeFromParent();chunks[c.id]=nil;terrainKeys[c.id]=key}
+            if terrainKeys[c.id] != key {chunks[c.id]?.removeFromParent();chunks[c.id]=nil;trackAlphas[c.id]=nil;terrainKeys[c.id]=key}
         }
         terrainKeys=terrainKeys.filter{active.contains($0.key)}
+        trackAlphas=trackAlphas.filter{active.contains($0.key)}
         for c in run.chunks where chunks[c.id] == nil {
             let root=Entity(),p=surfacePalettes[palette]
             let pattern=artPattern ?? TrackArt.pattern(identity:run.identity,distance:c.start)
@@ -121,14 +123,18 @@ import simd
                     if TrackArt.isLight(pattern,distance:Int(s),column:x) { light.quad(aa,dd,cc,bb) } else { dark.quad(aa,dd,cc,bb) }
                 }
                 let lower=SIMD3<Float>(0,-0.35,0)
-                deck.quad(a-rightA*Float(c.halfWidth)+lower,b-rightB*Float(c.halfWidth)+lower,b+rightB*Float(c.halfWidth)+lower,a+rightA*Float(c.halfWidth)+lower)
                 for x:Float in [-Float(c.halfWidth)-0.03,Float(c.halfWidth)+0.03] { let aa=a+rightA*x,bb=b+rightB*x;rim.tube([aa+[0,0.025,0],bb+[0,0.025,0]],radius:0.035,segments:4);deck.quad(aa,aa+lower,bb+lower,bb) }
                 let rise=elevation-Float(c.step?.height(at:s-0.5) ?? 0)
+                if stair || rise != 0 {rim.tube([SIMD3<Float>(a.x,y+0.03,a.z)-rightA*Float(c.halfWidth),SIMD3<Float>(a.x,y+0.03,a.z)+rightA*Float(c.halfWidth)],radius:0.025,segments:4)}
                 if rise != 0 {deck.quad(a-rightA*Float(c.halfWidth)-[0,rise,0],a+rightA*Float(c.halfWidth)-[0,rise,0],a+rightA*Float(c.halfWidth),a-rightA*Float(c.halfWidth))}
                 if stair {deck.quad(a-rightA*Float(c.halfWidth),a+rightA*Float(c.halfWidth),a+rightA*Float(c.halfWidth)+[0,y-a.y,0],a-rightA*Float(c.halfWidth)+[0,y-a.y,0])}
             }
             for (g,color,role) in [(light,UIColor(hex:p.track_light),"light"),(dark,UIColor(hex:p.track_dark),"dark"),(rim,UIColor(hex:p.accent_b),"rim"),(deck,UIColor(hex:p.fog),"deck")] where !g.positions.isEmpty {
-                if let mesh=try? g.resource() { let model=ModelEntity(mesh:mesh,materials:[factory.material(color,style:11)]);model.name="palette:\(role)";root.addChild(model) }
+                if let mesh=try? g.resource() {
+                    var material=factory.material(color,style:11)
+                    if role == "light" || role == "dark" {material.blending = .transparent(opacity:.init(floatLiteral:1));material.faceCulling = .none;material.roughness=0.28;material.metallic=0.04}
+                    let model=ModelEntity(mesh:mesh,materials:[material]);model.name="palette:\(role)";root.addChild(model)
+                }
             }
             if let drop=c.drop {
                 for s in [drop.departure-1,drop.departure-0.6] { var g=Geometry(); let pos=local(generator.sample(s),origin:origin); g.box(pos+[0,0.05,0],[4.2,0.05,0.1]); if let mesh=try? g.resource() { root.addChild(ModelEntity(mesh:mesh,materials:[UnlitMaterial(color:.white)])) } }
@@ -136,6 +142,15 @@ import simd
             }
             terrainDecorations(c,root:root,generator:generator,origin:origin,palette:p)
             chunks[c.id]=root; world.addChild(root);evolution.register(root,palette:palette,palettes:surfacePalettes,art:art)
+        }
+        for c in run.chunks {
+            let critical=c.gap != nil || c.step != nil || c.drop != nil || [.stairsStraight,.stairsSpiral].contains(c.routeFamily)
+            let alpha=TrackTranslucency.opacity(identity:run.identity,distance:run.distance,seconds:run.seconds,visual:run.visual,transitions:run.mirrorCount+run.dropCount,ahead:c.start-run.distance,critical:critical)
+            if abs((trackAlphas[c.id] ?? -1)-alpha.base)>0.012,let root=chunks[c.id] {
+                root.findEntity(named:"palette:dark")?.components.set(OpacityComponent(opacity:alpha.base))
+                root.findEntity(named:"palette:light")?.components.set(OpacityComponent(opacity:alpha.pattern))
+                trackAlphas[c.id]=alpha.base
+            }
         }
         animateTerrain(run)
         distantPath.update(run:run,origin:origin,palette:surfacePalettes[palette],world:world)
@@ -261,7 +276,7 @@ import simd
     }
     func preview(_ id:AssetID,palette:Int,style:Int,lod:Int,colliders:Bool = false) {
         art.invalidateEnvironment()
-        world.children.removeAll(); chunks.removeAll(); terrainKeys.removeAll(); hazards.removeAll(); pickups.removeAll(); gallery=nil; runner.isEnabled=false; lastRun=nil
+        world.children.removeAll(); chunks.removeAll(); terrainKeys.removeAll();trackAlphas.removeAll(); hazards.removeAll(); pickups.removeAll(); gallery=nil; runner.isEnabled=false; lastRun=nil
         let e=factory.build(id,palette:palette,style:style,lod:lod); world.addChild(e); gallery=e
         let bounds=e.visualBounds(relativeTo:e), center=bounds.center, extent=max(bounds.extents.x,max(bounds.extents.y,bounds.extents.z))
         if colliders {

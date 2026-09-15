@@ -28,7 +28,7 @@ Inspect existing files and tools before changes; preserve unrelated user work. U
 
 Commit a real runnable Xcode project and shared schemes. The first greybox is a milestone, not the finished deliverable. Generate original recognizable procedural assets when external models are absent. No missing-file stubs, fake in-app purchases or copied unlicensed art/audio. The six mood images are reference-only, not production resources.
 
-Separate deterministic Swift core from renderer/input/commerce. Match provided RNG/seed/pig fixtures. Use transactional idempotent persistence. Verify simulator build/tests when Xcode exists. Without Apple tooling, still implement the project/core and report exactly which checks could not run; never invent build success.
+Separate deterministic Swift core from renderer/input/commerce. Match provided RNG/seed/pig fixtures. Use transactional idempotent persistence. Verify simulator build/tests when Xcode exists. Use simulators only; the owner has explicitly prohibited further testing on their physical iPhone. Without Apple tooling, still implement the project/core and report exactly which checks could not run; never invent build success.
 
 Real payments, ads, signing, Game Center, Universal Links and cloud accounts require owner provisioning. Supply real adapters/configuration seams and safe disabled/local test modes. Debug grants/clock acceleration must never earn production rewards. Do not publish, spend money, create live products or use real ad inventory without explicit authorization.
 

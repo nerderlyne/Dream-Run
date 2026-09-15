@@ -5,6 +5,14 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Timed realities and translucent traversal — September 15, 2026
+
+- Photo evolution now begins at 20 active seconds and repeats at independently seeded 30–90-second start-to-start intervals. Overlaps occupy 80% of each interval, capped at 48 seconds; one third linger in the mixed state. Active time replaces distance, so stumbles/speed do not postpone changes. Existing two-card overlap, standby preload, three-photo cache, mirror/drop buffers and deep-void rules remain.
+- Completed the preceding track pass: translucent base tiles, stronger pattern tiles, opaque rims/risers and reinforced nearby critical footing. Removed the opaque underside; distant geometry dissolves further while retaining boundaries. Alpha changes do not rebuild meshes. See `docs/TRACK_TRANSLUCENCY.md` and simulator captures `evidence/track-alpha-water.png`, `evidence/track-alpha-space.png`.
+- Final verification: 3 Release core tests passed (28.562 seconds), covering 100 seeds × 200 transition intervals and track hierarchy. Debug simulator build and 3 targeted native tests passed (4.590 seconds), proving the twenty-second change without travel, simultaneous visible realities, failed-photo continuity, bounded photo cache and retained track geometry. Specification validation: 54 checks passed. Logs: `evidence/cadence-core.log`, `evidence/cadence-native.log`, `evidence/cadence-spec.log`.
+- Before the owner prohibited further device testing, the preceding track pass had completed one material test and one screenshot smoke test on a connected iPhone. A later device rerun was stopped; it is not counted as successful verification. All cadence verification used the simulator/local Swift core. Future physical iPhone testing is prohibited and recorded in AGENTS.md.
+- No sustained FPS/thermal benchmark, full-suite rerun or exhaustive photograph/hazard readability review. RealityKit simulator resource warnings occurred despite passing tests. Timing details: `docs/DREAM_TRANSITION_CADENCE.md`.
+
 ## Storm threat and post-death label — September 15, 2026
 
 - Corrected the requested scope: only the post-death restart button says **Dream On**. The title, app display name, share text and seed description remain Dream Again; the interrupted broader rename was reverted before this build.
