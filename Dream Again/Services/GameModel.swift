@@ -185,7 +185,7 @@ import UIKit
     }
     func leave() { pause(); screen="home" }
     func endRun() { simulation.resume(); simulation.wake("left the dream"); finish(); screen="results" }
-    func finish() { renderer?.snapshot { [weak self] image in self?.renderer?.frozenFrame=image }; let result=run; if result.mode.earns {transact { $0.settle(result,finished:true,catalogue:achievements); $0.snapshot=result }}; audio.stop(); motion.stop() }
+    func finish() { renderer?.snapshot { [weak self] image in self?.renderer?.frozenFrame=image }; let result=run; if result.mode.earns {transact { $0.settle(result,finished:true,catalogue:achievements); $0.snapshot=result }}; audio.stop(preserveThunder:result.cause == "lightning"); motion.stop() }
     func saveDream(title:String = "Remembered dream") {
         let result=run
         let bookmark=Bookmark(run:result,title:title)

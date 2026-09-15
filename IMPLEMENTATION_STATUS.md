@@ -5,6 +5,13 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Lightning impact audio — September 15, 2026
+
+- Replaced the quiet 0.6-second synthesized tone with an original precomputed 3.6-second thunder strike: fast broadband crack, low impact, scattered echoes and decaying rumble. `tools/synthesize_thunder.py` reproduces the mono 22.05 kHz PCM resource; peak amplitude is bounded at 0.88.
+- Preloads once into a dedicated thunder player. Lightning bypasses ordinary feedback debounce and cannot be cut off by balloons or stumble effects. Fatal lightning preserves the strike through the death transition; pause stops all audio. Effects, haptics, system volume and silent mode remain respected. Heavy strike haptic accompanies enabled haptics.
+- Debug iPhone 16 Pro Max simulator build/test succeeded. One targeted native playback/resource test passed (0.246 seconds); nine Release core obstacle tests passed (35.370 seconds); specification validator passed 54 checks. Evidence: `evidence/thunder-native.log`, `evidence/thunder-core.log`, `evidence/thunder-spec.log`.
+- No physical-device listening or subjective loudness assessment was performed. No full native suite, UI test, Release iOS build or performance soak in this audio-only pass.
+
 ## Curated DreamPlates — September 15, 2026
 
 - Replaced all nine generated sky plates with **102 unique owner-curated backgrounds**, imported from 103 files (one exact duplicate). Reviewed all five contact sheets. Original source files remain untouched and outside the app bundle; optimized JPEGs, source hashes and generated catalog are included.

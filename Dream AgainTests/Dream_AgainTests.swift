@@ -1,5 +1,6 @@
 import XCTest
 import RealityKit
+import AVFAudio
 @testable import DreamAgain
 final class Dream_AgainTests:XCTestCase {
     func testCoreIdentityInApp() throws {XCTAssertEqual(try DreamIdentity.parse("DR1-G1-R1-C1-000000000001A-460B").seed,42)}
@@ -425,5 +426,28 @@ extension Dream_AgainTests {
         XCTAssertEqual(r.balloonPops.activeCount,0)
         for _ in 0..<30 {r.balloonPops.spawn(at:.zero,world:r.world,tick:0)}
         XCTAssertEqual(r.balloonPops.activeCount,12);r.balloonPops.reset();XCTAssertEqual(r.balloonPops.activeCount,0)
+    }
+}
+
+extension Dream_AgainTests {
+    @MainActor func testThunderSurvivesPickupAndFatalStrikeButStopsOnPause() throws {
+        let audio=DreamAudio(),buffer=try XCTUnwrap(audio.thunderBuffer)
+        XCTAssertEqual(buffer.format.sampleRate,22050)
+        XCTAssertEqual(Double(buffer.frameLength)/buffer.format.sampleRate,3.6,accuracy:0.001)
+        let samples=try XCTUnwrap(buffer.floatChannelData?[0])
+        let peak=(0..<Int(buffer.frameLength)).map{abs(samples[$0])}.max()!
+        XCTAssertGreaterThan(peak,0.8);XCTAssertLessThan(peak,0.9)
+        var settings=Settings();settings.effects=true;settings.haptics=false
+        audio.feedback(.balloon,settings:settings)
+        audio.feedback(.thunder,settings:settings)
+        XCTAssertTrue(audio.thunder.isPlaying,"Pickup debounce must not suppress the strike")
+        audio.feedback(.stumble,settings:settings)
+        XCTAssertTrue(audio.thunder.isPlaying,"Other effects must not interrupt thunder")
+        audio.stop(preserveThunder:true)
+        XCTAssertTrue(audio.thunder.isPlaying,"Fatal lightning must retain its impact sound")
+        audio.stop();XCTAssertFalse(audio.thunder.isPlaying)
+        settings.effects=false
+        audio.feedback(.thunder,settings:settings)
+        XCTAssertFalse(audio.thunder.isPlaying)
     }
 }

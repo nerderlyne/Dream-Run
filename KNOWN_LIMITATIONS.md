@@ -1,5 +1,9 @@
 # Known limitations
 
+## Lightning audio — September 15, 2026
+
+The original synthesized 3.6-second strike is preloaded and amplitude-bounded. Simulator tests verify playback lifecycle, not perceived loudness or fright. Listening on physical iPhone speakers and headphones remains unverified; system volume, silent mode and the Effects setting still apply.
+
 ## Curated background integration — September 15, 2026
 
 - Current batch includes 102 unique images from the 103 source files present at verification. Later copied photos require rerunning `swift tools/import_dream_plates.swift` and rebuilding. Originals are untouched.

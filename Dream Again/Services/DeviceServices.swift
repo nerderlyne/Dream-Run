@@ -27,11 +27,19 @@ import UIKit
     }
 }
 @MainActor final class DreamAudio {
-    let engine=AVAudioEngine(), player=AVAudioPlayerNode(), effect=AVAudioPlayerNode()
+    let engine=AVAudioEngine(), player=AVAudioPlayerNode(), effect=AVAudioPlayerNode(), thunder=AVAudioPlayerNode()
+    private(set) var thunderBuffer:AVAudioPCMBuffer?
     var running=false, palette = -1
     var lastFeedback=0.0
     init() {
-        engine.attach(player); engine.attach(effect)
+        engine.attach(player); engine.attach(effect); engine.attach(thunder)
+        let format=AVAudioFormat(standardFormatWithSampleRate:22050,channels:1)!
+        engine.connect(thunder,to:engine.mainMixerNode,format:format)
+        if let url=Bundle.main.url(forResource:"thunder-strike",withExtension:"wav"),
+           let file=try? AVAudioFile(forReading:url),
+           let buffer=AVAudioPCMBuffer(pcmFormat:file.processingFormat,frameCapacity:AVAudioFrameCount(file.length)) {
+            do {try file.read(into:buffer);thunderBuffer=buffer} catch {thunderBuffer=nil}
+        }
         engine.connect(effect,to:engine.mainMixerNode,format:AVAudioFormat(standardFormatWithSampleRate:22050,channels:1))
         engine.connect(player,to:engine.mainMixerNode,format:AVAudioFormat(standardFormatWithSampleRate:22050,channels:1))
         try? AVAudioSession.sharedInstance().setCategory(.ambient,mode:.default,options:[.mixWithOthers])
@@ -50,16 +58,28 @@ import UIKit
         }
     }
     func feedback(_ event:GameEvent,settings:Settings) {
+        if event == .thunder {
+            if settings.haptics {UIImpactFeedbackGenerator(style:.heavy).impactOccurred(intensity:1)}
+            guard settings.effects,let buffer=thunderBuffer else {return}
+            if !engine.isRunning {do {try engine.start()} catch {return}}
+            thunder.stop()
+            thunder.scheduleBuffer(buffer)
+            thunder.play()
+            return
+        }
         let now=ProcessInfo.processInfo.systemUptime
         guard event == .stumble || event == .clover || now-lastFeedback > 0.12 else { return }; lastFeedback=now
         if settings.haptics { UIImpactFeedbackGenerator(style:event == .clover ? .medium : .soft).impactOccurred(intensity:event == .stumble ? 0.65 : 0.3) }
         // Original short tone, bounded to one effect node at a time via the system sound-free engine.
         guard settings.effects else { return }; if !engine.isRunning { do { try engine.start() } catch { return } }
-        let rate=22050.0, count=event == .thunder ? 13230:2205
+        let rate=22050.0, count=2205
         guard let format=AVAudioFormat(standardFormatWithSampleRate:rate,channels:1), let buffer=AVAudioPCMBuffer(pcmFormat:format,frameCapacity:AVAudioFrameCount(count)), let samples=buffer.floatChannelData?[0] else { return }
         buffer.frameLength=AVAudioFrameCount(count)
-        let frequency=event == .clover ? 880.0 : event == .thunder ? 55.0 : event == .stumble ? 130.0 : 660.0
-        for i in 0..<count { let t=Double(i)/rate, envelope=sin(Double.pi*Double(i)/Double(count))*exp(-t*(event == .thunder ? 5:25)); let rumble=sin(2*Double.pi*frequency*t)+sin(2*Double.pi*83*t)*0.5+sin(2*Double.pi*127*t)*0.2; samples[i]=Float((event == .thunder ? rumble:sin(2*Double.pi*frequency*t))*envelope*0.09) }
+        let frequency=event == .clover ? 880.0 : event == .stumble ? 130.0 : 660.0
+        for i in 0..<count {
+            let t=Double(i)/rate,envelope=sin(Double.pi*Double(i)/Double(count))*exp(-t*25)
+            samples[i]=Float(sin(2*Double.pi*frequency*t)*envelope*0.09)
+        }
         if event == .balloon {
             for i in 0..<count {
                 let t=Double(i)/rate
@@ -70,5 +90,8 @@ import UIKit
         }
         effect.stop(); effect.scheduleBuffer(buffer); effect.play()
     }
-    func stop() { player.pause(); effect.stop(); engine.pause(); running=false }
+    func stop(preserveThunder:Bool=false) {
+        player.pause();effect.stop();running=false
+        if !preserveThunder || !thunder.isPlaying {thunder.stop();engine.pause()}
+    }
 }
