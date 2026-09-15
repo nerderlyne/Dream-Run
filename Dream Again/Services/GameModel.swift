@@ -354,13 +354,15 @@ import UIKit
         simulation.state.chunks=(0...14).map {i in
             ChunkDescription(id:i,routeFamily:.trackStraight,start:Double(i)*24,hazards:[],pickups:[],scenery:[],recipe:0)
         }
-        let chunk=generator.encounterChunk(kind == .lightning ? 5:4,kind:kind,tier:2)
+        let chunk=generator.encounterChunk(kind == .lightning ? 5:kind == .animals ? 6:4,kind:kind,tier:2)
+        if kind == .animals {simulation.state.distance=138}
         simulation.state.chunks[chunk.id]=chunk
         simulation.state.hazards=chunk.hazards.map {h in
             var h=h;h.spawnTick=simulation.state.activeTicks
             if h.encounter == .lightning {h.strikeTick=simulation.state.activeTicks+(striking ? 0:164)}
             return h
         }
+        if ProcessInfo.processInfo.arguments.contains("--obstacle-close"),let hazard=simulation.state.hazards.first {simulation.state.distance=hazard.distance-5}
         renderer?.lastRun=nil;renderer?.render(run,equipped:profile.equipped)
     }
     func labDesign(theme:Int,pose:String="run",variant:Int=0,sky:String=DreamCollageKit.skyIDs[0],pattern:TrackPattern = .checker,mirror:Bool=false,contrast:Bool=false) {

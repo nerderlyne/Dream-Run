@@ -340,7 +340,16 @@ extension Dream_AgainTests {
                 guard let entity=renderer.obstacleModel(hazard),hazard.encounter != .step else {continue}
                 let bounds=entity.visualBounds(relativeTo:entity)
                 XCTAssertTrue(bounds.extents.x.isFinite);XCTAssertGreaterThan(bounds.extents.y,0)
-                if hazard.asset == .window {XCTAssertEqual(bounds.min.y,0.85,accuracy:0.02)}
+                if hazard.asset == .window {
+                    XCTAssertEqual(bounds.min.y,0.85,accuracy:0.02)
+                    XCTAssertNotNil(entity.findEntity(named:"jail-door-bars"))
+                }
+                if hazard.encounter == .swing {
+                    let spikes=try XCTUnwrap(entity.findEntity(named:"mace-spikes"))
+                    let b=spikes.visualBounds(relativeTo:entity)
+                    XCTAssertLessThanOrEqual(max(abs(b.min.x),abs(b.max.x)),Float(hazard.radius)+0.001)
+                    XCTAssertNotNil(entity.findEntity(named:"mace-chain"))
+                }
                 if hazard.encounter == .lightning {
                     let bolt=try XCTUnwrap(entity.findEntity(named:"lightning-bolt"))
                     let warning=try XCTUnwrap(entity.findEntity(named:"strike-warning"))

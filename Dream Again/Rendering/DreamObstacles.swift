@@ -7,9 +7,9 @@ extension DreamRenderer {
     func obstacleModel(_ h:HazardDescription)->Entity? {
         guard h.encounter == .lightning || h.encounter == .swing || h.encounter == .step || h.requiresJump || h.asset == .window && h.encounter == .slide else{return nil}
         let root=Entity();root.name="encounter:\(h.encounter.rawValue)"
-        func add(_ geometry:Geometry,_ color:String,_ name:String,_ unlit:Bool=false) {
+        func add(_ geometry:Geometry,_ color:String,_ name:String,_ unlit:Bool=false,style:Int=11) {
             if let mesh=try? geometry.resource() {
-                let material:any Material=unlit ? UnlitMaterial(color:UIColor(hex:color)):factory.material(UIColor(hex:color),style:11)
+                let material:any Material=unlit ? UnlitMaterial(color:UIColor(hex:color)):factory.material(UIColor(hex:color),style:style)
                 let e=ModelEntity(mesh:mesh,materials:[material]);e.name=name;root.addChild(e)
             }
         }
@@ -26,18 +26,46 @@ extension DreamRenderer {
             for child in cloud.children {if let model=child as? ModelEntity {model.model?.materials=[factory.material(UIColor(hex:"#898599"),style:0)]}}
             root.addChild(cloud)
         } else if h.encounter == .swing {
-            var moon=Geometry(),tether=Geometry(),craters=Geometry()
-            moon.ellipsoid([0,0.85,0],[0.38,0.38,0.38],segments:32,rings:20)
-            for i in 0..<5 {let a=Float(i)*2.1;craters.ellipsoid([cos(a)*0.2,0.85+sin(a)*0.2,0.32],[0.065,0.05,0.035],segments:12,rings:8)}
-            add(craters,"#B2A990","moon-craters")
-            tether.tube([[0,0,0],[0,1,0]],radius:0.025,segments:6)
-            add(moon,"#FFF0BC","swing-moon");add(tether,"#CBB29A","moon-ribbon")
+            var head=Geometry(),spikes=Geometry(),chain=Geometry(),collar=Geometry()
+            let center=SIMD3<Float>(0,0.85,0)
+            head.ellipsoid(center,[0.235,0.235,0.235],segments:32,rings:20)
+            for i in 0..<14 {
+                let y=1-2*(Float(i)+0.5)/14,a=Float(i)*2.399963
+                let direction=SIMD3<Float>(sqrt(1-y*y)*cos(a),y,sqrt(1-y*y)*sin(a))
+                let right=simd_normalize(simd_cross(direction,abs(y)>0.9 ? SIMD3<Float>(1,0,0):SIMD3<Float>(0,1,0)))
+                let up=simd_cross(direction,right),base=center+direction*0.195,tip=center+direction*0.38
+                for j in 0..<12 {
+                    let t=Float(j)/12*2*Float.pi,u=Float(j+1)/12*2*Float.pi
+                    spikes.triangle(base+(right*cos(t)+up*sin(t))*0.085,base+(right*cos(u)+up*sin(u))*0.085,tip)
+                }
+            }
+            collar.tube((0...24).map {i in let a=Float(i)/24*2*Float.pi;return center+[cos(a)*0.24,0,sin(a)*0.24]},radius:0.025,segments:8)
+            for i in 0..<20 {
+                let y=Float(i)/20
+                chain.tube((0...12).map {j in
+                    let a=Float(j)/12*2*Float.pi
+                    return i%2 == 0 ? [cos(a)*0.044,y+sin(a)*0.026,0]:[0,y+sin(a)*0.026,cos(a)*0.044]
+                },radius:0.012,segments:6)
+            }
+            add(head,"#B90825","mace-latex-head",style:1)
+            add(spikes,"#E31335","mace-spikes",style:1)
+            add(collar,"#410616","mace-collar",style:2)
+            add(chain,"#30212A","mace-chain",style:2)
         } else if h.asset == .window {
-            var frame=Geometry(),trim=Geometry()
-            for x:Float in [-2.05,2.05] {frame.box([x,1.7,0],[0.16,1.7,0.2])}
-            for y:Float in [0.95,2.5] {frame.box([0,y,0],[4.25,0.2,0.2])}
-            for x:Float in [-0.65,0.65] {trim.box([x,1.75,0],[0.04,1.3,0.07])}
-            add(frame,"#E9B6C8","low-window");add(trim,"#EBCF94","window-trim")
+            var frame=Geometry(),bars=Geometry(),hardware=Geometry(),lock=Geometry()
+            for x:Float in [-2.05,2.05] {frame.box([x,1.72,0],[0.16,1.74,0.24])}
+            for y:Float in [0.95,2.5] {frame.box([0,y,0],[4.25,0.2,0.24])}
+            for i in -6...6 {let x=Float(i)*0.3;bars.tube([[x,1.05,0],[x,2.4,0]],radius:0.038,segments:12)}
+            for y:Float in [1.42,2.12] {frame.box([0,y,0],[4,0.065,0.13])}
+            lock.box([0.65,1.73,0.1],[0.27,0.3,0.08])
+            hardware.ellipsoid([0.65,1.76,0.15],[0.035,0.035,0.012],segments:12,rings:8)
+            hardware.box([0.65,1.71,0.15],[0.025,0.065,0.024])
+            for x:Float in [-2.05,2.05] {for y:Float in [1.18,2.22] {
+                lock.box([x,y,0.08],[0.23,0.2,0.15])
+                hardware.ellipsoid([x,y,0.17],[0.036,0.036,0.018],segments:12,rings:8)
+            }}
+            add(frame,"#4D535A","jail-door-frame",style:2);add(bars,"#79818B","jail-door-bars",style:2)
+            add(lock,"#AF9D72","jail-door-lock",style:2);add(hardware,"#161820","jail-door-hardware")
         } else {
             var furniture=Geometry(),trim=Geometry()
             if h.asset == .bed {furniture.box([0,0.4,0],[4,0.4,1.2])}
@@ -63,7 +91,7 @@ extension DreamRenderer {
             e.findEntity(named:"strike-warning")?.isEnabled=visible
             e.findEntity(named:"strike-outline")?.isEnabled=visible
         }
-        if let ribbon=e.findEntity(named:"moon-ribbon") {
+        if let ribbon=e.findEntity(named:"mace-chain") {
             let offset=Float(h.lateral(at:run.activeTicks)-h.lateral)
             let direction=SIMD3<Float>(-offset,3.3,0)
             ribbon.position=[0,0.85,0];ribbon.scale=[1,simd_length(direction),1]

@@ -5,6 +5,15 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Toy zebra, jail door and mace — September 15, 2026
+
+- Replaced zebra hoop stripes with smooth, flush black/ivory surface bands, a rounded glossy toy silhouette, stout striped legs, hooves, muzzle, eyes, ears, upright mane and tufted tail. The open belly retains slide clearance. Removed the rejected zebra geometry.
+- Descending window obstacle now renders as a barred jail door with crossbars, hinges, lock plate and keyhole. Lowest edge remains 0.85 m; descent and slide timing are unchanged.
+- Swinging obstacle now renders as a glossy latex-red fourteen-spike mace with dark collar and alternating chain links. Tips fit inside the existing 0.38 m collision radius; the chain follows the existing swing. Updated visible Lab and death labels. No additional registered family or collision rule.
+- DEBUG animals preview now exposes the zebra; `--obstacle-close` supports inspecting the models without rewards. Actual close simulator captures are in `evidence/models-gallery.html` and reproduce with `tools/capture_models.py`.
+- Two targeted native tests passed (9.840 seconds): all 42 assets build with finite bounds, jail clearance, mace radius and obstacle animation. Nine Release obstacle tests passed (15.706 seconds). Specification validation passed 54 checks. Final Debug simulator build succeeded after deleting unreachable old zebra code; tests were not repeated for that cleanup. Logs: `evidence/models-native.log`, `evidence/models-core.log`, `evidence/models-spec.log`, `evidence/models-build.log`.
+- Initial compile caught a malformed numeric literal; corrected before all successful checks. Simulator emitted render-pipeline warnings despite passing assertions. No physical-device/performance or full UI test pass; visual inspection used static simulator previews.
+
 ## Lightning impact audio — September 15, 2026
 
 - Replaced the quiet 0.6-second synthesized tone with an original precomputed 3.6-second thunder strike: fast broadband crack, low impact, scattered echoes and decaying rumble. `tools/synthesize_thunder.py` reproduces the mono 22.05 kHz PCM resource; peak amplitude is bounded at 0.88.

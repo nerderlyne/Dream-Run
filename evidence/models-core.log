@@ -1,0 +1,38 @@
+Building for production...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/4] Compiling DreamCore BalloonMotion.swift
+[3/5] Write Objects.LinkFileList
+[4/5] Linking DreamCorePackageTests
+Build complete! (17.32s)
+Test Suite 'Selected tests' started at 2026-09-15 22:01:03.954.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-15 22:01:03.961.
+Test Suite 'ObstacleTests' started at 2026-09-15 22:01:03.961.
+Test Case '-[DreamCoreTests.ObstacleTests testContinueClearsTheWholeRecoverySurface]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testContinueClearsTheWholeRecoverySurface]' passed (0.003 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testCornerBallKnocksOffExposedBridgeButCentreCanRecover]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testCornerBallKnocksOffExposedBridgeButCentreCanRecover]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testDensityIncreasesAndAllConceptsAppear]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testDensityIncreasesAndAllConceptsAppear]' passed (0.006 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testEveryObstacleHasASurvivalWitnessAtOpeningAndCap]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testEveryObstacleHasASurvivalWitnessAtOpeningAndCap]' passed (0.009 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testLightningWarningCannotHitAndStrikeSurvivesSuspend]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testLightningWarningCannotHitAndStrikeSurvivesSuspend]' passed (0.004 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testMissedRequiredActionsAreFatal]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testMissedRequiredActionsAreFatal]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testOrdinaryPigRemainsASoftObstacle]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testOrdinaryPigRemainsASoftObstacle]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testSwingUsesContinuousSharedTrajectory]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testSwingUsesContinuousSharedTrajectory]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testTwentyMinuteProgressionEightSeeds]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testTwentyMinuteProgressionEightSeeds]' passed (15.682 seconds).
+Test Suite 'ObstacleTests' passed at 2026-09-15 22:01:19.668.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 15.706 (15.707) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-15 22:01:19.668.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 15.706 (15.708) seconds
+Test Suite 'Selected tests' passed at 2026-09-15 22:01:19.668.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 15.706 (15.714) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

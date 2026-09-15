@@ -222,15 +222,17 @@ extension UIColor {
             for n in 0..<4 { let t=Float(n)*Float.pi/2+Float.pi/4; heart(&body,[cos(t)*0.28,0.8+sin(t)*0.28,0],0.3) }
         case .rail:
             for n in 0..<9 { body.tube([[Float(n)*0.5-2,0,0],[Float(n)*0.5-2,1,0]],radius:0.045) }; trim.box([0,1,0],[4.3,0.12,0.16])
-        case .horse,.zebra:
-            bodyColor=id == .zebra ? UIColor(hex:"#F2ECE7") : UIColor(hex:p.accent_a); darkColor=UIColor(hex:"#36323C")
+        case .zebra:
+            bodyColor=UIColor(hex:"#F8F4E9");darkColor=UIColor(hex:"#16151B");trimColor=UIColor(hex:"#B8AAA0")
+            toyZebra(body:&body,dark:&dark,trim:&trim,segments:lod == 0 ? 72:40)
+        case .horse:
+            bodyColor=UIColor(hex:p.accent_a); darkColor=UIColor(hex:"#36323C")
             // Belly bottom .85, legs outside ±1.65: the central .58 m slide capsule visibly fits.
             sphere(&body,[0,1.5,0],[2.0,0.65,0.6]); sphere(&body,[1.65,2.05,0],[0.42,0.85,0.4]); sphere(&body,[1.95,2.7,0.05],[0.63,0.3,0.32])
             for x:Float in [-1.7,1.7] { for z:Float in [-0.43,0.43] { body.tube([[x,0,z],[x,1.4,z]],radius:0.12); dark.box([x,0.08,z],[0.28,0.16,0.27]) } }
             dark.tube([[-1.85,1.7,0],[-2.3,1,0],[-2.4,0.55,0]],radius:0.12)
             dark.tube([[1.25,1.65,-0.2],[1.35,2.5,-0.2],[1.65,2.95,-0.2]],radius:0.16)
             for z:Float in [-0.2,0.2] { sphere(&body,[1.8,3.05,z],[0.12,0.3,0.1]); sphere(&dark,[2.14,2.8,z*1.55],[0.06,0.06,0.04]) }
-            if id == .zebra { for n in 0..<12 { let x=Float(n)*0.28-1.55; dark.tube((0...12).map { let t=Float($0)/12*Float.pi*2; return [x+0.08*sin(t*2),1.5+0.65*cos(t),0.605*sin(t)] },radius:0.065) } }
         case .rabbit:
             body.sculpt([([0,0.34,-0.04],[0.32,0.34,0.38]),([0,0.66,0.19],[0.23,0.24,0.23]),([-0.14,0.98,0.17],[0.075,0.32,0.065]),([0.13,1.02,0.16],[0.08,0.34,0.07]),([-0.21,0.08,0.18],[0.13,0.09,0.22]),([0.21,0.08,0.18],[0.13,0.09,0.22]),([0,0.3,-0.4],[0.15,0.15,0.15])],min:[-0.45,-0.03,-0.59],max:[0.45,1.42,0.51],step:lod == 0 ? 0.032 : 0.05,blend:0.1)
             for x:Float in [-0.13,0.13] { sphere(&trim,[x,1.03,0.222],[0.035,0.22,0.012]); sphere(&dark,[x,0.73,0.382],[0.021,0.027,0.017]) }
@@ -243,7 +245,7 @@ extension UIColor {
         }
         var count=0
         for (g,color) in [(body,bodyColor),(trim,trimColor),(dark,darkColor),(semantic,semanticColor)] where !g.positions.isEmpty {
-            do { let chosen:any Material = id == .mirror && color == UIColor.black ? UnlitMaterial(color:.black) : material(color,style:id == .mirror ? 2:id == .soccer ? 0:style)
+            do { let chosen:any Material = id == .mirror && color == UIColor.black ? UnlitMaterial(color:.black) : material(color,style:id == .mirror ? 2:id == .soccer ? 0:id == .zebra ? 1:style)
                 let entity=ModelEntity(mesh:try g.resource(),materials:[chosen]); root.addChild(entity); count += g.indices.count/3 }
             catch { assertionFailure("Procedural mesh \(id): \(error)") }
         }

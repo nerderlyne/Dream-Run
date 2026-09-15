@@ -256,7 +256,7 @@ public struct GameSimulation: Sendable {
             else if let pig=h.pig, pig.clover {
                 state.pigs.append(CollectedPig(ordinal:pig.ordinal,hue:Int(pig.cloverDraw))); events.append(.clover)
                 if state.pigs.count == 3 { state.phase = .luckyTransition; state.endingElapsed = 0; state.distance = oldDistance+(state.distance-oldDistance)*c.t; break }
-            } else if h.fatal { wake(h.asset == .rabbit ? "rabbit" : h.asset == .nazar ? "nazar" : h.encounter == .lightning ? "lightning" : h.encounter == .swing ? "swinging moon" : h.requiresJump ? "missed jump" : "underpass"); events.append(.waking); break }
+            } else if h.fatal { wake(h.asset == .rabbit ? "rabbit" : h.asset == .nazar ? "nazar" : h.encounter == .lightning ? "lightning" : h.encounter == .swing ? "swinging mace" : h.requiresJump ? "missed jump" : "underpass"); events.append(.waking); break }
             else if state.activeTicks >= state.softImmunityUntil {
                 if state.activeTicks < state.instabilityUntil { wake("second stumble"); events.append(.waking); break }
                 state.lastSoftTick=state.activeTicks; state.instabilityUntil=state.activeTicks+300; state.softImmunityUntil=state.activeTicks+48

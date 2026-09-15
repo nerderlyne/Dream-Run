@@ -1,5 +1,9 @@
 # Known limitations
 
+## Zebra, jail door and mace — September 15, 2026
+
+These are original procedural toy/stylized models, not scanned or rigged photoreal assets. Verified close simulator previews and geometry bounds; physical-device frame pacing and moving-scene visual preference remain untested in this pass. The existing window and moon families supply the new interactive door/mace representations; no family is added.
+
 ## Lightning audio — September 15, 2026
 
 The original synthesized 3.6-second strike is preloaded and amplitude-bounded. Simulator tests verify playback lifecycle, not perceived loudness or fright. Listening on physical iPhone speakers and headphones remains unverified; system volume, silent mode and the Effects setting still apply.
