@@ -134,6 +134,8 @@ import UIKit
         switch event {
         case .balloon: cue = .balloon
         case .clover: cue = .clover
+        case .strawBreak: cue = .strawBreak
+        case .strawRepair: cue = .strawRepair
         case .stumble: cue = .stumble
         case .mirror: cue = .mirror
         case .drop: cue = .drop

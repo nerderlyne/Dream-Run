@@ -580,3 +580,23 @@ extension Dream_AgainTests {
         XCTAssertNotEqual(before,cloud.transform);XCTAssertEqual(ids,e.children.map(ObjectIdentifier.init))
     }
 }
+
+extension Dream_AgainTests {
+    @MainActor func testStrawLossRepairAndBurstRendering() throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        game.labCollage(index:0)
+        game.simulation.state.player.missingLimbs=[.leftArm,.rightArm,.leftLeg]
+        r.render(game.run,equipped:[:])
+        XCTAssertFalse(r.arms[0].isEnabled);XCTAssertFalse(r.arms[1].isEnabled)
+        XCTAssertFalse(r.legs[0].isEnabled);XCTAssertTrue(r.legs[1].isEnabled)
+        game.simulation.state.player.missingLimbs.removeLast();r.render(game.run,equipped:[:])
+        XCTAssertTrue(r.legs[0].isEnabled)
+        game.simulation.state.player.missingLimbs=StrawLimb.allCases;game.simulation.wake("unravelled")
+        r.render(game.run,equipped:[:]);game.simulation.state.endingElapsed=0.6;r.render(game.run,equipped:[:])
+        XCTAssertEqual(r.runner.components[OpacityComponent.self]?.opacity,0)
+        XCTAssertNotNil(r.world.children.first{$0.name == "straw-fragments"})
+        let bale=r.strawBale();XCTAssertEqual(bale.name,"straw-repair-bale");XCTAssertGreaterThan(bale.visualBounds(relativeTo:bale).extents.x,0.5)
+        XCTAssertNotNil(game.audio.buffers["strawBreak"]);XCTAssertNotNil(game.audio.buffers["strawRepair"])
+        XCTAssertFalse(game.run.mode.earns)
+    }
+}

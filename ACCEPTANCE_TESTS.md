@@ -26,9 +26,9 @@ Record **PASS / FAIL / NOT RUN**, test name, command/device and relevant output 
 
 **B06 — Slide.** Sliding capsule/animation clears the certified zebra/horse opening. Standing collides. Completion stands safely, cannot remain low indefinitely, and cannot grant a smaller collision body forever.
 
-**B07 — Soft hit.** One sports ball triggers exactly one stumble and a five-second instability window. Repeated overlap of the same ball is deduplicated. Five seconds without another hit clears instability.
+**B07 — Straw damage.** Each distinct sports ball after contact immunity removes one arm, the other arm, then a leg, then the last leg. The first three stumble/slow; the fourth produces a rising straw burst and wakes. Same-ball overlap is deduplicated. Edge knockback and fatal semantic hazards retain their existing rules.
 
-**B08 — Second soft hit.** A different ball after soft immunity but before five-second recovery causes waking. A late hit begins a new soft state. Boundary tick tests define the inclusive/exclusive interval.
+**B08 — Straw repair.** A tied hay bale on certified safe support restores one missing limb without currency, never consumes at full health, and cannot be recollected. Damage persists through pause/suspend. Continue restores the avatar. DEBUG damage/repair/burst previews cannot earn rewards. Break and repair effects respect the Effects setting.
 
 **B09 — Fatal semantic hazards.** A cute on-track rabbit and a blue nazar both wake on actual contact, including during soft-hit immunity. An off-track animal does not collide. No anatomical eye asset appears.
 

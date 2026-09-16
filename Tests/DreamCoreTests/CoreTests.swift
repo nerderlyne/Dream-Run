@@ -127,7 +127,7 @@ final class CoreTests: XCTestCase {
         var s=safe(); s.state.safeUntilDistance=0
         func hazard(_ id: String,_ asset: AssetID,_ encounter: Encounter = .rolling) -> HazardDescription { HazardDescription(id:id,asset:asset,encounter:encounter,distance:s.state.distance+0.1,lateral:0,radius:0.45,height:1) }
         s.state.hazards=[hazard("one",.soccer)]; XCTAssertTrue(s.step().contains(.stumble)); XCTAssertEqual(s.state.phase,.running)
-        for _ in 0..<49 { _=s.step() }; s.state.hazards=[hazard("two",.softball)]; XCTAssertTrue(s.step().contains(.waking))
+        for _ in 0..<49 { _=s.step() }; s.state.hazards=[hazard("two",.softball)]; XCTAssertTrue(s.step().contains(.strawBreak)); XCTAssertEqual(s.state.phase,.running); XCTAssertEqual(s.state.player.missingLimbs.count,2)
         s=safe(); s.state.safeUntilDistance=0; s.state.softImmunityUntil=100; s.state.hazards=[hazard("rabbit",.rabbit,.dodge)]; XCTAssertTrue(s.step().contains(.waking))
         s=safe(); s.state.safeUntilDistance=0; s.state.hazards=[hazard("zebra",.zebra,.slide)]; _=s.step(InputFrame(slide:true)); XCTAssertEqual(s.state.phase,.running)
         for _ in 0..<65 { _=s.step() }; XCTAssertEqual(s.state.player.slideTicks,0)

@@ -88,7 +88,7 @@ struct ContentView:View {
     var gameplay:some View {
         ZStack(alignment:.bottom) {
             if game.run.phase == .mirrorCrossing { Color.black.opacity(0.95).ignoresSafeArea().allowsHitTesting(false) }
-            if game.run.phase == .waking { GeometryReader{g in Color.black.frame(height:g.size.height*min(1,game.run.endingElapsed/1.25)).frame(maxHeight:.infinity,alignment:.bottom)}.ignoresSafeArea() }
+            if game.run.phase == .waking { GeometryReader{g in Color.black.frame(height:g.size.height*min(1,game.run.cause == "unravelled" ? max(0,(game.run.endingElapsed-1.6)/0.8):game.run.endingElapsed/1.25)).frame(maxHeight:.infinity,alignment:.bottom)}.ignoresSafeArea() }
             if game.run.instabilityUntil > game.run.activeTicks && game.run.phase == .running { LinearGradient(colors:[.clear,.black.opacity(0.45)],startPoint:.center,endPoint:.bottom).ignoresSafeArea().allowsHitTesting(false) }
 
             Color.clear.contentShape(Rectangle()).gesture(DragGesture(minimumDistance:8)
@@ -113,8 +113,10 @@ struct ContentView:View {
                     Text(game.time(game.run.activeTicks)).monospacedDigit().tracking(2)
                     Spacer()
                     BalloonCounter(total:game.run.balloons,tick:game.run.activeTicks,runID:game.run.id,reducedMotion:game.settings.reducedMotion)
+
                     Button {game.pause()} label:{Image(systemName:"pause").frame(width:44,height:44)}.accessibilityLabel("pause").accessibilityIdentifier("pause")
                 }.font(.system(size:14,weight:.medium)).padding(.leading,24).padding(.trailing,12).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.65) : .white).shadow(color:.black.opacity(0.5),radius:5,y:1)
+                if !game.run.player.missingLimbs.isEmpty && game.run.phase != .waking && game.run.phase != .finished {Text("Straw \(4-game.run.player.missingLimbs.count)/4 · Find hay").font(.caption).accessibilityLabel("\(game.run.player.missingLimbs.count) limbs missing. Collect hay to rebuild.")}
                 if game.run.mode != .fresh {Text(game.run.mode == .debug ? "PREVIEW · NO REWARDS" : game.run.mode.rawValue.uppercased()).font(.system(size:9,weight:.medium)).tracking(2).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.5) : .white.opacity(0.7)).allowsHitTesting(false)}
                 if game.run.stumbleWeight > 0 && game.run.phase == .running {
                     Text("stumbled").font(.callout.weight(.semibold)).padding(.horizontal,14).padding(.vertical,8).background(.black.opacity(0.5),in:Capsule()).allowsHitTesting(false)
@@ -267,7 +269,7 @@ struct ContentView:View {
                 ScrollView(.horizontal){HStack{ForEach(DreamObstacle.allCases,id:\.self){kind in Button(kind.title){game.labObstacle(kind)}}}}.font(.caption)
                 Toggle("Show role bounds",isOn:$game.labColliders).onChange(of:game.labColliders){_,_ in game.previewAsset()}
                 HStack{TextField("Dream ID for world preview",text:$code).font(.caption).textFieldStyle(.roundedBorder);Button("preview"){game.labWorld(code)};Button("+24m"){game.labStep()}}
-                ScrollView(.horizontal){HStack{ForEach(["Rabbit","Nazar","Zebra","Ball","Mirror","Drop","Ordinary pig","Clover pig","Lucky Dream","Three hours","Sparse","Beyond","Void","Waking"],id:\.self){event in Button(event){game.labEvent(event)}.buttonStyle(.bordered)}}}
+                ScrollView(.horizontal){HStack{ForEach(["Rabbit","Nazar","Zebra","Ball","Mirror","Drop","Ordinary pig","Clover pig","Lucky Dream","Three hours","Sparse","Beyond","Void","Waking","Straw damage","Straw burst"],id:\.self){event in Button(event){game.labEvent(event)}.buttonStyle(.bordered)}}}
                 HStack{Button("test reward"){game.labEvent("Waking");game.provider=MockRewardProvider(outcome:.earned("debug:\(UUID().uuidString)"))};Button("dismissed ad"){game.provider=MockRewardProvider(outcome:.dismissed);game.labEvent("Waking")};Button("failed ad"){game.provider=MockRewardProvider(outcome:.failed("Developer test failure"));game.labEvent("Waking")}}
                 HStack{Button("ledger scenarios"){game.labCommerce()};Button("export diagnostics"){game.labExport()}}
                 if !game.notice.isEmpty {Text(game.notice).font(.caption2)}

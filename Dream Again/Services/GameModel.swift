@@ -114,6 +114,17 @@ import UIKit
                     func arg(_ key:String,_ fallback:String)->String {arguments.firstIndex(of:key).flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1]:nil} ?? fallback}
                     labDesign(theme:theme,pose:pose,variant:Int(arg("--variant","0")) ?? 0,sky:arg("--sky",DreamCollageKit.skyIDs[0]),pattern:TrackPattern(rawValue:arg("--pattern","checker")) ?? .checker,mirror:arguments.contains("--design-mirror"),contrast:arguments.contains("--design-contrast"))
                     if let kind=DreamObstacle(rawValue:arg("--obstacle","")) {labObstacle(kind,striking:arguments.contains("--strike"))}
+                    if arguments.contains("--straw-limbs") {
+                        let n=max(0,min(4,Int(arg("--straw-limbs","0")) ?? 0))
+                        simulation.state.player.missingLimbs=Array(StrawLimb.allCases.prefix(n))
+                        simulation.state.hazards=[]
+                        for i in simulation.state.chunks.indices {simulation.state.chunks[i].pickups=[]}
+                        simulation.state.chunks[0].pickups.append(PickupDescription(id:"straw:preview",distance:run.distance+4,lateral:-0.85,height:0.45,kind:.straw))
+                        if n<4 {renderer?.lastStrawState=simulation.state.player.missingLimbs}
+                        if n == 4 {simulation.wake("unravelled")}
+                        renderer?.render(run,equipped:profile.equipped)
+                        if n == 4 {simulation.state.endingElapsed=0.55}
+                    }
                     if let value=Int(arg("--vignette","-1")),let vignette=DreamVignette(rawValue:value) {labVignette(vignette)}
                     if let value=Int(arg("--scale-event","-1")),let event=DreamScaleEvent(rawValue:value) {labScale(event,framing:DreamScaleFraming(rawValue:Int(arg("--scale-framing","-1")) ?? -1))}
                     collageMotion=arguments.contains("--collage-moving")
@@ -328,13 +339,15 @@ import UIKit
             let events=simulation.step(input); input.jump=false; input.slide=false
             audio.movement(before:before,after:run,settings:settings)
             if events.contains(.thunder) {audio.feedback(.thunder,settings:settings)}
-            if events.contains(.stumble) { audio.feedback(.stumble,settings:settings) }
+            if events.contains(.strawBreak) {audio.feedback(.strawBreak,settings:settings)}
+            if events.contains(.strawRepair) {audio.feedback(.strawRepair,settings:settings)}
+            if events.contains(.stumble) && !events.contains(.strawBreak) { audio.feedback(.stumble,settings:settings) }
             else if events.contains(.clover) { audio.feedback(.clover,settings:settings) }
             else if events.contains(.balloon) { audio.feedback(.balloon,settings:settings,tick:run.activeTicks) }
             if events.contains(.mirror) { audio.feedback(.mirror,settings:settings) }
             if events.contains(.drop) { audio.feedback(.drop,settings:settings) }
-            if events.contains(.waking) { finish() }
-            if run.mode.earns && (events.contains(.pigCommitted) || events.contains(.clover) || run.activeTicks%900 == 0) {
+            if events.contains(.waking) && run.cause != "unravelled" { finish() }
+            if run.mode.earns && (events.contains(.strawBreak) || events.contains(.strawRepair) || events.contains(.pigCommitted) || events.contains(.clover) || run.activeTicks%900 == 0) {
                 let snapshot=run
                 transact { $0.snapshot=snapshot; $0.settle(snapshot,finished:false,catalogue:achievements) }
             }
@@ -451,6 +464,12 @@ import UIKit
         case "Three hours": simulation.debugTime(10790)
         case "Sparse": simulation.debugTime(11050)
         case "Beyond": simulation.debugTime(11500)
+        case "Straw damage":
+            simulation.state.player.missingLimbs=[.leftArm,.rightArm,.leftLeg]
+            simulation.state.chunks[0].pickups.append(PickupDescription(id:"straw:lab",distance:15,lateral:0,height:0.45,kind:.straw))
+        case "Straw burst":
+            renderer?.render(run,equipped:profile.equipped)
+            simulation.state.player.missingLimbs=StrawLimb.allCases;simulation.wake("unravelled")
         case "Waking": simulation.wake("developer preview")
         case "Void": simulation.state.mirrorCount=6; simulation.state.distance=432
         case "Mirror": simulation.state.distance=1770; simulation.state.chunks=[]; simulation.state.hazards=[]

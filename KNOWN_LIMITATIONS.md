@@ -1,5 +1,9 @@
 # Known limitations
 
+## Straw damage and repair — September 16, 2026
+
+The one-leg state uses the existing running articulation with a small hop; missing limbs do not change physics or jump/slide clearance. Straw bursts are bounded procedural reeds, not simulated fibre breakage. Hay frequency and the two synthesized sound effects have not received subjective play/listening evaluation. Old unreleased snapshots are not migrated. Verification uses the simulator only.
+
 ## Color harmony and storm motion — September 16, 2026
 
 The cloud remains animated photographic cards with procedural electrical branches/rain, not volumetric fluid simulation. Its extra translucent scud card reuses the existing texture; sustained transparency cost is unmeasured. Obstacle and balloon colors follow the track palette, not automatic color extraction from each photo. Material animation and strike behavior were tested in the simulator only.

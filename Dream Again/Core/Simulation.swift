@@ -9,7 +9,9 @@ public struct InputFrame: Codable, Equatable, Sendable {
     public var slide = false
     public init(steering: Double = 0, jump: Bool = false, slide: Bool = false) { self.steering = steering; self.jump = jump; self.slide = slide }
 }
+public enum StrawLimb:String,Codable,CaseIterable,Sendable {case leftArm,rightArm,leftLeg,rightLeg}
 public struct PlayerState: Codable, Equatable, Sendable {
+    public var missingLimbs:[StrawLimb]=[]
     public var lateral = 0.0
     public var height = 0.0
     public var knockbackVelocity=0.0
@@ -23,7 +25,7 @@ public struct PlayerState: Codable, Equatable, Sendable {
     public var coyote = 5
     public var bodyHeight: Double { slideTicks > 0 ? 0.58 : 1.55 }
 }
-public enum GameEvent: Equatable, Sendable { case balloon, stumble, thunder, waking, clover, pigCommitted, mirror, drop, mastery, tutorialComplete, ending }
+public enum GameEvent: Equatable, Sendable { case balloon, strawBreak, strawRepair, stumble, thunder, waking, clover, pigCommitted, mirror, drop, mastery, tutorialComplete, ending }
 public struct CollectedPig: Codable, Equatable, Sendable { public var ordinal: Int; public var hue: Int }
 public struct RunState: Codable, Sendable {
     public var schema = 1
@@ -88,7 +90,7 @@ public struct GameSimulation: Sendable {
     init(certification:RunState,slope:Double) {state=certification;certificationSlope=slope}
     public init(identity: DreamIdentity, mode: RunMode = .fresh, rules: RunRules? = nil) { state = RunState(identity: identity, mode: mode); if let rules {state.rules=rules}; streamChunks() }
     public init(snapshot: RunState) throws {
-        guard snapshot.schema == 1, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-RunRules.pigIntervalTicks, snapshot.player.lateral.isFinite, abs(snapshot.player.lateral) <= 2.5, snapshot.player.knockbackVelocity.isFinite, abs(snapshot.player.knockbackVelocity)<=8, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
+        guard snapshot.schema == 1, Set(snapshot.player.missingLimbs).count == snapshot.player.missingLimbs.count, snapshot.player.missingLimbs.count <= 4, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-RunRules.pigIntervalTicks, snapshot.player.lateral.isFinite, abs(snapshot.player.lateral) <= 2.5, snapshot.player.knockbackVelocity.isFinite, abs(snapshot.player.knockbackVelocity)<=8, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
         state = snapshot
     }
     public mutating func resume() { if state.phase == .paused || state.phase == .ready { state.phase = state.resumePhase } }
@@ -123,7 +125,7 @@ public struct GameSimulation: Sendable {
         if state.pigs.count == 3 {
             if state.endingElapsed >= 45 { state.phase = .whiteEnding }
             if state.endingElapsed >= 57 || skip && state.endingElapsed >= 5 { state.phase = .finished; return [.ending] }
-        } else if state.endingElapsed >= 1.25 || skip && state.endingElapsed >= 0.35 { state.phase = .finished; return [.ending] }
+        } else if state.endingElapsed >= (state.cause == "unravelled" ? 2.4:1.25) || skip && state.endingElapsed >= 0.35 { state.phase = .finished; return [.ending] }
         return []
     }
     mutating func streamChunks() {
@@ -250,7 +252,13 @@ public struct GameSimulation: Sendable {
         }
         contacts.sort { abs($0.t-$1.t) < 1e-9 ? $0.priority < $1.priority : $0.t < $1.t }
         for c in contacts {
-            if let p=c.pickup { state.collectedIDs.insert(p.id); state.balloons += 1; events.append(.balloon); continue }
+            if let p=c.pickup {
+                if p.kind == .straw {
+                    guard !state.player.missingLimbs.isEmpty else {continue}
+                    state.player.missingLimbs.removeLast();state.collectedIDs.insert(p.id);events.append(.strawRepair)
+                } else {state.collectedIDs.insert(p.id);state.balloons += 1;events.append(.balloon)}
+                continue
+            }
             guard let i=c.hazard else { continue }; let h=state.hazards[i]; state.hazards[i].resolved=true
             if h.encounter == .mirror { state.mirrorCount += 1; state.mirrorUntilTick=state.activeTicks+6; state.phase = .mirrorCrossing; events.append(.mirror) }
             else if let pig=h.pig, pig.clover {
@@ -258,7 +266,12 @@ public struct GameSimulation: Sendable {
                 if state.pigs.count == 3 { state.phase = .luckyTransition; state.endingElapsed = 0; state.distance = oldDistance+(state.distance-oldDistance)*c.t; break }
             } else if h.fatal { wake(h.asset == .rabbit ? "rabbit" : h.asset == .nazar ? "nazar" : h.encounter == .lightning ? "lightning" : h.encounter == .swing ? "swinging mace" : h.requiresJump ? "missed jump" : "underpass"); events.append(.waking); break }
             else if state.activeTicks >= state.softImmunityUntil {
-                if state.activeTicks < state.instabilityUntil { wake("second stumble"); events.append(.waking); break }
+                if [.soccer,.eightBall,.softball,.americanFootball].contains(h.asset) {
+                    let left=state.player.lateral <= h.lateral(at:state.activeTicks)
+                    let order:[StrawLimb]=left ? [.leftArm,.rightArm,.leftLeg,.rightLeg]:[.rightArm,.leftArm,.rightLeg,.leftLeg]
+                    if let limb=order.first(where:{!state.player.missingLimbs.contains($0)}) {state.player.missingLimbs.append(limb);events.append(.strawBreak)}
+                    if state.player.missingLimbs.count == 4 {wake("unravelled");events.append(.waking);break}
+                }
                 state.lastSoftTick=state.activeTicks; state.instabilityUntil=state.activeTicks+300; state.softImmunityUntil=state.activeTicks+48
                 let direction=state.player.lateral >= h.lateral(at:state.activeTicks) ? 1.0:-1.0
                 state.player.lateral += direction*0.18;state.player.knockbackVelocity=direction*4

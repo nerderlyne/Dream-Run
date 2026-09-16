@@ -26,6 +26,8 @@ import simd
     var gallery:Entity?
     var renderEntities = 0
     let balloonPops=BalloonPopEffects()
+    let strawBursts=StrawBurstEffects()
+    var lastStrawState:[StrawLimb]=[]
     var frozenFrame: UIImage?
     var originalMaterials: [ObjectIdentifier:[PhysicallyBasedMaterial]] = [:]
     init(palettes:[PaletteDefinition]) {
@@ -77,7 +79,7 @@ import simd
         let targetPalette=artPalette ?? (cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex)
         if lastRun != run.id {
             distantPath.reset();art.reset();art.invalidateEnvironment()
-            balloonPops.reset();world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); terrainKeys.removeAll();trackAlphas.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
+            strawBursts.reset();lastStrawState=run.player.missingLimbs;balloonPops.reset();world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); terrainKeys.removeAll();trackAlphas.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
             evolution.reset(palette:palette,definition:surfacePalettes[palette])
             art.environment(view:view)
         } else if newBase != base {
@@ -185,15 +187,17 @@ import simd
         let available=run.chunks.flatMap(\.pickups).filter { !run.collectedIDs.contains($0.id) }
         let ids=Set(available.map(\.id))
         for (id,e) in pickups where !ids.contains(id) {
-            if run.collectedIDs.contains(id) {balloonPops.spawn(at:e.position,world:world,tick:run.activeTicks)}
+            if run.collectedIDs.contains(id) && !id.hasPrefix("straw:") {balloonPops.spawn(at:e.position,world:world,tick:run.activeTicks)}
             e.removeFromParent();pickups.removeValue(forKey:id)
         }
         for p in available {
             let e:Entity
             if let existing=pickups[p.id] {e=existing} else {
-                e=factory.build(.balloon,palette:palette,style:1,lod:0);world.addChild(e);pickups[p.id]=e
-                coordinatePalette(e,definition:surfacePalettes[palette],balloon:true)
-                evolution.register(e,palette:palette,palettes:surfacePalettes,art:art,allSurfaces:true)
+                e=p.kind == .straw ? strawBale():factory.build(.balloon,palette:palette,style:1,lod:0);world.addChild(e);pickups[p.id]=e
+                if p.kind == .balloon {
+                    coordinatePalette(e,definition:surfacePalettes[palette],balloon:true)
+                    evolution.register(e,palette:palette,palettes:surfacePalettes,art:art,allSurfaces:true)
+                }
             }
             let motion=p.balloonPosition(at:run.activeTicks)
             let center=local(generator.sample(p.distance),origin:origin,lateral:motion.lateral)+[0,Float(motion.height+run.floorHeight(at:p.distance)),0]
@@ -232,6 +236,7 @@ import simd
             arms[i].orientation=simd_quatf(angle:armAngle,axis:[1,0,0])*simd_quatf(angle:(i == 0 ? -1 : 1)*(slide ? 0.08 : 0.45*stumble),axis:[0,0,1])
             elbows[i].orientation=simd_quatf(angle:slide ? 0.15 : activeGait ? 1.35 : 0,axis:[1,0,0])
         }
+        updateStrawBody(run)
         if cinematic && run.endingElapsed >= 45 {
             if gallery == nil { let pigs=Entity(); pigs.name="ending-pigs"; for i in 0..<3 { let e=factory.build(.pig,palette:7); e.position=position+[Float(i-1)*1.1,0,-6]; pigs.addChild(e) }; gallery=pigs; world.addChild(pigs) }
             for e in pickups.values { e.isEnabled=false }

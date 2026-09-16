@@ -48,7 +48,7 @@ public struct DreamSoundscape: Sendable {
 }
 
 public enum DreamSoundCue: String, CaseIterable, Sendable {
-    case step, waterStep, stoneStep, jump, land, slide, balloon, clover, stumble, mirror, drop, menu
+    case strawBreak, strawRepair, step, waterStep, stoneStep, jump, land, slide, balloon, clover, stumble, mirror, drop, menu
 }
 
 /// Called at simulation tick boundaries: accepted actions, not raw swipe attempts.

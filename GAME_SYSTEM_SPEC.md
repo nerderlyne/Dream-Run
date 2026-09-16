@@ -173,7 +173,7 @@ Use active time rather than phone wall-clock time. Moving the device clock, leav
 
 ### 3.2 Event precedence
 
-Resolve events in increasing time-of-impact within a fixed tick. At an exact tie: fatal collision → second soft hit → ordinary soft hit → clover pickup → balloon pickup → transitions. A third pig and a rabbit occupying the same collision instant cannot make the runner invincible; normal generation must avoid that placement anyway. A collectible acquired strictly before a fatal impact remains credited. Each instance ID produces at most one pickup/impact event.
+Resolve events in increasing time-of-impact within a fixed tick. At an exact tie: fatal collision → ball limb-loss impact → ordinary soft hit → clover pickup → balloon pickup → transitions. A third pig and a rabbit occupying the same collision instant cannot make the runner invincible; normal generation must avoid that placement anyway. A collectible acquired strictly before a fatal impact remains credited. Each instance ID produces at most one pickup/impact event.
 
 When a run becomes terminal, stop physics/control and pending gameplay events immediately, then play presentation. Result finalization is idempotent. No double wallet grant from a repeated callback, app resume, or tapping share/retry twice.
 
@@ -315,7 +315,7 @@ The clover is not a second currency and is not independently farmable. The whole
 
 ### 6.1 Soft impacts and dream instability
 
-On the first distinct soft impact: a short stumble animation, momentary speed scale 0.75 recovering over one second, and a black lower-edge intrusion. Set `destabilizedUntil = activeTicks + 300`. If a second distinct soft hazard hits after the brief contact lockout but before recovery, wake. After five collision-free active seconds, the edge recedes and instability clears.
+Each distinct sports-ball impact after the contact lockout removes one straw limb: both arms before either leg, with impact side choosing the available limb. The first three also stumble and briefly slow the runner; the fourth unrepaired loss causes a 2.4-second rising straw-burst wake-up. Damage does not heal with time. A small tied hay bale restores the most recently lost limb, awards no currency, and is consumed once only when damage exists. Bales are reclaimed humanoid straw fragments, outside the 42 scenery families, generated on safe hazard-free support. Missing limbs and consumed bales persist in live suspension. A continue rebuilds the body. Edge knockback and other lethal hazards still wake immediately. Cosmetic limb loss never changes the collision capsule or jump/slide controls.
 
 Use 0.8 seconds of immunity to **soft repeat impacts** only, plus per-instance hit deduplication. Rabbits, nazar, fatal gaps and blocked full-body underpasses remain fatal during that period. Do not let recovery effects conceal the next obstacle. A single ball's collider cannot hit every tick and instantly count as two hits.
 

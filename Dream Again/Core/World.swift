@@ -42,8 +42,10 @@ public struct HazardDescription: Codable, Equatable, Identifiable, Sendable {
     public var contactHalfWidth:Double {asset == .americanFootball ? max(radius,0.65) : radius}
     public var fatal: Bool { asset == .rabbit || asset == .nazar || encounter == .slide || requiresJump || encounter == .swing || encounter == .lightning }
 }
+public enum PickupKind:String,Codable,Sendable {case balloon,straw}
 public struct PickupDescription: Codable, Equatable, Identifiable, Sendable {
     public var id: String; public var distance: Double; public var lateral: Double; public var height: Double = 0.9
+    public var kind:PickupKind = .balloon
 }
 public struct SceneryPlacement: Codable, Equatable, Sendable {
     public var asset: AssetID; public var distance: Double; public var lateral: Double; public var scale: Double
@@ -128,6 +130,11 @@ public struct WorldGenerator: Sendable {
             if index == 5 { result.gap = 132...134; result.routeFamily = .trackBroken }
             if index == 9 { result.hazards = [HazardDescription(id: "tutorial:slide", asset: .zebra, encounter: .slide, distance: 228, lateral: 0, radius: 2, height: 2.4)] }
             if index == 13 { result.hazards = [HazardDescription(id: "tutorial:rabbit", asset: .rabbit, encounter: .dodge, distance: 324, lateral: 0.7, radius: 0.35, height: 0.8)] }
+        }
+        // Reclaimed avatar straw, not an additional scenery family or currency.
+        var repair=identity.stream("straw-repair",index)
+        if start>120 && result.gap == nil && result.step == nil && result.drop == nil && result.hazards.isEmpty && repair.below(5)==0 {
+            result.pickups.append(PickupDescription(id:"straw:\(index)",distance:start+12,lateral:Double(Int(repair.below(3))-1)*min(0.85,max(0,result.halfWidth-0.6)),height:0.45,kind:.straw))
         }
         return result
     }
