@@ -21,7 +21,9 @@ uncanny; void becomes sparse; Lucky Dream dissolves; alien palettes rebuild.
 This follows the gameplay palette, not image recognition of the photo plates.
 
 Accepted jumps, slides, landings and six-metre running strides drive immediate
-feedback. Stairs and watery palettes have distinct footfalls. Balloon trails
+feedback. Stairs and watery palettes have distinct footfalls. All running footfalls use
+0.14 gain (about −17 dB) relative to other effects, retaining their contact
+transients at a barely present level beneath the score. Balloon trails
 cycle a three-note phrase with an eight-tick rate limit. Mirrors draw the texture
 back and temporarily suppress music; safe drops soften it. Busy hazard windows
 reduce decorative motif/pulse gain. Three-hour stripping and rebuilding change

@@ -113,7 +113,10 @@ import UIKit
         // Four reusable one-shot voices prevent footfalls from cutting off jumps.
         let node=voices.first(where:{!$0.isPlaying}) ?? voices[voiceIndex]
         voiceIndex=(voiceIndex+1)%voices.count
-        node.stop(); node.volume=Float(DreamSoundscape.level(settings.effectsLevel))
+        // Running stays just perceptible beneath the score. Preserve the contact
+        // transient and surface timbre, but attenuate every footfall by ~17 dB.
+        let cueGain:Float = [.step,.waterStep,.stoneStep].contains(cue) ? 0.14 : 1
+        node.stop(); node.volume=Float(DreamSoundscape.level(settings.effectsLevel))*cueGain
         node.scheduleBuffer(buffer); node.play()
     }
     func feedback(_ event:GameEvent,settings:Settings,tick:UInt64?=nil) {

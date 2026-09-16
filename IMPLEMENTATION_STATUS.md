@@ -5,6 +5,11 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Quieter running — September 16, 2026
+
+- Lowered ordinary, watery and stair running footfalls to 0.14 of their previous amplitude (approximately −17 dB). Original contact transients and surface timbres remain; jump/landing and other interaction levels are unchanged.
+- Debug simulator build succeeded; `git diff --check` passed. Build log: `evidence/footfall-build.log`. No new tests for this gain-only adjustment; subjective headphone audibility remains to be assessed by the owner. No physical device testing.
+
 ## Adaptive dream soundtrack and theta — September 16, 2026
 
 - Replaced the single runtime-generated ambient tone with six crossfading environment beds, a seed-selected three-note motif, a restrained pulse, and original movement/interaction sounds. Accepted jumps/slides/landings and distance-based footfalls use simulation state; pickups form a rate-limited phrase. Mirrors, safe drops, crowded hazards, void, Lucky Dream and three-hour stripping/rebuilding alter the mix. No gameplay RNG, rewards or timing changed.
