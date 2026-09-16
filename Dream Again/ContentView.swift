@@ -53,10 +53,10 @@ struct ContentView:View {
         .fileImporter(isPresented:$showImport,allowedContentTypes:[.json,.data],allowsMultipleSelection:false){result in do { if let url=try result.get().first {game.importURL(url)} } catch {game.error=error.localizedDescription}}
         .onOpenURL{game.importURL($0)}
         .onChange(of:game.screen){_,screen in if screen == "wardrobe" {game.renderer?.previewAvatar(equipped:game.profile.equipped,wardrobe:true)} else if screen == "home" {game.renderer?.render(game.run,equipped:game.profile.equipped)} }
-        .onChange(of:scenePhase){_,phase in if phase != .active {game.pause()} }
+        .onChange(of:scenePhase){_,phase in if phase != .active {game.audio.stop();game.pause()} }
     }
     func button(_ title:String,_ action:@escaping ()->Void)->some View {
-        Button(action:action) {
+        Button(action:{game.audio.menuFeedback(settings:game.settings);action()}) {
             Text(title).font(.system(size:17,weight:.medium,design:.rounded))
                 .frame(maxWidth:.infinity).padding(.vertical,14)
                 .background(.white.opacity(0.08),in:RoundedRectangle(cornerRadius:22))
@@ -233,7 +233,17 @@ struct ContentView:View {
         menu("settings") {
             VStack(alignment:.leading){Text("Tilt sensitivity");Slider(value:$game.settings.sensitivity,in:0.5...1.5);Text("Dead zone · \(game.settings.deadzone,specifier:"%.1f")°");Slider(value:$game.settings.deadzone,in:0.5...4)}
             Toggle("Reduced motion",isOn:$game.settings.reducedMotion);Toggle("Reduced flashes",isOn:$game.settings.reducedFlashes)
-            Toggle("Music",isOn:$game.settings.music);Toggle("Effects",isOn:$game.settings.effects);Toggle("Haptics",isOn:$game.settings.haptics);Toggle("Lower visual detail",isOn:$game.settings.lowPower)
+            Toggle("Music",isOn:$game.settings.music)
+            Slider(value:$game.settings.musicLevel,in:0...1){Text("Music level")}.accessibilityIdentifier("music level")
+            Toggle("Effects",isOn:$game.settings.effects)
+            Slider(value:$game.settings.effectsLevel,in:0...1){Text("Effects level")}.accessibilityIdentifier("effects level")
+            Toggle("Theta · stereo headphones",isOn:$game.settings.thetaEnabled).accessibilityIdentifier("theta audio")
+            Text("An optional gentle 6 Hz binaural texture. Enable only while using stereo headphones, including Bluetooth headphones. It pauses on phone speakers or with Mono Audio. It is not proven to induce dreams or hypnosis.").font(.footnote).foregroundStyle(.secondary)
+            if game.settings.thetaEnabled {
+                Text("Theta level").font(.caption)
+                Slider(value:$game.settings.thetaLevel,in:0...1){Text("Theta level")}.accessibilityIdentifier("theta level")
+            }
+            Toggle("Haptics",isOn:$game.settings.haptics);Toggle("Lower visual detail",isOn:$game.settings.lowPower)
             button("save settings"){game.saveSettings();game.notice="Settings saved."}
             button("replay introduction"){game.start(mode:.tutorial)}
             Text("Pause and recalibrate at any time. Sound respects silent mode. Wallet and dreams are stored on this device; consumable balance is not automatically restored across reinstalls.").font(.footnote).foregroundStyle(.secondary)

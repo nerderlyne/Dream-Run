@@ -129,10 +129,16 @@ import UIKit
         displayTarget.owner=self
         link=CADisplayLink(target:displayTarget,selector:#selector(DreamDisplayTarget.tick(_:))); link?.add(to:.main,forMode:.common)
         NotificationCenter.default.addObserver(self,selector:#selector(interrupted(_:)),name:AVAudioSession.interruptionNotification,object:nil)
+        NotificationCenter.default.addObserver(self,selector:#selector(audioRouteChanged(_:)),name:AVAudioSession.routeChangeNotification,object:nil)
     }
     @objc func interrupted(_ notification:Notification) {
         guard let type=notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt, type == AVAudioSession.InterruptionType.began.rawValue else {return}
-        pause()
+        audio.stop(); pause()
+    }
+    @objc func audioRouteChanged(_ notification:Notification) {
+        guard let reason=notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              reason == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue else { return }
+        audio.stop(); pause()
     }
     func refresh() { if let store { profile=store.profile } }
     func transact(_ action:(inout Profile)throws->Void) {
@@ -308,6 +314,7 @@ import UIKit
         if [.waking,.luckyTransition,.whiteEnding,.resuming].contains(run.phase) {
             let events=simulation.presentationStep(delta)
             renderer?.render(run,equipped:profile.equipped,lowPower:settings.lowPower)
+            audio.update(run:run,settings:settings,delta:delta)
             if events.contains(.ending) { finish(); screen="results" }
             return
         }
@@ -317,11 +324,15 @@ import UIKit
             else {input.steering=0;notice="Tilt input was interrupted. Hold your device comfortably and tap ready to recalibrate.";pause();return}
         }
         for _ in 0..<steps {
+            let before=run
             let events=simulation.step(input); input.jump=false; input.slide=false
+            audio.movement(before:before,after:run,settings:settings)
             if events.contains(.thunder) {audio.feedback(.thunder,settings:settings)}
             if events.contains(.stumble) { audio.feedback(.stumble,settings:settings) }
             else if events.contains(.clover) { audio.feedback(.clover,settings:settings) }
-            else if events.contains(.balloon) { audio.feedback(.balloon,settings:settings) }
+            else if events.contains(.balloon) { audio.feedback(.balloon,settings:settings,tick:run.activeTicks) }
+            if events.contains(.mirror) { audio.feedback(.mirror,settings:settings) }
+            if events.contains(.drop) { audio.feedback(.drop,settings:settings) }
             if events.contains(.waking) { finish() }
             if run.mode.earns && (events.contains(.pigCommitted) || events.contains(.clover) || run.activeTicks%900 == 0) {
                 let snapshot=run
@@ -330,7 +341,7 @@ import UIKit
             if [.waking,.luckyTransition].contains(run.phase) { break }
         }
         renderer?.render(run,equipped:profile.equipped,lowPower:settings.lowPower || ProcessInfo.processInfo.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue)
-        audio.update(active:true,palette:run.paletteIndex,settings:settings)
+        audio.update(run:run,settings:settings,delta:delta)
     }
     #if DEBUG
     func labScale(_ event:DreamScaleEvent,framing:DreamScaleFraming?=nil) {

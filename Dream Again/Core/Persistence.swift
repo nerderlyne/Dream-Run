@@ -29,6 +29,24 @@ public struct Settings: Codable, Sendable {
     public var effects = true
     public var haptics = true
     public var lowPower = false
+    /// Nil means the player has not customized sound; theta always requires opting in.
+    public var dreamAudio: DreamAudioPreferences?
+    public var musicLevel: Double {
+        get { dreamAudio?.musicLevel ?? 0.75 }
+        set { var value=dreamAudio ?? .init(); value.musicLevel=newValue; dreamAudio=value }
+    }
+    public var effectsLevel: Double {
+        get { dreamAudio?.effectsLevel ?? 0.7 }
+        set { var value=dreamAudio ?? .init(); value.effectsLevel=newValue; dreamAudio=value }
+    }
+    public var thetaEnabled: Bool {
+        get { dreamAudio?.thetaEnabled ?? false }
+        set { var value=dreamAudio ?? .init(); value.thetaEnabled=newValue; dreamAudio=value }
+    }
+    public var thetaLevel: Double {
+        get { dreamAudio?.thetaLevel ?? 0.35 }
+        set { var value=dreamAudio ?? .init(); value.thetaLevel=newValue; dreamAudio=value }
+    }
     public init() {}
 }
 public struct Profile: Codable, Sendable {

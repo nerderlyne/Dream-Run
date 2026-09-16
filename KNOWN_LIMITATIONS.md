@@ -1,5 +1,9 @@
 # Known limitations
 
+## Adaptive audio and theta — September 16, 2026
+
+The procedural score is implemented, but perceived musical quality, headphone comfort, safe listening level at a particular system-volume setting, Bluetooth latency and physical-device routing remain untested. No claim of hypnosis, sleep induction or neurological benefit is made. Theta is off by default and requires an eligible stereo headphone/Bluetooth route with Mono Audio off. Bluetooth A2DP can also represent a speaker; the player must honor the stereo-headphone instruction. The score follows gameplay palettes rather than identifying individual photograph contents. Bundled loops repeat in combinations; this is not an unlimited generated composition. Normal pause restarts loop playback on resume while preserving gameplay state. No physical iPhone was used. Details and reproduction: `docs/DREAM_AUDIO.md`.
+
 ## Track translucency and timed realities — September 15, 2026
 
 Transparency uses non-overlapping base/pattern meshes with opaque rims and stair faces. The water and space simulator captures demonstrate plate bleed-through, but every photo/hazard combination and sustained transparency frame pacing remain unverified. Timed photo changes use active seconds; an unavailable texture can delay a transition while the existing reality stays visible. Scenic props retain independent staggered replacement. Physical iPhone testing is prohibited by the owner; use the simulator for further verification.
