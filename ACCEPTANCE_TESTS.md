@@ -28,7 +28,7 @@ Record **PASS / FAIL / NOT RUN**, test name, command/device and relevant output 
 
 **B07 — Straw damage.** Each distinct sports ball after contact immunity removes one arm, the other arm, then a leg, then the last leg. The first three stumble/slow; the fourth produces a rising straw burst and wakes. Same-ball overlap is deduplicated. Edge knockback and fatal semantic hazards retain their existing rules.
 
-**B08 — Straw repair.** A tied hay bale on certified safe support restores one missing limb without currency, never consumes at full health, and cannot be recollected. Damage persists through pause/suspend. Continue restores the avatar. DEBUG damage/repair/burst previews cannot earn rewards. Break and repair effects respect the Effects setting.
+**B08 — Straw repair.** A rolling hay ball always grants +1 hay with sound and visible feedback, including at full health, and cannot be recollected. It restores one missing limb or accumulates reserve straw. Banked straw repairs after a one-second delay. Motion, collision and saved roll-start ticks agree; no balloon currency is awarded. Damage persists through pause/suspend. Continue restores the avatar. DEBUG damage/repair/burst previews cannot earn rewards. Break and repair effects respect the Effects setting.
 
 **B09 — Fatal semantic hazards.** A cute on-track rabbit and a blue nazar both wake on actual contact, including during soft-hit immunity. An off-track animal does not collide. No anatomical eye asset appears.
 

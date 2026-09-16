@@ -595,7 +595,7 @@ extension Dream_AgainTests {
         r.render(game.run,equipped:[:]);game.simulation.state.endingElapsed=0.6;r.render(game.run,equipped:[:])
         XCTAssertEqual(r.runner.components[OpacityComponent.self]?.opacity,0)
         XCTAssertNotNil(r.world.children.first{$0.name == "straw-fragments"})
-        let bale=r.strawBale();XCTAssertEqual(bale.name,"straw-repair-bale");XCTAssertGreaterThan(bale.visualBounds(relativeTo:bale).extents.x,0.5)
+        let bale=r.strawBall();XCTAssertEqual(bale.name,"rolling-hay-ball");XCTAssertGreaterThan(bale.visualBounds(relativeTo:bale).extents.x,0.5)
         XCTAssertNotNil(game.audio.buffers["strawBreak"]);XCTAssertNotNil(game.audio.buffers["strawRepair"])
         XCTAssertFalse(game.run.mode.earns)
     }

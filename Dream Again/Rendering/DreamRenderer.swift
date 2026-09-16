@@ -27,6 +27,7 @@ import simd
     var renderEntities = 0
     let balloonPops=BalloonPopEffects()
     let strawBursts=StrawBurstEffects()
+    var lastHayCount=0
     var lastStrawState:[StrawLimb]=[]
     var frozenFrame: UIImage?
     var originalMaterials: [ObjectIdentifier:[PhysicallyBasedMaterial]] = [:]
@@ -79,7 +80,7 @@ import simd
         let targetPalette=artPalette ?? (cinematic ? (Int(paletteRNG.below(7))+Int(run.distance / 432)+run.mirrorCount*2)%7 : run.paletteIndex)
         if lastRun != run.id {
             distantPath.reset();art.reset();art.invalidateEnvironment()
-            strawBursts.reset();lastStrawState=run.player.missingLimbs;balloonPops.reset();world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); terrainKeys.removeAll();trackAlphas.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
+            strawBursts.reset();lastHayCount=run.hayCollected;lastStrawState=run.player.missingLimbs;balloonPops.reset();world.children.removeAll(); gallery=nil; originalMaterials.removeAll(); chunks.removeAll(); terrainKeys.removeAll();trackAlphas.removeAll(); hazards.removeAll(); pickups.removeAll(); base=newBase; palette=targetPalette; lastRun=run.id; lastVisual=run.visual
             evolution.reset(palette:palette,definition:surfacePalettes[palette])
             art.environment(view:view)
         } else if newBase != base {
@@ -193,17 +194,18 @@ import simd
         for p in available {
             let e:Entity
             if let existing=pickups[p.id] {e=existing} else {
-                e=p.kind == .straw ? strawBale():factory.build(.balloon,palette:palette,style:1,lod:0);world.addChild(e);pickups[p.id]=e
+                e=p.kind == .straw ? strawBall():factory.build(.balloon,palette:palette,style:1,lod:0);world.addChild(e);pickups[p.id]=e
                 if p.kind == .balloon {
                     coordinatePalette(e,definition:surfacePalettes[palette],balloon:true)
                     evolution.register(e,palette:palette,palettes:surfacePalettes,art:art,allSurfaces:true)
                 }
             }
             let motion=p.balloonPosition(at:run.activeTicks)
-            let center=local(generator.sample(p.distance),origin:origin,lateral:motion.lateral)+[0,Float(motion.height+run.floorHeight(at:p.distance)),0]
+            let pickupDistance=p.routeDistance(at:run.activeTicks)
+            let center=local(generator.sample(pickupDistance),origin:origin,lateral:motion.lateral)+[0,Float(motion.height+run.floorHeight(at:pickupDistance)),0]
             // Rotate around the balloon body, so its collision center stays on the shared trajectory.
-            let rotation=simd_quatf(angle:Float(motion.roll),axis:[0,0,1])
-            e.orientation=rotation;e.position=center-rotation.act([0,0.65,0])
+            let rotation=simd_quatf(angle:Float(motion.roll),axis:p.kind == .straw ? [1,0,0]:[0,0,1])
+            e.orientation=rotation;e.position=p.kind == .straw ? center:center-rotation.act([0,0.65,0])
         }
         balloonPops.update(tick:run.activeTicks)
         let position=local(generator.sample(visualDistance),origin:origin,lateral:run.player.lateral)

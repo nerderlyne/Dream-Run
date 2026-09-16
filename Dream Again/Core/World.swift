@@ -46,6 +46,7 @@ public enum PickupKind:String,Codable,Sendable {case balloon,straw}
 public struct PickupDescription: Codable, Equatable, Identifiable, Sendable {
     public var id: String; public var distance: Double; public var lateral: Double; public var height: Double = 0.9
     public var kind:PickupKind = .balloon
+    public var rollStart:UInt64?
 }
 public struct SceneryPlacement: Codable, Equatable, Sendable {
     public var asset: AssetID; public var distance: Double; public var lateral: Double; public var scale: Double

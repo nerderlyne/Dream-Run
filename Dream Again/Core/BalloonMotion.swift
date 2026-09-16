@@ -1,10 +1,14 @@
 import Foundation
 
 public extension PickupDescription {
+    func routeDistance(at tick:UInt64)->Double {
+        guard kind == .straw,let start=rollStart,tick>=start else {return distance}
+        return distance-8*Double(tick-start)/60
+    }
     /// Cosmetic motion and collision share this active-time trajectory. No extra RNG draws.
     var floatsHigh:Bool {distance>100 && !id.hasPrefix("drop-balloon:") && SplitMix64.fnv(id)%4==0}
     func balloonPosition(at tick:UInt64)->(lateral:Double,height:Double,roll:Double) {
-        if kind == .straw {return (lateral,height,0)}
+        if kind == .straw {return (lateral,0.5,(distance-routeDistance(at:tick))/0.48)}
         let phase=Double(SplitMix64.fnv(id)%1024)/1024*2*Double.pi
         let t=Double(tick)/60
         let bob=sin(t*1.8+phase)

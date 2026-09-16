@@ -5,6 +5,13 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Rolling hay and stored straw — September 17, 2026
+
+- Replaced the static repair bale with a tangled straw ball rolling toward the runner at 8 m/s, activated within 72 metres. Rendering, spin and swept pickup collision share its saved active-time trajectory.
+- Fixed full-body contact doing nothing: every ball now gives +1 hay, a visible popup, straw particles and pickup sound. Missing limbs consume that hay immediately; intact runners bank it in a visible reserve. Stored hay rebuilds a limb one second after damage. Reserve, pickup activation and consumed IDs suspend with the run; balloons remain the only currency.
+- Verification: 5 focused Swift core tests passed (0.181 seconds), including incoming trajectory, full-body collection, reserve rebuilding and existing damage/repair rules. One native simulator renderer test passed (2.423 seconds); specification validator passed 54 checks. The final curved-strand art refinement received a successful simulator build and refreshed, visually inspected capture after that native test. Logs: `evidence/hay-core.log`, `hay-native.log`, `hay-spec.log`, `hay-build.log`; preview: `evidence/straw-3.png`.
+- Simulator only. No full-suite rerun, physical-device testing or sustained performance/balance measurement in this pass.
+
 ## Quieter running — September 16, 2026
 
 - Lowered ordinary, watery and stair running footfalls to 0.14 of their previous amplitude (approximately −17 dB). Original contact transients and surface timbres remain; jump/landing and other interaction levels are unchanged.
@@ -21,7 +28,7 @@ Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after contin
 ## Straw body damage and hay repair — September 16, 2026
 
 - Distinct sports-ball hits after contact immunity remove arms first, then legs, using impact side for the available limb. Three losses retain stumble/slow/knockback; the fourth unrepaired loss triggers a 2.4-second rising straw-burst wake-up. The previous second-hit death rule was replaced in the specification and acceptance criteria. Edge falls and fatal semantic hazards remain lethal; collision and input dimensions do not change with missing limbs.
-- Seeded tied hay bales restore one limb and never award currency. They use reclaimed humanoid straw outside the 42 world-scenery families, appear only on hazard-free support without gaps/steps/drops, and are not consumed at full health. Live suspension serializes missing limbs and consumed pickup IDs. Continue rebuilds the avatar. No old-development-snapshot migration was added.
+- Initially, seeded tied hay bales restored one limb without currency (superseded by rolling, bankable hay above). They use reclaimed humanoid straw outside the 42 world-scenery families, appear only on hazard-free support without gaps/steps/drops, and originally were not consumed at full health; that behavior is fixed above. Live suspension serializes missing limbs and consumed pickup IDs. Continue rebuilds the avatar. No old-development-snapshot migration was added.
 - Bounded reed bursts accompany damage/repair; the runner fades into a larger upward burst on the fourth hit. Added two original, reproducibly synthesized sound effects and DEBUG Lab damage/burst previews. Documentation and generation/capture commands: `docs/STRAW_DAMAGE.md`.
 - Initial 72-test core run: 71 passed, one obsolete second-hit-death assertion failed. Updated that assertion; final focused run passed all 5 tests in 0.158 seconds, including four-hit progression, repair/no currency/dedup, suspend, continue, immunity, safe seeded placement and tutorial placement. Native simulator test passed in 3.354 seconds, verifying limb visibility/restoration, burst, bale geometry and bundled audio. Specification validation passed 54 checks. Final tutorial-placement, immediate damage/repair checkpoint, preview framing and delayed wake-overlay adjustments received a simulator rebuild; the native renderer test was not repeated after those changes.
 - Visually inspected final simulator previews of the one-legged avatar with its repair bale and the unobscured full straw burst: `evidence/straw-gallery.html`.

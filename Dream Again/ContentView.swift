@@ -117,6 +117,10 @@ struct ContentView:View {
                     Button {game.pause()} label:{Image(systemName:"pause").frame(width:44,height:44)}.accessibilityLabel("pause").accessibilityIdentifier("pause")
                 }.font(.system(size:14,weight:.medium)).padding(.leading,24).padding(.trailing,12).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.65) : .white).shadow(color:.black.opacity(0.5),radius:5,y:1)
                 if !game.run.player.missingLimbs.isEmpty && game.run.phase != .waking && game.run.phase != .finished {Text("Straw \(4-game.run.player.missingLimbs.count)/4 · Find hay").font(.caption).accessibilityLabel("\(game.run.player.missingLimbs.count) limbs missing. Collect hay to rebuild.")}
+                if game.run.straw>0 {Text("Hay \(game.run.straw)").font(.caption).foregroundStyle(.white)}
+                if let tick=game.run.lastHayTick,game.run.activeTicks>=tick,game.run.activeTicks-tick<75 {
+                    Text("+1 hay").font(.headline).foregroundStyle(.yellow).padding(8).background(.black.opacity(0.45),in:Capsule()).allowsHitTesting(false)
+                }
                 if game.run.mode != .fresh {Text(game.run.mode == .debug ? "PREVIEW · NO REWARDS" : game.run.mode.rawValue.uppercased()).font(.system(size:9,weight:.medium)).tracking(2).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.5) : .white.opacity(0.7)).allowsHitTesting(false)}
                 if game.run.stumbleWeight > 0 && game.run.phase == .running {
                     Text("stumbled").font(.callout.weight(.semibold)).padding(.horizontal,14).padding(.vertical,8).background(.black.opacity(0.5),in:Capsule()).allowsHitTesting(false)

@@ -1,5 +1,9 @@
 # Known limitations
 
+## Rolling hay reserve — September 17, 2026
+
+Hay rolls along the certified route rather than using rigid-body physics. The golden tangled sphere is procedural straw geometry. Reserve straw automatically repairs one limb per second after damage; frequency and reserve balance still need subjective play evaluation. No physical-device testing is authorized.
+
 ## Straw damage and repair — September 16, 2026
 
 The one-leg state uses the existing running articulation with a small hop; missing limbs do not change physics or jump/slide clearance. Straw bursts are bounded procedural reeds, not simulated fibre breakage. Hay frequency and the two synthesized sound effects have not received subjective play/listening evaluation. Old unreleased snapshots are not migrated. Verification uses the simulator only.

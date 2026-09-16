@@ -31,18 +31,24 @@ import simd
 }
 
 extension DreamRenderer {
-    func strawBale()->Entity {
-        let root=Entity();root.name="straw-repair-bale"
-        var hay=Geometry(),fibres=Geometry(),twine=Geometry()
-        hay.box([0,0.65,0],[0.55,0.42,0.4])
-        for i in 0..<22 {
-            let x=Float(i)/21*0.52-0.26
-            fibres.tube([[x,0.44,0.207],[x+0.008*sin(Float(i)),0.66,0.215],[x,0.86,0.207]],radius:0.006,segments:4)
+    func strawBall()->Entity {
+        let root=Entity();root.name="rolling-hay-ball"
+        var core=Geometry(),fibres=Geometry()
+        core.ellipsoid(.zero,[0.44,0.44,0.44],segments:20,rings:14)
+        for i in 0..<150 {
+            let y=1-2*(Float(i)+0.5)/150,a=Float(i)*2.39996
+            let n=SIMD3<Float>(sqrt(1-y*y)*cos(a),y,sqrt(1-y*y)*sin(a))
+            let u=simd_normalize(simd_cross(n,abs(y)>0.9 ? SIMD3<Float>(1,0,0):[0,1,0]))
+            let v=simd_cross(n,u),twist=Float(i)*1.731
+            let tangent=u*cos(twist)+v*sin(twist)
+            let points=(0...9).map {j -> SIMD3<Float> in
+                let angle=(Float(j)/9-0.5)*1.8
+                let radius:Float=0.459+0.015*sin(Float(j)*1.2+Float(i))
+                return (n*cos(angle)+tangent*sin(angle))*radius
+            }
+            fibres.tube(points,radius:0.008,segments:4)
         }
-        for x:Float in [-0.16,0.16] {
-            twine.tube([[x,0.43,-0.21],[x,0.87,-0.21],[x,0.87,0.22],[x,0.43,0.22],[x,0.43,-0.21]],radius:0.018,segments:5)
-        }
-        for (g,color) in [(hay,"#B89554"),(fibres,"#E8D099"),(twine,"#685238")] {
+        for (g,color) in [(core,"#947342"),(fibres,"#E8D099")] {
             if let mesh=try? g.resource() {root.addChild(ModelEntity(mesh:mesh,materials:[factory.material(UIColor(hex:color),style:10)]))}
         }
         return root
@@ -53,6 +59,10 @@ extension DreamRenderer {
             let repair=missing.count<lastStrawState.count
             strawBursts.spawn(at:runner.position+[0,1.1,0],world:world,time:time,repair:repair,large:missing.count == 4)
             lastStrawState=missing
+        }
+        if run.hayCollected != lastHayCount {
+            strawBursts.spawn(at:runner.position+[0,1.1,0],world:world,time:time,repair:true)
+            lastHayCount=run.hayCollected
         }
         for i in 0..<2 {
             arms[i].isEnabled = !missing.contains(i == 0 ? .leftArm:.rightArm)

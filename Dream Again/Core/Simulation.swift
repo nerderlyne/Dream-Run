@@ -39,6 +39,10 @@ public struct RunState: Codable, Sendable {
     public var distance = 0.0
     public var player = PlayerState()
     public var continueCount = 0
+    public var straw = 0
+    public var hayCollected = 0
+    public var lastHayTick:UInt64?
+    public var nextStrawRepairTick:UInt64 = 0
     public var balloons = 0
     public var pigs: [CollectedPig] = []
     public var pendingPig: PigDecision?
@@ -90,7 +94,7 @@ public struct GameSimulation: Sendable {
     init(certification:RunState,slope:Double) {state=certification;certificationSlope=slope}
     public init(identity: DreamIdentity, mode: RunMode = .fresh, rules: RunRules? = nil) { state = RunState(identity: identity, mode: mode); if let rules {state.rules=rules}; streamChunks() }
     public init(snapshot: RunState) throws {
-        guard snapshot.schema == 1, Set(snapshot.player.missingLimbs).count == snapshot.player.missingLimbs.count, snapshot.player.missingLimbs.count <= 4, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-RunRules.pigIntervalTicks, snapshot.player.lateral.isFinite, abs(snapshot.player.lateral) <= 2.5, snapshot.player.knockbackVelocity.isFinite, abs(snapshot.player.knockbackVelocity)<=8, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
+        guard snapshot.schema == 1, snapshot.straw >= 0, snapshot.straw <= snapshot.hayCollected, Set(snapshot.player.missingLimbs).count == snapshot.player.missingLimbs.count, snapshot.player.missingLimbs.count <= 4, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-RunRules.pigIntervalTicks, snapshot.player.lateral.isFinite, abs(snapshot.player.lateral) <= 2.5, snapshot.player.knockbackVelocity.isFinite, abs(snapshot.player.knockbackVelocity)<=8, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
         state = snapshot
     }
     public mutating func resume() { if state.phase == .paused || state.phase == .ready { state.phase = state.resumePhase } }
@@ -222,6 +226,14 @@ public struct GameSimulation: Sendable {
             }
         }
         if state.hazards.contains(where:{$0.encounter == .lightning && $0.strikeTick == state.activeTicks}) {events.append(.thunder)}
+        for i in state.chunks.indices {
+            for j in state.chunks[i].pickups.indices where state.chunks[i].pickups[j].kind == .straw && state.chunks[i].pickups[j].rollStart == nil {
+                if state.chunks[i].pickups[j].distance-state.distance <= 72 {state.chunks[i].pickups[j].rollStart=state.activeTicks}
+            }
+        }
+        if state.straw>0 && !state.player.missingLimbs.isEmpty && state.activeTicks>=state.nextStrawRepairTick {
+            state.straw -= 1;state.player.missingLimbs.removeLast();state.nextStrawRepairTick=state.activeTicks+60;events.append(.strawRepair)
+        }
         // Swept route-space slab intersection; sorted impact times implement tie precedence.
         struct Contact { var t: Double; var priority: Int; var hazard: Int?; var pickup: PickupDescription? }
         var contacts: [Contact] = []
@@ -244,8 +256,8 @@ public struct GameSimulation: Sendable {
         }
         for p in state.chunks.flatMap(\.pickups) where !state.collectedIDs.contains(p.id) {
             let before=p.balloonPosition(at:state.activeTicks-1),after=p.balloonPosition(at:state.activeTicks)
-            guard let s=interval(oldDistance,state.distance,p.distance-0.55,p.distance+0.55),
-                  let x=interval(oldLateral-before.lateral,state.player.lateral-after.lateral,-0.58,0.58),
+            guard let s=interval(oldDistance-p.routeDistance(at:state.activeTicks-1),state.distance-p.routeDistance(at:state.activeTicks),p.kind == .straw ? -0.76:-0.55,p.kind == .straw ? 0.76:0.55),
+                  let x=interval(oldLateral-before.lateral,state.player.lateral-after.lateral,p.kind == .straw ? -0.76:-0.58,p.kind == .straw ? 0.76:0.58),
                   let y=interval(oldHeight-before.height,state.player.height-after.height,-state.player.bodyHeight-0.32,0.36),
                   max(s.0,x.0,y.0) <= min(s.1,x.1,y.1) else {continue}
             contacts.append(Contact(t:max(s.0,x.0,y.0),priority:4,pickup:p))
@@ -254,8 +266,9 @@ public struct GameSimulation: Sendable {
         for c in contacts {
             if let p=c.pickup {
                 if p.kind == .straw {
-                    guard !state.player.missingLimbs.isEmpty else {continue}
-                    state.player.missingLimbs.removeLast();state.collectedIDs.insert(p.id);events.append(.strawRepair)
+                    state.straw += 1;state.hayCollected += 1;state.lastHayTick=state.activeTicks
+                    if !state.player.missingLimbs.isEmpty {state.straw -= 1;state.player.missingLimbs.removeLast()}
+                    state.collectedIDs.insert(p.id);events.append(.strawRepair)
                 } else {state.collectedIDs.insert(p.id);state.balloons += 1;events.append(.balloon)}
                 continue
             }
@@ -269,7 +282,7 @@ public struct GameSimulation: Sendable {
                 if [.soccer,.eightBall,.softball,.americanFootball].contains(h.asset) {
                     let left=state.player.lateral <= h.lateral(at:state.activeTicks)
                     let order:[StrawLimb]=left ? [.leftArm,.rightArm,.leftLeg,.rightLeg]:[.rightArm,.leftArm,.rightLeg,.leftLeg]
-                    if let limb=order.first(where:{!state.player.missingLimbs.contains($0)}) {state.player.missingLimbs.append(limb);events.append(.strawBreak)}
+                    if let limb=order.first(where:{!state.player.missingLimbs.contains($0)}) {state.player.missingLimbs.append(limb);events.append(.strawBreak);state.nextStrawRepairTick=state.activeTicks+60}
                     if state.player.missingLimbs.count == 4 {wake("unravelled");events.append(.waking);break}
                 }
                 state.lastSoftTick=state.activeTicks; state.instabilityUntil=state.activeTicks+300; state.softImmunityUntil=state.activeTicks+48

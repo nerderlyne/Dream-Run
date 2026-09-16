@@ -1,0 +1,30 @@
+Building for production...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/4] Compiling DreamCoreTests AtmosphereTests.swift
+[3/5] Write Objects.LinkFileList
+[4/5] Linking DreamCorePackageTests
+Build complete! (20.78s)
+Test Suite 'Selected tests' started at 2026-09-17 00:55:05.878.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-17 00:55:05.888.
+Test Suite 'StrawDamageTests' started at 2026-09-17 00:55:05.888.
+Test Case '-[DreamCoreTests.StrawDamageTests testBalesUseSafeSupportAndDedicatedDeterministicStream]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testBalesUseSafeSupportAndDedicatedDeterministicStream]' passed (0.007 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testFourBallHitsLoseArmsThenLegsAndWake]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testFourBallHitsLoseArmsThenLegsAndWake]' passed (0.164 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testHayRepairsOneLimbWithoutCurrencyAndCannotReplay]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testHayRepairsOneLimbWithoutCurrencyAndCannotReplay]' passed (0.008 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testRollingHayTrajectoryAndBankedRebuild]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testRollingHayTrajectoryAndBankedRebuild]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testSingleBallImmunityAndFullBodyBanksHay]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testSingleBallImmunityAndFullBodyBanksHay]' passed (0.001 seconds).
+Test Suite 'StrawDamageTests' passed at 2026-09-17 00:55:06.069.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.181 (0.182) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-17 00:55:06.069.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.181 (0.182) seconds
+Test Suite 'Selected tests' passed at 2026-09-17 00:55:06.070.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.181 (0.192) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
