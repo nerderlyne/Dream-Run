@@ -3,6 +3,22 @@ import UIKit
 import simd
 
 extension DreamRenderer {
+    /// Keep material finish and geometry, but share the traversal palette and its gradual evolution.
+    func coordinatePalette(_ root:Entity,definition p:PaletteDefinition,balloon:Bool=false) {
+        var ordinal=0
+        func visit(_ e:Entity) {
+            if let model=e as? ModelEntity,let materials=model.model?.materials as? [PhysicallyBasedMaterial] {
+                model.model?.materials=materials.map { original in
+                    var m=original
+                    let roles=balloon ? [p.accent_a,p.track_light]:[p.track_dark,p.track_light,p.accent_b,p.track_dark]
+                    m.baseColor.tint=UIColor(hex:roles[ordinal % roles.count]);ordinal += 1
+                    return m
+                }
+            }
+            for child in e.children {visit(child)}
+        }
+        visit(root)
+    }
     /// Interactive art is authored to the same dimensions as its route-space collision contract.
     func obstacleModel(_ h:HazardDescription)->Entity? {
         guard h.encounter == .lightning || h.encounter == .swing || h.encounter == .step || h.requiresJump || h.asset == .window && h.encounter == .slide else{return nil}
@@ -31,16 +47,26 @@ extension DreamRenderer {
                 rain.tube([[x,y,z],[x-0.08,y-0.5,z]],radius:0.006,segments:3)
             }
             add(rain,"#8A9AAE","storm-rain",true)
-            for n in 0..<6 {
-                var shade=Geometry()
-                let inner=Float(n)*0.5,outer=inner+0.5
-                for i in 0..<40 {
-                    let a=Float(i)/40*2*Float.pi,b=Float(i+1)/40*2*Float.pi
-                    shade.quad([cos(a)*inner,0.025,sin(a)*inner],[cos(b)*inner,0.025,sin(b)*inner],[cos(b)*outer,0.025,sin(b)*outer],[cos(a)*outer,0.025,sin(a)*outer])
+            // Opaque, irregular char rather than translucent concentric target rings.
+            var char=Geometry(),embers=Geometry(),charge=Geometry()
+            for i in 0..<32 {
+                func point(_ n:Int)->SIMD3<Float> {
+                    let a=Float(n%32)/32*2*Float.pi,r:Float=1.05+0.22*sin(Float(n%32)*7.3)
+                    return [max(-1.88-Float(h.lateral),min(1.88-Float(h.lateral),cos(a)*r)),0.035,sin(a)*r*1.4]
                 }
-                add(shade,"#0D1422","storm-shade-\(n)",true)
-                root.findEntity(named:"storm-shade-\(n)")?.components.set(OpacityComponent(opacity:0.32-Float(n)*0.047))
+                char.triangle([0,0.035,0],point(i+1),point(i))
             }
+            add(char,"#201D25","storm-char",style:0)
+            for i in 0..<7 {
+                let x=Float(i-3)*0.16
+                embers.tube([[x,0.047,-0.65],[x+0.16,0.047,-0.2],[x-0.08,0.047,0.25]],radius:0.012,segments:3)
+            }
+            add(embers,"#A96149","storm-embers",true)
+            for i in 0..<5 {
+                let x=Float(i-2)*1.2,y:Float=6+Float(i%2)*0.5
+                charge.tube([[x-0.6,y,0.15],[x-0.2,y+0.3,0.16],[x+0.1,y-0.1,0.15],[x+0.6,y+0.2,0.16]],radius:0.025,segments:4)
+            }
+            add(charge,"#B9CBFF","storm-charge",true)
             let flash=PointLight();flash.name="storm-flash";flash.position=[0,3,0];flash.light.color=UIColor(hex:"#CADFFF");flash.light.attenuationRadius=12;flash.light.intensity=0;root.addChild(flash)
         } else if h.encounter == .swing {
             var head=Geometry(),spikes=Geometry(),chain=Geometry(),collar=Geometry()
@@ -107,9 +133,25 @@ extension DreamRenderer {
             let visible=h.strikeTick == UInt64.max || run.activeTicks<h.strikeTick+24
             e.findEntity(named:"strike-warning")?.isEnabled=visible
             e.findEntity(named:"strike-warning")?.components.set(OpacityComponent(opacity:0.28+0.12*Float(sin(run.seconds*4))))
-            if let cloud=e.findEntity(named:"storm-cloud") {cloud.orientation=camera.orientation(relativeTo:e)}
-            if let rain=e.findEntity(named:"storm-rain") {rain.position.y = -Float(run.seconds.truncatingRemainder(dividingBy:0.7))*1.4;rain.components.set(OpacityComponent(opacity:0.23))}
-            (e.findEntity(named:"storm-flash") as? PointLight)?.light.intensity=h.striking(at:run.activeTicks) ? 14000:0
+            let t=Float(run.seconds),buzz=pow(max(0,sin(t*17+Float(h.distance.truncatingRemainder(dividingBy:17)))),12)
+            let approach=Float(max(0,min(1,(40-(h.distance-run.distance))/30)))
+            if let cloud=e.findEntity(named:"storm-cloud") {
+                cloud.orientation=camera.orientation(relativeTo:e)*simd_quatf(angle:0.025*sin(t*1.7),axis:[0,0,1])
+                cloud.scale=[12*(1+0.045*sin(t*2.1)),8*(1+0.035*cos(t*2.7)),1]
+                cloud.position=[0.16*sin(t*1.9),7.3+0.12*sin(t*2.3),0]
+                if let scud=cloud.findEntity(named:"storm-scud") {
+                    scud.position=[0.055*sin(t*0.9),-0.05+0.02*cos(t*1.4),0.025]
+                    scud.scale=[1.04+0.04*cos(t*1.1),0.8+0.06*sin(t*1.3),1]
+                    scud.components.set(OpacityComponent(opacity:0.16+0.1*buzz))
+                }
+            }
+            if let charge=e.findEntity(named:"storm-charge") {
+                charge.components.set(OpacityComponent(opacity:buzz*(0.35+0.65*approach)))
+                charge.scale.x=1+0.08*sin(t*23)
+            }
+            e.findEntity(named:"storm-embers")?.components.set(OpacityComponent(opacity:h.striking(at:run.activeTicks) ? 0.9:0.18+0.10*buzz))
+            if let rain=e.findEntity(named:"storm-rain") {rain.position.y = -Float(run.seconds.truncatingRemainder(dividingBy:0.7))*1.4;rain.components.set(OpacityComponent(opacity:0.25+0.18*approach))}
+            (e.findEntity(named:"storm-flash") as? PointLight)?.light.intensity=h.striking(at:run.activeTicks) ? 14000:1200*buzz*approach
         }
         if let ribbon=e.findEntity(named:"mace-chain") {
             let offset=Float(h.lateral(at:run.activeTicks)-h.lateral)
@@ -128,7 +170,7 @@ extension DreamRenderer {
                     marks.triangle(center+right*(x-0.18)+[0,0.045,0.2],center+right*(x+0.18)+[0,0.045,0.2],center+right*x+[0,0.045,-0.2])
                 }
             }
-            if let mesh=try? marks.resource() {root.addChild(ModelEntity(mesh:mesh,materials:[UnlitMaterial(color:UIColor(hex:"#F1B665"))]))}
+            if let mesh=try? marks.resource() {let model=ModelEntity(mesh:mesh,materials:[factory.material(UIColor(hex:palette.accent_b),style:11)]);model.name="palette:rim";root.addChild(model)}
             if c.collapsing {
                 let tiles=Entity();tiles.name="collapsing-tiles"
                 for n in Int(floor(gap.lowerBound))..<Int(ceil(gap.upperBound)) {
@@ -139,7 +181,7 @@ extension DreamRenderer {
                     tile.quad(a-ra*2,a+ra*2,b+rb*2,b-rb*2)
                     crack.tube([a+[-1.9,0.02,-0.3],a+[-0.7,0.02,-0.7],a+[0.2,0.02,-0.3],a+[1.9,0.02,-0.6]],radius:0.018,segments:4)
                     let holder=Entity();holder.name="tile:\(n)"
-                    if let mesh=try? tile.resource() {holder.addChild(ModelEntity(mesh:mesh,materials:[factory.material(UIColor(hex:n%2 == 0 ? palette.track_light:palette.track_dark),style:11)]))}
+                    if let mesh=try? tile.resource() {let model=ModelEntity(mesh:mesh,materials:[factory.material(UIColor(hex:n%2 == 0 ? palette.track_light:palette.track_dark),style:11)]);model.name=n%2 == 0 ? "palette:light":"palette:dark";holder.addChild(model)}
                     if let mesh=try? crack.resource() {holder.addChild(ModelEntity(mesh:mesh,materials:[UnlitMaterial(color:UIColor(hex:"#302232"))]))}
                     tiles.addChild(holder)
                 }

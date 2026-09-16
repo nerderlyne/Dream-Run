@@ -24,14 +24,20 @@ import simd
                 let model=ModelEntity(mesh:try MeshResource.generate(from:[d]),materials:[material]);model.name="storm-photo"
                 model.components.set(DynamicLightShadowComponent(castsShadow:false))
                 self?.template=model
-                for holder in self?.waiting ?? [] {holder.addChild(model.clone(recursive:true))}
+                for holder in self?.waiting ?? [] {self?.install(model,on:holder)}
                 self?.waiting.removeAll()
             } catch {self?.loadError=String(describing:error)}
         }
     }
+    private func install(_ model:ModelEntity,on holder:Entity) {
+        holder.addChild(model.clone(recursive:true))
+        let scud=model.clone(recursive:true);scud.name="storm-scud"
+        scud.components.set(OpacityComponent(opacity:0.16));scud.position=[0,-0.05,0.025]
+        holder.addChild(scud)
+    }
     func cloud()->Entity {
         let holder=Entity();holder.name="storm-cloud";holder.position=[0,7.3,0];holder.scale=[12,8,1]
-        if let template {holder.addChild(template.clone(recursive:true))} else {waiting.append(holder)}
+        if let template {install(template,on:holder)} else {waiting.append(holder)}
         return holder
     }
 }

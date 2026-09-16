@@ -46,9 +46,9 @@ struct PaletteTransition {
         surfaces.removeAll{$0.model.parent == nil}
         for i in surfaces.indices {surfaces[i].original=art.baseMaterials(of:surfaces[i].model);surfaces[i].applied = -1}
     }
-    func register(_ entity:Entity,palette:Int,palettes:[PaletteDefinition],art:DreamArtDirection) {
+    func register(_ entity:Entity,palette:Int,palettes:[PaletteDefinition],art:DreamArtDirection,allSurfaces:Bool=false) {
         func visit(_ e:Entity,scenery:Bool) {
-            let scene=scenery || e.name == "scenery"
+            let scene=allSurfaces || scenery || e.name == "scenery"
             if let model=e as? ModelEntity,(scene || e.name.hasPrefix("palette:")),let materials=model.model?.materials as? [PhysicallyBasedMaterial],!materials.isEmpty {
                 let colors=swatches(palettes[palette])
                 let explicit=["palette:light":0,"palette:dark":1,"palette:rim":3,"palette:deck":4][e.name]

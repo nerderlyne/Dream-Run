@@ -144,7 +144,8 @@ import simd
             chunks[c.id]=root; world.addChild(root);evolution.register(root,palette:palette,palettes:surfacePalettes,art:art)
         }
         for c in run.chunks {
-            let critical=c.gap != nil || c.step != nil || c.drop != nil || [.stairsStraight,.stairsSpiral].contains(c.routeFamily)
+            let stormFooting=run.hazards.contains{$0.encounter == .lightning && $0.distance >= c.start-3 && $0.distance <= c.end+3}
+            let critical=stormFooting || c.gap != nil || c.step != nil || c.drop != nil || [.stairsStraight,.stairsSpiral].contains(c.routeFamily)
             let alpha=TrackTranslucency.opacity(identity:run.identity,distance:run.distance,seconds:run.seconds,visual:run.visual,transitions:run.mirrorCount+run.dropCount,ahead:c.start-run.distance,critical:critical)
             if abs((trackAlphas[c.id] ?? -1)-alpha.base)>0.012,let root=chunks[c.id] {
                 root.findEntity(named:"palette:dark")?.components.set(OpacityComponent(opacity:alpha.base))
@@ -168,6 +169,10 @@ import simd
                 } else {e=obstacleModel(h) ?? factory.build(h.asset,palette:palette,lod:0)}
                 if h.pig?.clover == true { let clover=factory.build(.clover,palette:palette); clover.scale=[0.45,0.45,0.45]; clover.position=[0,0.7,0]; e.addChild(clover) }
                 world.addChild(e); hazards[h.id]=e
+                if ![AssetID.soccer,.eightBall,.softball,.americanFootball,.zebra,.nazar,.rabbit,.pig].contains(h.asset) && h.encounter != .lightning {
+                    coordinatePalette(e,definition:surfacePalettes[palette])
+                    evolution.register(e,palette:palette,palettes:surfacePalettes,art:art,allSurfaces:true)
+                }
             }
             let routeSample=generator.sample(h.position(at:run.activeTicks))
             e.position=local(routeSample,origin:origin,lateral:h.lateral(at:run.activeTicks))+[0,Float(run.floorHeight(at:h.position(at:run.activeTicks))),0]
@@ -187,6 +192,8 @@ import simd
             let e:Entity
             if let existing=pickups[p.id] {e=existing} else {
                 e=factory.build(.balloon,palette:palette,style:1,lod:0);world.addChild(e);pickups[p.id]=e
+                coordinatePalette(e,definition:surfacePalettes[palette],balloon:true)
+                evolution.register(e,palette:palette,palettes:surfacePalettes,art:art,allSurfaces:true)
             }
             let motion=p.balloonPosition(at:run.activeTicks)
             let center=local(generator.sample(p.distance),origin:origin,lateral:motion.lateral)+[0,Float(motion.height+run.floorHeight(at:p.distance)),0]

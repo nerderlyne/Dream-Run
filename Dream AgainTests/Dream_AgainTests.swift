@@ -542,3 +542,41 @@ extension Dream_AgainTests {
         XCTAssertLessThanOrEqual(kit.residentPlateCount,3)
     }
 }
+
+
+extension Dream_AgainTests {
+    @MainActor func testTraversalAndBalloonsFollowPaletteEvolution() throws {
+        func assertColor(_ actual:UIColor,_ expected:UIColor,file:StaticString=#filePath,line:UInt=#line) {
+            let a=actual.artSRGB.cgColor.components!,b=expected.artSRGB.cgColor.components!
+            for i in 0..<3 {XCTAssertEqual(a[i],b[i],accuracy:0.002,file:file,line:line)}
+        }
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        game.labObstacle(.window)
+        let door=try XCTUnwrap(r.hazards.values.first)
+        let frame=try XCTUnwrap(door.findEntity(named:"jail-door-frame") as? ModelEntity)
+        let original=try XCTUnwrap(frame.model?.materials.first as? PhysicallyBasedMaterial).baseColor.tint
+        assertColor(original,UIColor(hex:r.vividPalettes[r.palette].track_dark))
+        let balloon=r.factory.build(.balloon,palette:r.palette,style:1,lod:0)
+        r.world.addChild(balloon);r.coordinatePalette(balloon,definition:r.vividPalettes[r.palette],balloon:true)
+        let body=try XCTUnwrap(balloon.children.first as? ModelEntity)
+        assertColor(try XCTUnwrap(body.model?.materials.first as? PhysicallyBasedMaterial).baseColor.tint,UIColor(hex:r.vividPalettes[r.palette].accent_a))
+        r.evolution.register(balloon,palette:r.palette,palettes:r.vividPalettes,art:r.art,allSurfaces:true)
+        let target=(r.palette+1)%7
+        r.evolution.request(target,seconds:0,accelerated:false,palettes:r.vividPalettes,art:r.art)
+        for _ in 0..<500 {r.evolution.update(seconds:60,palettes:r.vividPalettes,art:r.art)}
+        assertColor(try XCTUnwrap(frame.model?.materials.first as? PhysicallyBasedMaterial).baseColor.tint,UIColor(hex:r.vividPalettes[target].track_dark))
+        assertColor(try XCTUnwrap(body.model?.materials.first as? PhysicallyBasedMaterial).baseColor.tint,UIColor(hex:r.vividPalettes[target].accent_a))
+    }
+    @MainActor func testStormMovesWithoutRebuildingAndHasOpaqueScorch() async throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        await r.storm.waitUntilReady();game.labObstacle(.lightning)
+        let h=try XCTUnwrap(game.run.hazards.first),e=try XCTUnwrap(r.hazards[h.id])
+        let cloud=try XCTUnwrap(e.findEntity(named:"storm-cloud"))
+        let char=try XCTUnwrap(e.findEntity(named:"storm-char"))
+        XCTAssertNil(char.components[OpacityComponent.self]);XCTAssertNotNil(e.findEntity(named:"storm-charge"))
+        XCTAssertNotNil(e.findEntity(named:"storm-scud"));XCTAssertNil(e.findEntity(named:"storm-shade-0"))
+        let before=cloud.transform,ids=e.children.map(ObjectIdentifier.init)
+        var later=game.run;later.activeTicks += 11;r.animateObstacle(e,h:h,run:later)
+        XCTAssertNotEqual(before,cloud.transform);XCTAssertEqual(ids,e.children.map(ObjectIdentifier.init))
+    }
+}

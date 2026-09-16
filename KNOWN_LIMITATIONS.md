@@ -1,5 +1,9 @@
 # Known limitations
 
+## Color harmony and storm motion — September 16, 2026
+
+The cloud remains animated photographic cards with procedural electrical branches/rain, not volumetric fluid simulation. Its extra translucent scud card reuses the existing texture; sustained transparency cost is unmeasured. Obstacle and balloon colors follow the track palette, not automatic color extraction from each photo. Material animation and strike behavior were tested in the simulator only.
+
 ## Adaptive audio and theta — September 16, 2026
 
 The procedural score is implemented, but perceived musical quality, headphone comfort, safe listening level at a particular system-volume setting, Bluetooth latency and physical-device routing remain untested. No claim of hypnosis, sleep induction or neurological benefit is made. Theta is off by default and requires an eligible stereo headphone/Bluetooth route with Mono Audio off. Bluetooth A2DP can also represent a speaker; the player must honor the stereo-headphone instruction. The score follows gameplay palettes rather than identifying individual photograph contents. Bundled loops repeat in combinations; this is not an unlimited generated composition. Normal pause restarts loop playback on resume while preserving gameplay state. No physical iPhone was used. Details and reproduction: `docs/DREAM_AUDIO.md`.
