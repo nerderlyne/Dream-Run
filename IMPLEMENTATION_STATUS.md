@@ -5,6 +5,13 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Hay spawn balance and bounded rolling — September 19, 2026
+
+- Hay candidates now require four certified moving sports balls before one is admitted; unused eligibility is reset after an offer. This counts actual accepted obstacle chunks, not rejected generator candidates. The budget persists with the run.
+- Hay starts rolling only after the runner enters its empty support section, and its travel stops one metre inside that section. It cannot travel backward across earlier stairs, gaps, drops or static obstacle setups. Collapsing support is excluded. Shared active-time distance math now drives both sports balls and hay; collision and rendering use the same bounded position.
+- Collection, banked straw and repair feedback remain. This is controlled route motion, not rigid-body ball-to-ball physics. Verification: 7 focused Release core tests passed (2.007 seconds), the Debug iOS Simulator build succeeded, and all 54 specification checks passed. Logs: `evidence/hay-routing-core.log`, `hay-routing-build.log`, `hay-routing-spec.log`. No simulator gameplay session, full-suite rerun or performance benchmark in this pass. No physical iPhone testing.
+
+
 ## Rolling hay and stored straw — September 17, 2026
 
 - Replaced the static repair bale with a tangled straw ball rolling toward the runner at 8 m/s, activated within 72 metres. Rendering, spin and swept pickup collision share its saved active-time trajectory.

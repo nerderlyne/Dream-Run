@@ -41,6 +41,7 @@ public struct RunState: Codable, Sendable {
     public var continueCount = 0
     public var straw = 0
     public var hayCollected = 0
+    public var sportsBallsSinceHay = 0
     public var lastHayTick:UInt64?
     public var nextStrawRepairTick:UInt64 = 0
     public var balloons = 0
@@ -94,7 +95,7 @@ public struct GameSimulation: Sendable {
     init(certification:RunState,slope:Double) {state=certification;certificationSlope=slope}
     public init(identity: DreamIdentity, mode: RunMode = .fresh, rules: RunRules? = nil) { state = RunState(identity: identity, mode: mode); if let rules {state.rules=rules}; streamChunks() }
     public init(snapshot: RunState) throws {
-        guard snapshot.schema == 1, snapshot.straw >= 0, snapshot.straw <= snapshot.hayCollected, Set(snapshot.player.missingLimbs).count == snapshot.player.missingLimbs.count, snapshot.player.missingLimbs.count <= 4, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-RunRules.pigIntervalTicks, snapshot.player.lateral.isFinite, abs(snapshot.player.lateral) <= 2.5, snapshot.player.knockbackVelocity.isFinite, abs(snapshot.player.knockbackVelocity)<=8, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
+        guard snapshot.schema == 1, snapshot.sportsBallsSinceHay >= 0, snapshot.straw >= 0, snapshot.straw <= snapshot.hayCollected, Set(snapshot.player.missingLimbs).count == snapshot.player.missingLimbs.count, snapshot.player.missingLimbs.count <= 4, snapshot.identity.supported, snapshot.distance.isFinite, snapshot.distance >= 0, snapshot.distance <= Double(Int.max/4096), snapshot.activeTicks < UInt64.max-RunRules.pigIntervalTicks, snapshot.player.lateral.isFinite, abs(snapshot.player.lateral) <= 2.5, snapshot.player.knockbackVelocity.isFinite, abs(snapshot.player.knockbackVelocity)<=8, snapshot.continueCount <= 1, snapshot.pigs.count <= 3, snapshot.chunks.count <= 16, snapshot.rules == RunRules() else { throw DreamError.corruptStore }
         state = snapshot
     }
     public mutating func resume() { if state.phase == .paused || state.phase == .ready { state.phase = state.resumePhase } }
@@ -150,6 +151,11 @@ public struct GameSimulation: Sendable {
             }
             if !certified {chunk.hazards=[];chunk.gap=nil;chunk.step=nil;chunk.collapsing=false;chunk.halfWidth=2;chunk.routeFamily = .trackStraight;chunk.candidateAttempts=8;chunk.fallbackReason="no certified horizon trajectory"}
             if chunk.start < state.safeUntilDistance && chunk.end > state.distance { chunk.hazards=[]; chunk.gap=nil;chunk.step=nil;chunk.collapsing=false;chunk.halfWidth=2 }
+            state.sportsBallsSinceHay += chunk.hazards.filter { $0.isRollingSportsBall }.count
+            if chunk.pickups.contains(where:{$0.kind == .straw}) {
+                if state.sportsBallsSinceHay >= 4 {state.sportsBallsSinceHay=0}
+                else {chunk.pickups.removeAll {$0.kind == .straw}}
+            }
             state.chunks.append(chunk)
             state.recentAssets=Array((state.recentAssets+chunk.scenery.map(\.asset)).suffix(12))
             state.recentRoutes=Array((state.recentRoutes+[chunk.routeFamily]).suffix(2))
@@ -228,7 +234,12 @@ public struct GameSimulation: Sendable {
         if state.hazards.contains(where:{$0.encounter == .lightning && $0.strikeTick == state.activeTicks}) {events.append(.thunder)}
         for i in state.chunks.indices {
             for j in state.chunks[i].pickups.indices where state.chunks[i].pickups[j].kind == .straw && state.chunks[i].pickups[j].rollStart == nil {
-                if state.chunks[i].pickups[j].distance-state.distance <= 72 {state.chunks[i].pickups[j].rollStart=state.activeTicks}
+                let pickup=state.chunks[i].pickups[j]
+                // Wait until the runner clears the preceding obstacle section. Confine
+                // rolling to this clear support, including when the player misses it.
+                if state.distance >= (pickup.rollLimit ?? state.chunks[i].start) && pickup.distance-state.distance <= 72 {
+                    state.chunks[i].pickups[j].rollStart=state.activeTicks
+                }
             }
         }
         if state.straw>0 && !state.player.missingLimbs.isEmpty && state.activeTicks>=state.nextStrawRepairTick {

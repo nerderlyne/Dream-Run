@@ -67,4 +67,33 @@ final class StrawDamageTests:XCTestCase {
         for _ in 0..<60 {_=s.step();if s.state.hayCollected>0 {break}}
         XCTAssertEqual(s.state.hayCollected,1);XCTAssertEqual(s.state.balloons,0);XCTAssertLessThanOrEqual(s.state.activeTicks,35)
     }
+    func testHayWaitsForClearSectionAndCannotRollAcrossItsBoundary() {
+        var s=clean()
+        let p=PickupDescription(id:"hay:bounded",distance:42,lateral:0,height:0.5,kind:.straw,rollLimit:25)
+        s.state.chunks[1].pickups=[p]
+        _=s.step()
+        XCTAssertNil(s.state.chunks[1].pickups.first?.rollStart)
+        s.state.distance=25
+        _=s.step()
+        let moving=s.state.chunks[1].pickups[0]
+        XCTAssertNotNil(moving.rollStart)
+        XCTAssertEqual(moving.routeDistance(at:s.state.activeTicks+600),25)
+        let ball=HazardDescription(id:"ball",asset:.soccer,encounter:.rolling,distance:42,lateral:0,radius:0.48,height:0.96,speed:8,spawnTick:s.state.activeTicks)
+        XCTAssertEqual(moving.routeDistance(at:s.state.activeTicks+60),ball.position(at:s.state.activeTicks+60))
+    }
+    func testLiveStreamNeverOffersMoreThanOneHayPerFourSportsBalls() {
+        var s=clean();s.state.chunks=[];s.state.hazards=[];s.state.sportsBallsSinceHay=0
+        var sports=0,hay=0,seen=Set<Int>()
+        for index in 0..<100 {
+            s.state.distance=Double(index)*24;s.streamChunks()
+            for c in s.state.chunks where seen.insert(c.id).inserted {
+                sports += c.hazards.filter{$0.isRollingSportsBall}.count
+                hay += c.pickups.filter{$0.kind == .straw}.count
+            }
+            XCTAssertLessThanOrEqual(hay*4,sports)
+        }
+        XCTAssertGreaterThan(sports,0)
+        XCTAssertGreaterThan(hay,0)
+    }
+
 }

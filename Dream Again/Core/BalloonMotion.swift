@@ -3,7 +3,7 @@ import Foundation
 public extension PickupDescription {
     func routeDistance(at tick:UInt64)->Double {
         guard kind == .straw,let start=rollStart,tick>=start else {return distance}
-        return distance-8*Double(tick-start)/60
+        return max(rollLimit ?? -Double.infinity,RollingMotion.distance(origin:distance,speed:8,start:start,tick:tick))
     }
     /// Cosmetic motion and collision share this active-time trajectory. No extra RNG draws.
     var floatsHigh:Bool {distance>100 && !id.hasPrefix("drop-balloon:") && SplitMix64.fnv(id)%4==0}

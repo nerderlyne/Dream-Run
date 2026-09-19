@@ -13,6 +13,11 @@ public struct SafeDropContract: Codable, Equatable, Sendable {
     public var lowerBy: Double = 3
     public var validated: Bool { landing > departure && landing - departure <= 18 && lowerBy == 3 }
 }
+enum RollingMotion {
+    static func distance(origin:Double,speed:Double,start:UInt64,tick:UInt64)->Double {
+        origin-Double(tick >= start ? tick-start:0)/60*speed
+    }
+}
 public struct HazardDescription: Codable, Equatable, Identifiable, Sendable {
     public var id: String
     public var asset: AssetID
@@ -30,7 +35,7 @@ public struct HazardDescription: Codable, Equatable, Identifiable, Sendable {
     public var requiresJump:Bool {encounter == .jump || encounter == .step}
     public func lateral(at tick:UInt64)->Double {encounter == .swing ? lateral+0.95*sin(Double(tick)/60*2.2+motionPhase):lateral}
     public func striking(at tick:UInt64)->Bool {strikeTick != UInt64.max && tick>=strikeTick && tick-strikeTick<24}
-    public func position(at tick: UInt64) -> Double { distance - Double(tick >= spawnTick ? tick - spawnTick : 0) / 60 * speed }
+    public func position(at tick: UInt64) -> Double { RollingMotion.distance(origin:distance,speed:speed,start:spawnTick,tick:tick) }
     public var isRollingSportsBall:Bool {speed > 0 && [.soccer,.eightBall,.softball,.americanFootball].contains(asset)}
     public var rollingRadius:Double {asset == .americanFootball ? 0.35 : radius}
     public func hasStartedMoving(at tick:UInt64)->Bool {speed == 0 || spawnTick <= tick}
@@ -47,6 +52,7 @@ public struct PickupDescription: Codable, Equatable, Identifiable, Sendable {
     public var id: String; public var distance: Double; public var lateral: Double; public var height: Double = 0.9
     public var kind:PickupKind = .balloon
     public var rollStart:UInt64?
+    public var rollLimit:Double?
 }
 public struct SceneryPlacement: Codable, Equatable, Sendable {
     public var asset: AssetID; public var distance: Double; public var lateral: Double; public var scale: Double
@@ -134,8 +140,8 @@ public struct WorldGenerator: Sendable {
         }
         // Reclaimed avatar straw, not an additional scenery family or currency.
         var repair=identity.stream("straw-repair",index)
-        if start>120 && result.gap == nil && result.step == nil && result.drop == nil && result.hazards.isEmpty && repair.below(5)==0 {
-            result.pickups.append(PickupDescription(id:"straw:\(index)",distance:start+12,lateral:Double(Int(repair.below(3))-1)*min(0.85,max(0,result.halfWidth-0.6)),height:0.45,kind:.straw))
+        if start>120 && result.gap == nil && result.step == nil && result.drop == nil && !result.collapsing && result.hazards.isEmpty && repair.below(5)==0 {
+            result.pickups.append(PickupDescription(id:"straw:\(index)",distance:start+18,lateral:Double(Int(repair.below(3))-1)*min(0.85,max(0,result.halfWidth-0.6)),height:0.45,kind:.straw,rollLimit:start+1))
         }
         return result
     }

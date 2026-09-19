@@ -2,7 +2,7 @@
 
 ## Rolling hay reserve — September 17, 2026
 
-Hay rolls along the certified route rather than using rigid-body physics. The golden tangled sphere is procedural straw geometry. Reserve straw automatically repairs one limb per second after damage; frequency and reserve balance still need subjective play evaluation. No physical-device testing is authorized.
+Hay rolls along the certified route rather than using rigid-body physics. It is confined to its empty track section and stops at that section’s boundary if missed; it does not bounce off other balls. Live spawning now requires four certified sports balls per hay offer. The golden tangled sphere is procedural straw geometry. Reserve straw automatically repairs one limb per second after damage; frequency and reserve balance still need subjective play evaluation. No physical-device testing is authorized.
 
 ## Straw damage and repair — September 16, 2026
 
