@@ -1,7 +1,7 @@
 # Current collage pipeline
 
 There is one visual pipeline and one runtime catalog: `DreamCollageKit.swift`.
-148 shipping images provide 46 transparent objects and 102 owner-curated background plates.
+156 shipping images provide 54 transparent objects and 102 owner-curated background plates.
 The nine generated backdrops have been removed. See `DREAM_PLATES.md` for importing photos,
 source records and the bounded on-demand photo cache. The supplied mood references are never production resources.
 
@@ -43,6 +43,13 @@ in every shuffled five-cell cycle; each cell is 640 metres. Cultural apparitions
 midnight kitchen, never in the general scenery deck. Their frequency is one cell per 3,200 metres.
 The ordinary scenery slots visit each eligible ingredient before repeating a deck. Slot zero
 now reserves the single semantic scale-event budget described below.
+
+Midnight Kitchen now mixes two unframed original cultural objects with two seeded archive cards
+drawn without repetition from eight locally generated low-resolution forum reposts. The reposts
+use only project-original objects and creatures, original fictional text and generic image-board
+grammar. They retain bad JPEG edges, displaced copies, scanlines, cache filenames and reply
+fragments. They are world-space cards with perspective and parallax, not screen UI. There are no
+starter-pack layouts and no imported internet memes, people, characters, logos or site branding.
 
 The four composition cards join the existing 16 cards and two sky cards: 22 pooled entities total.
 Transforms are sampled from active seconds with bounded drift, bob, rotation and jellyfish breathing.
@@ -116,6 +123,6 @@ Capture using `python3 tools/capture_atmosphere.py DEVICE_ID` after installing t
 
 ## Composition hierarchy from the owner reference
 
-See `COMPOSITION_REVIEW.md` for the analysis of `app_target_01.jpeg`. Atmospheric selection now uses four arrangements with a strong primary form, a lower-contrast opposing form and a faint veil. Base opacity is 0.32 / 0.12 / 0.09 (superseding the equal-emphasis values above); large scale remains common. Each slot adopts its arrangement only at replacement, preserving staggered evolution. Track surface probabilities favor solid surfaces for dense silhouettes while retaining stripes and checker. The 25-card pool and 55 textures are unchanged.
+See `COMPOSITION_REVIEW.md` for the analysis of `app_target_01.jpeg`. Atmospheric selection now uses four arrangements with a strong primary form, a lower-contrast opposing form and a faint veil. Base opacity is 0.32 / 0.12 / 0.09 (superseding the equal-emphasis values above); large scale remains common. Each slot adopts its arrangement only at replacement, preserving staggered evolution. Track surface probabilities favor solid surfaces for dense silhouettes while retaining stripes and checker. The 25-card entity pool remains unchanged; 54 cutout textures preload and background plates use their bounded cache.
 
 `tools/capture_composition.py <simulator-UUID>` records seeds 0–7 using the DEBUG `--composition-seed` option. It sets no sky, track, palette or scale-event override and grants no production rewards. Review `evidence/composition-gallery.html`.

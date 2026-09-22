@@ -20,7 +20,7 @@ Original files are kept untouched outside the app bundle. Only optimized images 
 
 A seeded shuffled sequence visits every photograph before repeating one, avoids repetition across deck boundaries, and advances when crossing a mirror or taking a safe drop. Ordinary changes use 24-second smooth overlaps; one third of sections use a 48-second dissolve with a prolonged mixed-reality middle. Mirror/drop changes use a 1.8-second overlap. The opaque current photo stays beneath the incoming alpha until completion; transitions never fade both cards out.
 
-The renderer preloads the 46 transparent cutouts, requests photos asynchronously, and retains at most three photo textures in its cache. Texture decoding is not performed synchronously in the frame update. Selection is cached between sections. Large libraries therefore do not cause every photo to be decoded at launch.
+The renderer preloads the 54 transparent cutouts, requests photos asynchronously, and retains at most three photo textures in its cache. Texture decoding is not performed synchronously in the frame update. Selection is cached between sections. Large libraries therefore do not cause every photo to be decoded at launch.
 
 Both sky cards use the actual image aspect ratio and aspect-fill the camera view. Wide photos are cropped to fill portrait screens, not stretched. Portrait photos similarly cover iPad layouts. The loaded current background remains displayed while the next photo loads. A stable scene preloads its deterministic successor. Failed plates are excluded for the session and selection advances deterministically through the available library; errors never clear the visible cards. If no photo is ready, a non-black lavender field is visible.
 

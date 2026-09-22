@@ -34,7 +34,7 @@ extension Dream_AgainTests {
     func testRepresentationRegistryKeepsExactlyFortyTwoSemanticConcepts() throws {
         XCTAssertEqual(DreamRepresentationRegistry.concepts.count,42)
         XCTAssertEqual(Set(DreamRepresentationRegistry.concepts.map(\.semanticID)),Set(AssetID.allCases))
-        XCTAssertEqual(DreamMemeLibrary.entries.count,4)
+        XCTAssertEqual(DreamMemeLibrary.entries.count,12)
         for concept in DreamRepresentationRegistry.concepts {
             XCTAssertFalse(concept.proceduralRepresentationID.isEmpty)
             XCTAssertTrue(concept.representations.allSatisfy{$0.concept == concept.semanticID})
@@ -56,14 +56,14 @@ extension Dream_AgainTests {
         let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
         await renderer.art.collage.waitForPreload()
         XCTAssertEqual(renderer.art.collage.loadErrors,[])
-        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,49)
+        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,57)
         game.labCollage(index:0)
         renderer.render(game.run,equipped:game.profile.equipped)
         XCTAssertGreaterThan(renderer.art.collage.activeCardCount,5)
         XCTAssertGreaterThanOrEqual(renderer.art.collage.activeAtmosphereCount,1)
         XCTAssertEqual(renderer.art.collage.pooledCardCount,25)
         for _ in 0..<30 {renderer.render(game.run,equipped:game.profile.equipped)}
-        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,49)
+        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,57)
         XCTAssertTrue(renderer.art.collage.root.children.allSatisfy{$0.components[CollisionComponent.self] == nil})
         for asset in DreamCollageKit.assets {
             XCTAssertNotNil(Bundle.main.url(forResource:asset.resource,withExtension:asset.resourceExtension))
@@ -80,7 +80,7 @@ extension Dream_AgainTests {
             r.render(game.run,equipped:[:]);await kit.waitForPreload()
             r.render(game.run,equipped:[:])
             XCTAssertLessThanOrEqual(kit.residentPlateCount,3)
-            XCTAssertLessThanOrEqual(kit.loadedTextureCount,49)
+            XCTAssertLessThanOrEqual(kit.loadedTextureCount,57)
             for entity in kit.root.children where entity.name == "collage:\(plate.id)" {
                 XCTAssertEqual(abs(entity.scale.x/entity.scale.y),plate.aspect,accuracy:0.001)
             }

@@ -27,5 +27,5 @@ public enum DreamCollageKit {
         .init(id:"arch_ruined",concept:.arch,medium:.photographic,orientation:"threeQuarter",moods:["dreamlike","serene"],paletteTags:["ruined"],depths:[.midground,.background],backgroundOnly:true,interactive:false,rarity:1,alphaBounds:[42,11,729,688],pixelSize:[768,702],recommendedScaleRange:[12,300]),
         .init(id:"arch_glass",concept:.arch,medium:.surrealCGI,orientation:"threeQuarter",moods:["dreamlike","serene"],paletteTags:["glass"],depths:[.midground,.background],backgroundOnly:true,interactive:false,rarity:2,alphaBounds:[53,48,461,718],pixelSize:[512,768],recommendedScaleRange:[12,300]),
         .init(id:"window_pink",concept:.window,medium:.photographic,orientation:"front",moods:["dreamlike","serene"],paletteTags:["pink"],depths:[.midground,.background],backgroundOnly:true,interactive:false,rarity:1,alphaBounds:[58,13,709,479],pixelSize:[768,512],recommendedScaleRange:[12,300]),
-    ] + DreamPilotKit.assets + DreamPlateLibrary.assets
+    ] + DreamPilotKit.assets + DreamRepostKit.assets + DreamPlateLibrary.assets
 }

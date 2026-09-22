@@ -39,7 +39,9 @@ public enum DreamRepresentationRegistry {
     }
     public static func definition(for id:AssetID)->DreamConceptDefinition {concepts[id.rawValue-1]}
 }
-public enum DreamMemeLibrary {public static let entries=["chicken_chef","stove_chrome","tv_cloud","telephone_banana"]}
+public enum DreamMemeLibrary {
+    public static let entries=["chicken_chef","stove_chrome","tv_cloud","telephone_banana"]+DreamRepostKit.assets.map(\.id)
+}
 
 /// A stable slot description. All positions derive from distance cells, never load timing.
 public struct DreamCollagePlacement:Equatable,Sendable {

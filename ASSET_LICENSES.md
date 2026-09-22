@@ -14,6 +14,13 @@ Production copies were resized with macOS sips. Transparent cutouts retain actua
 The sole runtime metadata catalog is `Dream Again/Core/DreamCollageKit.swift`.
 This record describes provenance; it does not assert exclusive copyright or a legal warranty.
 
+Eight `repost_*` forum cards are deterministic composites generated locally from those same
+project-original cutouts by `tools/generate_repost_cards.swift`. Their interface, handles,
+timestamps and text are original fictional material; they do not reproduce a third-party meme,
+website interface, person, brand or character. The deliberately degraded thumbnails are generated
+from chicken_chef, whale_opal, seahorse_gold, horse_pink, telephone_banana, tv_cloud,
+chair_velvet and jellyfish_lilac. Shipping cards can be reproduced without a network service.
+
 Shipping assets: horse_white, horse_black, horse_red, horse_brown, horse_pink, tree_fuzzy, tree_dead, tree_blue, tree_oak, tree_painted, house_photo, house_fuzzy, house_brutal, house_painted, cloud_white, cloud_dark, cloud_pink, fog_silver, fog_lavender, moon_real, moon_red, moon_pearl, arch_pearl, arch_ruined, arch_glass, window_pink, sky_blue, sky_storm, sky_pink, sky_cosmos, sky_underwater, sky_aurora, sky_mirage, sky_lavender_mist, sky_opal_dawn.
 
 ## Adaptive dream audio — September 16, 2026

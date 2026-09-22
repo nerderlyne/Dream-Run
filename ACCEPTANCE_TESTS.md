@@ -50,6 +50,8 @@ Record **PASS / FAIL / NOT RUN**, test name, command/device and relevant output 
 
 **C06 — Budget review.** Inspect near/mid/far LODs, triangle counts, material cache and entity count. Report profiling targets separately from measured device results.
 
+**C07 — Cultural reposts.** Across seeded Midnight Kitchen cells, exactly two of four cards are original low-resolution forum reposts and two remain unframed cultural objects. Repost selection is deterministic, covers the eight-card deck, stays background-only and does not change the 42-family registry. No starter-pack layout or third-party meme/brand/person appears.
+
 ## D. Procedural fairness and transitions
 
 **D01 — Connectivity.** For a seeded manifest, all neighbouring route sockets align within tolerance; support masks reflect visible gaps. No duplicate overlapping floors or phantom stairs.

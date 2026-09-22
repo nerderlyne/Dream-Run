@@ -368,7 +368,7 @@ import UIKit
         labCollage(index:kind.rawValue)
         renderer?.art.collage.previewVignette=kind
         simulation.state.distance=150
-        renderer?.lastRun=nil;renderer?.render(run,equipped:profile.equipped)
+        renderer?.art.collage.reset();renderer?.lastRun=nil;renderer?.render(run,equipped:profile.equipped)
     }
     func labObstacle(_ kind:DreamObstacle,striking:Bool=false) {
         labCollage(index:0);obstacleReview=kind

@@ -72,10 +72,10 @@ The original synthesized 3.6-second strike is preloaded and amplitude-bounded. S
 - Selected runtime screenshots are visual evidence, not approval of every asset/material/LOD,
   seed, collision encounter, hat/action combination or small-phone/iPad layout. The remaining
   procedural world families vary in polish. Full reference-quality art acceptance remains open.
-- This is the approved 20-image pilot, not the eventual additional ~100-image library. All 55
-  textures currently preload. Measure physical-device memory and implement a bounded texture
+- The original pilot now includes eight small, locally generated repost cards in addition to its
+  20 cutouts. All 54 transparent textures currently preload. Measure physical-device memory and implement a bounded texture
   working set before scaling production substantially. Rare cultural content is original generated
-  absurdist imagery, not imported internet memes. Motion uses transformed image cards, not GIFs,
+  absurdist imagery and original fictional forum fragments, not imported internet memes. Motion uses transformed image cards, not GIFs,
   skeletal swimming or a multi-frame cooking animation. Some story parts are intentionally
   occluded by other scenery; every composition is not fully visible in every portrait frame.
 - Atmosphere is layered images, not volumetric clouds/water or true planar reflections.

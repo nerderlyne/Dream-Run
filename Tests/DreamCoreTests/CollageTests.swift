@@ -4,7 +4,7 @@ import XCTest
 final class CollageTests:XCTestCase {
     func testKitCountsAndMetadata() {
         let kit=DreamCollageKit.assets
-        XCTAssertEqual(kit.count,46+DreamPlateLibrary.assets.count);XCTAssertEqual(Set(kit.map(\.id )).count,kit.count)
+        XCTAssertEqual(kit.count,54+DreamPlateLibrary.assets.count);XCTAssertEqual(Set(kit.map(\.id )).count,kit.count)
         XCTAssertEqual(kit.filter(\.isPlate).count,DreamPlateLibrary.assets.count)
         for (concept,count) in [(AssetID.horse,5),(.tree,5),(.house,5),(.cloud,6),(.moon,3),(.arch,3),(.window,2)] {
             XCTAssertEqual(kit.filter{$0.concept == concept}.count,count)
@@ -59,6 +59,7 @@ final class CollageTests:XCTestCase {
 extension CollageTests {
     func testPilotScenesAreLayerableAndApparitionsStayRare() {
         XCTAssertEqual(DreamPilotKit.assets.count,20)
+        XCTAssertEqual(DreamRepostKit.assets.count,8)
         XCTAssertEqual(DreamPilotKit.assets.filter{$0.concept == .seaCreatures}.count,6)
         for seed:UInt64 in 0..<20 {
             let identity=DreamIdentity.current(seed:seed)
@@ -75,6 +76,35 @@ extension CollageTests {
                     XCTAssertEqual(a,scene.placement(identity:identity,distance:150,part:part))
                 }
             }
+        }
+    }
+    func testMidnightKitchenMixesOriginalObjectsWithSeededReposts() {
+        let repostIDs=Set(DreamRepostKit.assets.map(\.id))
+        var seen=Set<String>()
+        for seed:UInt64 in 0..<20 {
+            let identity=DreamIdentity.current(seed:seed)
+            for cell in 0..<20 {
+                let ids=DreamVignette.midnightKitchen.ingredients(identity:identity,cell:cell)
+                XCTAssertEqual(ids.count,4)
+                XCTAssertEqual(ids.filter{repostIDs.contains($0)}.count,2)
+                XCTAssertEqual(Set(ids).count,4)
+                XCTAssertEqual(ids,DreamVignette.midnightKitchen.ingredients(identity:identity,cell:cell))
+                seen.formUnion(ids.filter{repostIDs.contains($0)})
+                let scale=DreamScaleComposition.plan(identity:identity,distance:Double(cell)*640)
+                let repostExtents=ids.enumerated().filter{repostIDs.contains($0.element)}.map{DreamScaleComposition.extent(scale.role(slot:16+$0.offset))}
+                let allExtents=(0..<4).map{DreamScaleComposition.extent(scale.role(slot:16+$0))}.sorted(by:>)
+                XCTAssertEqual(repostExtents.sorted(by:>),Array(allExtents.prefix(2)))
+                let posts=(0..<4).map{DreamVignette.midnightKitchen.placement(identity:identity,distance:Double(cell)*640+150,part:$0)}.filter{$0.representation.orientation == "forumRepost"}
+                XCTAssertEqual(posts.count,2)
+                XCTAssertLessThan(posts[0].lateral*posts[1].lateral,0)
+                XCTAssertTrue(posts.allSatisfy{$0.elevation>0 && !$0.mirrored})
+            }
+        }
+        XCTAssertEqual(seen,repostIDs)
+        for asset in DreamRepostKit.assets {
+            XCTAssertEqual(asset.concept,.culturalApparitions)
+            XCTAssertEqual(asset.orientation,"forumRepost")
+            XCTAssertTrue(asset.backgroundOnly);XCTAssertFalse(asset.interactive)
         }
     }
     func testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies() {

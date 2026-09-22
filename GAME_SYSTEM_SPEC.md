@@ -40,7 +40,7 @@ whole scene at a boundary. Sky coverage, track readability and 42 registered fam
 
 ## Creator-approved background pilot — 14 September 2026
 
-The 42 slots are semantic families, not file limits. Sea creatures occupy #05 and cultural apparitions #23; curved stairs merge into #04 and mountains into #22. Pig remains #42. The pilot adds twenty independently layerable cutouts and five animated compositions. Cultural apparitions are part of the 42 families, superseding the earlier separate meme-layer proposal. All imagery is original, bundled and harmless; motion, selection and recurrence are seeded/presentation-only.
+The 42 slots are semantic families, not file limits. Sea creatures occupy #05 and cultural apparitions #23; curved stairs merge into #04 and mountains into #22. Pig remains #42. Cultural apparitions include original independent cutouts and seeded low-resolution forum reposts made only from the game's own objects and creatures. A repost occurrence mixes framed archive fragments with unframed objects at world depth; it is scenery, never HUD. No third-party meme, character, celebrity, logo or social-media interface is reproduced. Motion, selection and recurrence are seeded/presentation-only.
 
 ## Creator-approved gameplay update — 14 September 2026
 

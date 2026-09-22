@@ -5,6 +5,27 @@ shared Xcode scheme, offline progression, save/share, suspend/resume, achievemen
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
+## Reposted dream fragments — September 22, 2026
+
+- Added eight original low-resolution forum cards built solely from existing project-owned
+  creatures and objects. The local generator adds deliberate JPEG damage, bad crops, displaced
+  repost ghosts, scanlines, fictional handles/timestamps, cache filenames and reply fragments.
+- Midnight Kitchen occurrences now deterministically mix two unframed cultural objects with two
+  unique repost cards. They remain world-space scenery with perspective, parallax, fades and the
+  existing density/void behavior; none are HUD overlays or gameplay colliders. Starter-pack layouts
+  and third-party memes, people, characters, logos and website branding are excluded.
+- Family #23 remains Cultural Apparitions and the world-family count remains exactly 42. The fixed
+  25-card entity pool is unchanged; eight small preloaded textures raise transparent ingredients
+  from 46 to 54. Assets are reproducible with `tools/generate_repost_cards.swift`.
+- Verification: 11 focused Release core tests passed (4.034 seconds), covering deterministic
+  selection, full-deck coverage, two-post/two-object composition, scale priority, opposing visible
+  placement, metadata, plate selection and track art. Two focused native simulator tests passed
+  (13.200 seconds), loading every bundled image and preserving the 42-family registry and bounded
+  25-entity pool. The final positioning refinement then received a successful simulator build and
+  visual inspection in `evidence/repost-dream.png`. Specification validator: 54 checks passed.
+  Logs: `evidence/reposts-core.log`, `reposts-native.log`, `reposts-build.log`, `reposts-spec.log`.
+  No physical-device test, full-suite rerun or sustained performance measurement in this pass.
+
 ## Hay spawn balance and bounded rolling — September 19, 2026
 
 - Hay candidates now require four certified moving sports balls before one is admitted; unused eligibility is reset after an offer. This counts actual accepted obstacle chunks, not rejected generator candidates. The budget persists with the run.
@@ -225,7 +246,7 @@ were run for this isolated mesh correction.
 
 ## Current visual implementation
 
-- One current collage renderer and one Swift catalog: 46 transparent ingredients, nine skies (55 images total).
+- One current collage renderer and one Swift catalog: 54 transparent ingredients and 102 owner-curated background plates (156 images total).
 - Six additional atmosphere plates: space, underwater, aurora, mirage, lavender mist, opal dawn.
 - Slim reed/twine straw doll, one articulated rig, modular ribbons, skirt/apron/lace and fitted hats.
 - Rear run, tucked jump and back slide; five DEBUG cosmetic review looks.
@@ -249,7 +270,7 @@ were run for this isolated mesh correction.
   prevent immediate repetition and expose all eligible images before repeating a deck.
 - Exactly 42 families: curved/straight stairs share #4, mountains share rock #22, freeing #5
   for sea creatures and #23 for cultural apparitions. Pig remains #42; no compatibility aliases.
-- Fixed 22-card pool including two skies. All 55 textures preload; no new background colliders.
+- Fixed 22-card pilot pool including two skies. All transparent cutouts preload; background plates retain their bounded on-demand cache; no new background colliders.
 - Twenty PNGs add 4,942,083 bytes, 20 MiB decoded RGBA / estimated 26.67 MiB with full mipmaps.
   These are arithmetic budgets, not measured resident GPU memory. All alpha audits passed,
   with transparent margins and zero occupied edge pixels (`evidence/pilot-alpha.jsonl`).
