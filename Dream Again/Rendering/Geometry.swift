@@ -55,15 +55,26 @@ extension UIColor {
     convenience init(hex: String) { let n=UInt32(hex.replacingOccurrences(of:"#",with:""),radix:16) ?? 0xEFE7EB; self.init(red:CGFloat((n>>16)&255)/255,green:CGFloat((n>>8)&255)/255,blue:CGFloat(n&255)/255,alpha:1) }
 }
 @MainActor final class PrefabFactory {
-    var cache: [String:Entity] = [:]
+    private(set) var cache = BoundedLRUCache<String,Entity>(capacity:168)
     var triangleCounts: [String:Int] = [:]
     let surface=DreamMaterials()
     let palettes: [PaletteDefinition]
     init(palettes: [PaletteDefinition]) { self.palettes=palettes }
     func material(_ color:UIColor,style:Int)->PhysicallyBasedMaterial {surface.make(color,style:style)}
     func build(_ id: AssetID, palette: Int = 0, style: Int = 0, lod: Int = 0) -> Entity {
-        let key="\(id.rawValue):\(palette):\(style):\(lod)"
-        if let cached=cache[key] { return cached.clone(recursive:true) }
+        // These semantic colors and every mesh slot are palette-independent.
+        // Reuse their resources across palette transitions instead of rebuilding.
+        let paletteKey=Self.fixedPaletteAssets.contains(id) ? 0:palette
+        let key="\(id.rawValue):\(paletteKey):\(style):\(lod)"
+        if let cached=cache.value(forKey:key) { return cached.clone(recursive:true) }
+        return PerformanceTrace.measure("PrefabBuild") {make(id,palette:palette,style:style,lod:lod,key:key)}
+    }
+    static let fixedPaletteAssets:Set<AssetID> = [.rabbit,.zebra,.soccer,.eightBall,.softball,.americanFootball,.nazar,.pig,.clover]
+    func prepareGameplay() {
+        surface.prepare()
+        for id in Self.fixedPaletteAssets.sorted(by:{$0.rawValue < $1.rawValue}) {_ = build(id)}
+    }
+    private func make(_ id:AssetID,palette:Int,style:Int,lod:Int,key:String)->Entity {
         let p=palettes[palette % palettes.count], root=Entity()
         var body=Geometry(),trim=Geometry(),dark=Geometry(),semantic=Geometry()
         var bodyColor=UIColor(hex:p.accent_a),trimColor=UIColor(hex:p.accent_b),darkColor=UIColor(hex:p.track_dark),semanticColor=UIColor.white
@@ -250,7 +261,7 @@ extension UIColor {
             catch { assertionFailure("Procedural mesh \(id): \(error)") }
         }
         root.name="asset:\(id.rawValue)"; triangleCounts[key]=count
-        if cache.count >= 168 { cache.removeAll(keepingCapacity:true) }; cache[key]=root
+        if let evicted=cache.insert(root,forKey:key) {triangleCounts.removeValue(forKey:evicted)}
         return root.clone(recursive:true)
     }
 }

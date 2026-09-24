@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "working_title": "Dream Again",
+  "working_title": "Dreamlooper",
   "swift_module": "DreamAgain",
   "deployment_target_ios": "18.0",
   "versions": {
-    "generator": 1,
-    "rules": 1,
+    "generator": 2,
+    "rules": 2,
     "content": 1,
     "save": 1
   },

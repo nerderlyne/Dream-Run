@@ -3,7 +3,7 @@ import RealityKit
 import AVFAudio
 @testable import DreamAgain
 final class Dream_AgainTests:XCTestCase {
-    func testCoreIdentityInApp() throws {XCTAssertEqual(try DreamIdentity.parse("DR1-G1-R1-C1-000000000001A-460B").seed,42)}
+    func testCoreIdentityInApp() throws {XCTAssertEqual(try DreamIdentity.parse(DreamIdentity.current(seed:42).code).seed,42)}
     @MainActor func testEveryAssetBuildsAndBoundsAreFinite() throws {
         let game=GameModel();XCTAssertNil(game.error);XCTAssertEqual(game.assets.count,42)
         guard let renderer=game.renderer else {return XCTFail("Renderer unavailable")}
@@ -172,7 +172,7 @@ extension Dream_AgainTests {
         let head=try XCTUnwrap(r.runner.findEntity(named:"straw-head"))
         let hips=r.legs.map{ObjectIdentifier($0)}
         for hat in ["bow","nightcap","moon_hat","beyond_crown"] {
-            r.dress(["character":"girl","hat":hat])
+            r.dress(["bottom":"straw_skirt","hat":hat])
             XCTAssertTrue(r.runner.findEntity(named:"straw-head") === head)
             XCTAssertEqual(r.legs.map{ObjectIdentifier($0)},hips)
             XCTAssertNotNil(r.runner.findEntity(named:"straw-skirt"))
@@ -203,9 +203,9 @@ extension Dream_AgainTests {
     @MainActor func testAllHatsFitBothCharactersWithoutChangingTheRun() throws {
         let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
         let originalRun=game.run, originalBalance=game.profile.balance
-        for character in ["girl","runner"] {
+        for bottom in ["straw_skirt","plain_bottom"] {
             for item in game.catalogue where item.slot == "hat" {
-                renderer.dress(["character":character,"hat":item.id])
+                renderer.dress(["bottom":bottom,"hat":item.id])
                 XCTAssertEqual(renderer.legs.count,2)
                 XCTAssertEqual(renderer.arms.count,2)
                 XCTAssertEqual(renderer.headAttachment.position.y,1.73,accuracy:0.001)
@@ -223,15 +223,22 @@ extension Dream_AgainTests {
                     }
                 } else {XCTAssertTrue(renderer.headAttachment.children.isEmpty)}
                 XCTAssertNotNil(renderer.runner.findEntity(named:"straw-head"))
-                XCTAssertEqual(renderer.runner.findEntity(named:"straw-skirt") != nil,character == "girl")
+                XCTAssertEqual(renderer.runner.findEntity(named:"straw-skirt") != nil,bottom == "straw_skirt")
             }
         }
         XCTAssertEqual(game.run.id,originalRun.id)
         XCTAssertEqual(game.run.distance,originalRun.distance)
         XCTAssertEqual(game.profile.balance,originalBalance)
-        var profile=Profile();profile.equipped["character"]="girl"
+        let lockedHat=try XCTUnwrap(game.catalogue.first(where:{$0.id == "paper_hat"}))
+        XCTAssertFalse(game.profile.owned.contains(lockedHat.id))
+        renderer.previewAvatar(equipped:["hat":lockedHat.id,"bottom":"straw_skirt"],wardrobe:true)
+        XCTAssertNotNil(renderer.headAttachment.findEntity(named:"fitted-paper_hat"))
+        XCTAssertNotNil(renderer.runner.findEntity(named:"straw-skirt"))
+        XCTAssertFalse(game.profile.owned.contains(lockedHat.id),"Try-on must not grant an item")
+        XCTAssertEqual(game.profile.balance,originalBalance,"Try-on must not spend balloons")
+        var profile=Profile();profile.equipped["bottom"]="straw_skirt"
         let restored=try JSONDecoder().decode(Profile.self,from:JSONEncoder().encode(profile))
-        XCTAssertEqual(restored.equipped["character"],"girl")
+        XCTAssertEqual(restored.equipped["bottom"],"straw_skirt")
     }
 }
 
@@ -240,7 +247,7 @@ extension Dream_AgainTests {
         let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
         game.labArt(theme:0)
         var run=game.run
-        let equipped=["character":"girl","hat":"bare_head"]
+        let equipped=["bottom":"straw_skirt","hat":"bare_head"]
         renderer.render(run,equipped:equipped)
         var times:[Double]=[]
         for _ in 0..<120 {
@@ -598,5 +605,21 @@ extension Dream_AgainTests {
         let bale=r.strawBall();XCTAssertEqual(bale.name,"rolling-hay-ball");XCTAssertGreaterThan(bale.visualBounds(relativeTo:bale).extents.x,0.5)
         XCTAssertNotNil(game.audio.buffers["strawBreak"]);XCTAssertNotNil(game.audio.buffers["strawRepair"])
         XCTAssertFalse(game.run.mode.earns)
+    }
+}
+
+extension Dream_AgainTests {
+    @MainActor func testFloatingStairGapMarkersFollowRaisedLanding() throws {
+        let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
+        let generator=WorldGenerator(DreamIdentity.current(seed:42))
+        let chunk=generator.encounterChunk(4,kind:.floatingStairs,tier:2)
+        let root=Entity(),origin=generator.sample(chunk.start)
+        renderer.terrainDecorations(chunk,root:root,generator:generator,origin:origin,palette:game.palettes[0])
+        let marks=try XCTUnwrap(root.findEntity(named:"palette:rim"))
+        let bounds=marks.visualBounds(relativeTo:root)
+        let landing=try XCTUnwrap(chunk.gap).upperBound+0.4
+        let expected=generator.sample(landing).y-origin.y+chunk.step!.height(at:landing)+0.045
+        XCTAssertEqual(Double(bounds.max.y),expected,accuracy:0.001)
+        XCTAssertEqual(chunk.gap!.upperBound,chunk.step!.start)
     }
 }

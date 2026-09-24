@@ -83,28 +83,52 @@
       "notes": "Small pearl crescent fixed to a head-fitting circlet."
     },
     {
+      "id": "plain_ribbon",
+      "name": "Straw ribbon",
+      "slot": "top",
+      "balloon_price": 0,
+      "required_achievement": null,
+      "notes": "Default ribbon and sash on the shared straw body."
+    },
+    {
+      "id": "plain_bottom",
+      "name": "No skirt",
+      "slot": "bottom",
+      "balloon_price": 0,
+      "required_achievement": null,
+      "notes": "Default uncovered straw legs."
+    },
+    {
+      "id": "straw_skirt",
+      "name": "Straw skirt",
+      "slot": "bottom",
+      "balloon_price": 0,
+      "required_achievement": null,
+      "notes": "Skirt and apron costume layer; the straw body and rig stay unchanged."
+    },
+    {
       "id": "pearl_body",
-      "name": "Pearl body",
-      "slot": "body_color",
+      "name": "Pearl ribbon",
+      "slot": "top",
       "balloon_price": 500,
       "required_achievement": null,
-      "notes": "Cosmetic material preset only."
+      "notes": "Ribbon and sash colour on the shared straw body."
     },
     {
       "id": "rose_body",
-      "name": "Rose body",
-      "slot": "body_color",
+      "name": "Rose ribbon",
+      "slot": "top",
       "balloon_price": 500,
       "required_achievement": null,
-      "notes": "Cosmetic material preset only."
+      "notes": "Ribbon and sash colour on the shared straw body."
     },
     {
       "id": "mint_body",
-      "name": "Mint body",
-      "slot": "body_color",
+      "name": "Mint ribbon",
+      "slot": "top",
       "balloon_price": 500,
       "required_achievement": null,
-      "notes": "Cosmetic material preset only."
+      "notes": "Ribbon and sash colour on the shared straw body."
     },
     {
       "id": "lucky_pig_hat",

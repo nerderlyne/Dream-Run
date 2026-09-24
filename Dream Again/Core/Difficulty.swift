@@ -13,8 +13,15 @@ public enum DreamDifficulty {
 
 public struct DreamStep:Codable,Equatable,Sendable {
     public var start:Double
+    public var ascendingRun:Bool = false
     public func height(at distance:Double)->Double {
         let x=distance-start
+        if ascendingRun {
+            if x<0 || x>=84 {return 0}
+            if x<60 {return 0.72*Double(min(3,Int(x/24)+1))}
+            // A gradual recovery descent after three distinct raised landings.
+            return 2.16*(84-x)/24
+        }
         if x<0 || x>=12 {return 0}
         if x<9 {return 0.72}
         return max(0,0.72-0.24*floor(x-8))
@@ -22,7 +29,7 @@ public struct DreamStep:Codable,Equatable,Sendable {
 }
 
 public enum DreamObstacle:String,CaseIterable,Sendable {
-    case stairs,brokenFloor,exposedBridge,window,moon,collapse,furniture,volley,lightning,animals
+    case stairs,brokenFloor,exposedBridge,window,moon,collapse,furniture,volley,lightning,animals,floatingStairs
     public var title:String {
         switch self {
         case .stairs:return "Impossible stairs"
@@ -35,6 +42,7 @@ public enum DreamObstacle:String,CaseIterable,Sendable {
         case .volley:return "Ball volley"
         case .lightning:return "Lightning"
         case .animals:return "Dream animals"
+        case .floatingStairs:return "Floating stairs"
         }
     }
 }
@@ -42,7 +50,7 @@ public enum DreamObstacle:String,CaseIterable,Sendable {
 extension WorldGenerator {
     public func obstacle(_ index:Int)->DreamObstacle {
         var choices=DreamObstacle.allCases
-        var rng=identity.stream("encounter-sequence",index/20)
+        var rng=identity.stream("encounter-sequence",index/(choices.count*2))
         for j in stride(from:choices.count-1,through:1,by:-1) {choices.swapAt(j,Int(rng.below(UInt64(j+1))))}
         return choices[(index/2)%choices.count]
     }
@@ -53,9 +61,10 @@ extension WorldGenerator {
             .init(id:"dream:\(index):\(Int(offset))",asset:asset,encounter:encounter,distance:anchor+offset,lateral:x,radius:radius,height:height)
         }
         switch kind {
-        case .stairs:
+        case .stairs,.floatingStairs:
             c.routeFamily = .stairsStraight;c.step=DreamStep(start:anchor)
             c.hazards=[hazard(.stairsStraight,.step,0,0.72,0.15,-0.6)]
+            if kind == .floatingStairs {c.gap=(anchor-(tier == 0 ? 3:4))...anchor}
         case .brokenFloor,.collapse:
             let length=[4.0,6.0,6.0][min(2,tier)]
             c.routeFamily = .trackBroken;c.gap=(anchor-length/2)...(anchor+length/2)
@@ -78,6 +87,39 @@ extension WorldGenerator {
             c.hazards=[hazard(.cloud,.lightning,0,8,0.5)]
         case .animals:
             c.hazards=[index%4<2 ? hazard(.rabbit,.dodge,0.68):hazard(.zebra,.slide,0,2.4,0.6)]
+        }
+        return c
+    }
+
+    /// Three separate jumps, 24 m apart (at least 1.09 s at the speed cap),
+    /// followed by a full recovery chunk. This owns the entire encounter horizon.
+    public func jumpSequenceChunk(_ index:Int)->ChunkDescription? {
+        let slot=index%12,first=index-slot+4
+        guard (4...7).contains(slot) else {return nil}
+        let beginning=Double(first)*24,ending=beginning+96
+        // Keep complete sequences outside the mirror's protected approach/exit.
+        guard Int(beginning/1800) == Int(ending/1800),
+              beginning<1800 || beginning.truncatingRemainder(dividingBy:1800)>72,
+              ending.truncatingRemainder(dividingBy:1800)<1752 else {return nil}
+        var rng=identity.stream("jump-sequence",index/12)
+        let variant=Int(rng.below(3)),ordinal=slot-4
+        var c=ChunkDescription(id:index,routeFamily:.trackStraight,start:Double(index)*24,hazards:[],pickups:[],scenery:[],recipe:0)
+        let tier=DreamDifficulty.tier(distance:beginning)
+        if variant < 2 {
+            c.routeFamily = .stairsStraight
+            c.step=DreamStep(start:beginning+12,ascendingRun:true)
+            if ordinal<3 {
+                c.hazards=[HazardDescription(id:"ascending:\(index)",asset:.stairsStraight,encounter:.step,distance:c.start+11.4,lateral:0,radius:0.15,height:0.72)]
+                // Missing treads end at the next raised landing. Later courses
+                // put air between every flight, rather than adding generic hurdles.
+                if variant == 1 || tier == 2 || (tier == 1 && ordinal>0) {
+                    let length:Double = (tier == 2 || variant == 1 && tier>0) ? 4:3
+                    c.gap=(c.start+12-length)...(c.start+12)
+                }
+            }
+        } else if ordinal<3 {
+            let kind:DreamObstacle = ordinal == 1 ? .brokenFloor:.furniture
+            c=encounterChunk(index,kind:kind,tier:DreamDifficulty.tier(distance:c.start))
         }
         return c
     }

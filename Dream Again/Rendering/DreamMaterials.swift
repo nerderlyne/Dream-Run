@@ -3,11 +3,11 @@ import UIKit
 
 /// Render-only vocabulary. Style indices retain their existing saved/Lab meanings.
 @MainActor final class DreamMaterials {
-    private var cache:[String:PhysicallyBasedMaterial]=[:]
+    private var cache=BoundedLRUCache<String,PhysicallyBasedMaterial>(capacity:160)
     private var maps:[String:TextureResource]=[:]
     func make(_ tint:UIColor,style:Int)->PhysicallyBasedMaterial {
         let key="\(tint.description)/\(style)"
-        if let m=cache[key] {return m}
+        if let m=cache.value(forKey:key) {return m}
         var m=PhysicallyBasedMaterial();m.baseColor = .init(tint:tint)
         m.roughness = .init(floatLiteral:0.72);m.specular = .init(floatLiteral:0.28)
         switch style {
@@ -35,8 +35,15 @@ import UIKit
             m.baseColor.texture = texture(style:style,normal:false).map{.init($0)}
             m.normal = .init(texture:texture(style:style,normal:true).map{.init($0)})
         }
-        if cache.count >= 160 {cache.removeAll(keepingCapacity:true)}
-        cache[key]=m;return m
+        cache.insert(m,forKey:key);return m
+    }
+    /// Generate the ten small shared maps before active play, never on first contact
+    /// with a new material family while the player is running.
+    func prepare() {
+        for style in [0,3,4,6,8] {
+            _ = texture(style:style,normal:false)
+            _ = texture(style:style,normal:true)
+        }
     }
     private func texture(style:Int,normal:Bool)->TextureResource? {
         let key="\(style)/\(normal)";if let t=maps[key] {return t}
@@ -73,7 +80,7 @@ import UIKit
             }}
         guard let provider=CGDataProvider(data:Data(pixels) as CFData),
               let cg=CGImage(width:n,height:n,bitsPerComponent:8,bitsPerPixel:32,bytesPerRow:n*4,space:CGColorSpaceCreateDeviceRGB(),bitmapInfo:CGBitmapInfo(rawValue:CGImageAlphaInfo.noneSkipLast.rawValue),provider:provider,decode:nil,shouldInterpolate:true,intent:.defaultIntent),
-              let t=try? TextureResource.generate(from:cg,options:.init(semantic:normal ? .normal : .color)) else{return nil}
+              let t=try? TextureResource(image:cg,options:.init(semantic:normal ? .normal : .color)) else{return nil}
         maps[key]=t;return t
     }
 }

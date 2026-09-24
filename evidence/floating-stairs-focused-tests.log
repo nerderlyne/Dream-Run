@@ -1,0 +1,40 @@
+Building for production...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/5] Compiling DreamCore BalloonMotion.swift
+[5/7] Compiling DreamCoreTests AsyncPersistenceTests.swift
+[5/7] Write Objects.LinkFileList
+[6/7] Linking DreamCorePackageTests
+Build complete! (23.91s)
+Test Suite 'Selected tests' started at 2026-09-22 13:02:15.589.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-22 13:02:15.594.
+Test Suite 'JumpSequenceTests' started at 2026-09-22 13:02:15.594.
+Test Case '-[DreamCoreTests.JumpSequenceTests testAscendingLandingsAreSharedWithoutStackingAndPersist]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testAscendingLandingsAreSharedWithoutStackingAndPersist]' passed (0.010 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testBalloonDropIsNotGeneratedOrActivated]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testBalloonDropIsNotGeneratedOrActivated]' passed (0.005 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testGeneratedSequencesAreCertifiedAndDoNotBecomeEmptyScenery]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testGeneratedSequencesAreCertifiedAndDoNotBecomeEmptyScenery]' passed (7.033 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testSkippingAnyJumpFailsEvenAtMaximumLateralOffset]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testSkippingAnyJumpFailsEvenAtMaximumLateralOffset]' passed (0.310 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testSupersededLayoutCannotResumeOrSilentlyReplay]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testSupersededLayoutCannotResumeOrSilentlyReplay]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testThreeSeparateJumpsSurviveEveryVariantAndGrade]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testThreeSeparateJumpsSurviveEveryVariantAndGrade]' passed (0.167 seconds).
+Test Suite 'JumpSequenceTests' passed at 2026-09-22 13:02:23.122.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 7.527 (7.528) seconds
+Test Suite 'ObstacleTests' started at 2026-09-22 13:02:23.122.
+Test Case '-[DreamCoreTests.ObstacleTests testEveryObstacleHasASurvivalWitnessAtOpeningAndCap]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testEveryObstacleHasASurvivalWitnessAtOpeningAndCap]' passed (0.009 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testMissedRequiredActionsAreFatal]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testMissedRequiredActionsAreFatal]' passed (0.001 seconds).
+Test Suite 'ObstacleTests' passed at 2026-09-22 13:02:23.133.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.011 (0.011) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-22 13:02:23.133.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 7.538 (7.539) seconds
+Test Suite 'Selected tests' passed at 2026-09-22 13:02:23.133.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 7.538 (7.544) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

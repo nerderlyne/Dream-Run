@@ -1,0 +1,17 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "80DBBEEC-A752-43F6-A60E-2419BAE5B77E",
+        "deviceName" : "iPhone 16 Pro Max",
+        "exportedFileName" : "859A7C63-78BD-491E-BBBB-BC47804E1F69.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Performance smoke — paused after automated run_0_4E7618E8-5A10-4122-8FF8-0A3CFAE4822E.png",
+        "timestamp" : 1789904024.964
+      }
+    ],
+    "testIdentifier" : "PerformanceSmokeUITests/testAutomatedRunCompletesWithoutRewardsOrSaveError()",
+    "testIdentifierURL" : "test://com.apple.xcode/Dream%20Again/Dream%20AgainUITests/PerformanceSmokeUITests/testAutomatedRunCompletesWithoutRewardsOrSaveError"
+  }
+]

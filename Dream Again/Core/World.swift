@@ -89,8 +89,7 @@ public struct WorldGenerator: Sendable {
         let z = -s + Double(block)*loopLength + loopProgress-radius*sin(angle)
         let dx=5.0/120*cos(s/120)+(inLoop ? sign*sin(angle) : 0)
         let dz=inLoop ? -cos(angle) : -1
-        var y=2.5*sin(s/100)+Double(block)*(loopLength*0.05-3)+loopProgress*0.05
-        if within >= 900 { y -= 3*min(1,(within-900)/16) }
+        let y=2.5*sin(s/100)+Double(block)*loopLength*0.05+loopProgress*0.05
         return RouteSample(x:x,y:y,z:z,yaw:atan2(dx,-dz))
     }
 
@@ -113,19 +112,18 @@ public struct WorldGenerator: Sendable {
                     result.hazards=[HazardDescription(id:"setup:\(index)",asset:.nazar,encounter:.dodge,distance:start+12,lateral:-0.7,radius:0.42,height:1.4)]
                 }
             }
+            if let sequence=jumpSequenceChunk(index) {
+                result.hazards=sequence.hazards;result.gap=sequence.gap;result.step=sequence.step
+                result.collapsing=false;result.halfWidth=2;result.routeFamily=sequence.routeFamily
+            }
         }
         // Safe transitions own a wide, hazard-free horizon on either side.
         let local = start.truncatingRemainder(dividingBy: 1800)
         if local >= 1080 && local < 1708 {result.routeFamily = .stairsSpiral}
-        if local >= 864 && local <= 936 || local <= 48 && start >= 1800 { result.hazards = []; result.gap = nil;result.step=nil;result.collapsing=false;result.halfWidth=2 }
-        if local == 888 { result.drop = SafeDropContract(departure: start + 12, landing: start + 28) }
+        if local <= 48 && start >= 1800 { result.hazards = []; result.gap = nil;result.step=nil;result.collapsing=false;result.halfWidth=2 }
         if local == 0 && start >= 1800 { result.hazards = [HazardDescription(id: "mirror:\(index)", asset: .mirror, encounter: .mirror, distance: start + 12, lateral: 0, radius: 2, height: 4)] }
         if result.gap == nil && result.hazards.isEmpty {
             for n in 0..<2 { result.pickups.append(PickupDescription(id: "b:\(index):\(n)", distance: start + 8 + Double(n)*8, lateral: [-0.9,0,0.9][Int(scenery.below(3))])) }
-        }
-        if let drop=result.drop {
-            result.pickups=[]
-            for n in 0..<4 { result.pickups.append(PickupDescription(id:"drop-balloon:\(index):\(n)",distance:drop.departure+Double(n)*4,lateral:0)) }
         }
         let recipes: [[AssetID]] = [[.cloud,.window,.house,.heart],[.water,.column,.roomShell,.fountain],[.rail,.moon,.star,.arch],[.tree,.horse,.rock],[.chair,.bed,.tower,.curtain],[.flower,.mushroom,.rock,.ribbon]]
         for n in 0..<2 {

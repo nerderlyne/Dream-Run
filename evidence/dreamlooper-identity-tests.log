@@ -1,0 +1,20 @@
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.25s)
+Test Suite 'Selected tests' started at 2026-09-17 01:40:56.109.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-17 01:40:56.112.
+Test Suite 'CoreTests' started at 2026-09-17 01:40:56.113.
+Test Case '-[DreamCoreTests.CoreTests testAllGoldenVectors]' started.
+Test Case '-[DreamCoreTests.CoreTests testAllGoldenVectors]' passed (0.008 seconds).
+Test Case '-[DreamCoreTests.CoreTests testIDsRejectBadInput]' started.
+Test Case '-[DreamCoreTests.CoreTests testIDsRejectBadInput]' passed (0.002 seconds).
+Test Suite 'CoreTests' passed at 2026-09-17 01:40:56.122.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.009 (0.010) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-17 01:40:56.122.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.009 (0.010) seconds
+Test Suite 'Selected tests' passed at 2026-09-17 01:40:56.122.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.009 (0.013) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

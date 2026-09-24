@@ -1,0 +1,265 @@
+Building for production...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/5] Compiling DreamCore BalloonMotion.swift
+[5/7] Compiling DreamCoreTests AsyncPersistenceTests.swift
+[5/7] Write Objects.LinkFileList
+[6/7] Linking DreamCorePackageTests
+Build complete! (24.96s)
+Test Suite 'All tests' started at 2026-09-21 03:53:20.783.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-21 03:53:20.788.
+Test Suite 'AsyncPersistenceTests' started at 2026-09-21 03:53:20.788.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testBlockedStorageCannotAccumulateUnboundedSnapshots]' started.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testBlockedStorageCannotAccumulateUnboundedSnapshots]' passed (0.015 seconds).
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testFailedAsyncWriteDoesNotPublishOrLoseKnownGoodBackup]' started.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testFailedAsyncWriteDoesNotPublishOrLoseKnownGoodBackup]' passed (0.004 seconds).
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testReadersSeeLastDurableProfileWithoutWaitingForWriter]' started.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testReadersSeeLastDurableProfileWithoutWaitingForWriter]' passed (0.002 seconds).
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testSynchronousBarrierDrainsQueuedCheckpointsInOrder]' started.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testSynchronousBarrierDrainsQueuedCheckpointsInOrder]' passed (0.010 seconds).
+Test Suite 'AsyncPersistenceTests' passed at 2026-09-21 03:53:20.820.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.032 (0.032) seconds
+Test Suite 'AtmosphereTests' started at 2026-09-21 03:53:20.820.
+Test Case '-[DreamCoreTests.AtmosphereTests testDensityControlsAtmosphereIndependentlyAndVoidIsEmpty]' started.
+Test Case '-[DreamCoreTests.AtmosphereTests testDensityControlsAtmosphereIndependentlyAndVoidIsEmpty]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.AtmosphereTests testLargeTranslucentLayersDoNotChangeSemanticScaleEvents]' started.
+Test Case '-[DreamCoreTests.AtmosphereTests testLargeTranslucentLayersDoNotChangeSemanticScaleEvents]' passed (0.188 seconds).
+Test Case '-[DreamCoreTests.AtmosphereTests testOpeningCompositionHasHierarchyCounterweightAndVariety]' started.
+Test Case '-[DreamCoreTests.AtmosphereTests testOpeningCompositionHasHierarchyCounterweightAndVariety]' passed (0.019 seconds).
+Test Suite 'AtmosphereTests' passed at 2026-09-21 03:53:21.028.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.207 (0.208) seconds
+Test Suite 'BackgroundContinuityTests' started at 2026-09-21 03:53:21.028.
+Test Case '-[DreamCoreTests.BackgroundContinuityTests testBlackPaletteCannotEraseEarlyReality]' started.
+Test Case '-[DreamCoreTests.BackgroundContinuityTests testBlackPaletteCannotEraseEarlyReality]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.BackgroundContinuityTests testBleedIsContinuousAndLingersWithoutDroppingUnderlyingReality]' started.
+Test Case '-[DreamCoreTests.BackgroundContinuityTests testBleedIsContinuousAndLingersWithoutDroppingUnderlyingReality]' passed (0.003 seconds).
+Test Suite 'BackgroundContinuityTests' passed at 2026-09-21 03:53:21.032.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+Test Suite 'BalloonTests' started at 2026-09-21 03:53:21.032.
+Test Case '-[DreamCoreTests.BalloonTests testHighBalloonRequiresJumpAndOnlyPaysOnce]' started.
+Test Case '-[DreamCoreTests.BalloonTests testHighBalloonRequiresJumpAndOnlyPaysOnce]' passed (0.357 seconds).
+Test Case '-[DreamCoreTests.BalloonTests testMotionIsBoundedRepeatableAndSafeDropsStayLow]' started.
+Test Case '-[DreamCoreTests.BalloonTests testMotionIsBoundedRepeatableAndSafeDropsStayLow]' passed (0.039 seconds).
+Test Suite 'BalloonTests' passed at 2026-09-21 03:53:21.428.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.396 (0.396) seconds
+Test Suite 'CollageTests' started at 2026-09-21 03:53:21.428.
+Test Case '-[DreamCoreTests.CollageTests testBackgroundMotionIsBoundedDeterministicAndCanBeDisabled]' started.
+Test Case '-[DreamCoreTests.CollageTests testBackgroundMotionIsBoundedDeterministicAndCanBeDisabled]' passed (0.025 seconds).
+Test Case '-[DreamCoreTests.CollageTests testCurrentSeedRoundTrips]' started.
+Test Case '-[DreamCoreTests.CollageTests testCurrentSeedRoundTrips]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CollageTests testDensityIsNonterminalAndRebuilds]' started.
+Test Case '-[DreamCoreTests.CollageTests testDensityIsNonterminalAndRebuilds]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CollageTests testFiveRecombinationsAreStableAndDifferent]' started.
+Test Case '-[DreamCoreTests.CollageTests testFiveRecombinationsAreStableAndDifferent]' passed (0.006 seconds).
+Test Case '-[DreamCoreTests.CollageTests testKitCountsAndMetadata]' started.
+Test Case '-[DreamCoreTests.CollageTests testKitCountsAndMetadata]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CollageTests testPilotScenesAreLayerableAndApparitionsStayRare]' started.
+Test Case '-[DreamCoreTests.CollageTests testPilotScenesAreLayerableAndApparitionsStayRare]' passed (0.015 seconds).
+Test Case '-[DreamCoreTests.CollageTests testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies]' started.
+Test Case '-[DreamCoreTests.CollageTests testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies]' passed (0.041 seconds).
+Test Suite 'CollageTests' passed at 2026-09-21 03:53:21.518.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.089 (0.090) seconds
+Test Suite 'CoreTests' started at 2026-09-21 03:53:21.518.
+Test Case '-[DreamCoreTests.CoreTests testAllGoldenVectors]' started.
+Test Case '-[DreamCoreTests.CoreTests testAllGoldenVectors]' passed (0.004 seconds).
+Test Case '-[DreamCoreTests.CoreTests testCurrentSpeedCurveAndSnapshot]' started.
+Test Case '-[DreamCoreTests.CoreTests testCurrentSpeedCurveAndSnapshot]' passed (0.004 seconds).
+Test Case '-[DreamCoreTests.CoreTests testEverySportsBallStumblesSlowsAndRecovers]' started.
+Test Case '-[DreamCoreTests.CoreTests testEverySportsBallStumblesSlowsAndRecovers]' passed (0.006 seconds).
+Test Case '-[DreamCoreTests.CoreTests testExactProbability]' started.
+Test Case '-[DreamCoreTests.CoreTests testExactProbability]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testFastRollingBallTravelSpinAndTelegraph]' started.
+Test Case '-[DreamCoreTests.CoreTests testFastRollingBallTravelSpinAndTelegraph]' passed (0.004 seconds).
+Test Case '-[DreamCoreTests.CoreTests testFramePacingAndStall]' started.
+Test Case '-[DreamCoreTests.CoreTests testFramePacingAndStall]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testHeldSlideCannotRemainLowForever]' started.
+Test Case '-[DreamCoreTests.CoreTests testHeldSlideCannotRemainLowForever]' passed (0.026 seconds).
+Test Case '-[DreamCoreTests.CoreTests testIDsRejectBadInput]' started.
+Test Case '-[DreamCoreTests.CoreTests testIDsRejectBadInput]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CoreTests testMotionNormalization]' started.
+Test Case '-[DreamCoreTests.CoreTests testMotionNormalization]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testMovementAndPauseSnapshot]' started.
+Test Case '-[DreamCoreTests.CoreTests testMovementAndPauseSnapshot]' passed (0.002 seconds).
+Test Case '-[DreamCoreTests.CoreTests testNarrowFastSteeringAndSnapshotBounds]' started.
+Test Case '-[DreamCoreTests.CoreTests testNarrowFastSteeringAndSnapshotBounds]' passed (0.168 seconds).
+Test Case '-[DreamCoreTests.CoreTests testNarrowRunCanBypassScheduledClover]' started.
+Test Case '-[DreamCoreTests.CoreTests testNarrowRunCanBypassScheduledClover]' passed (0.048 seconds).
+Test Case '-[DreamCoreTests.CoreTests testPigCommitAndDeepNonterminal]' started.
+Test Case '-[DreamCoreTests.CoreTests testPigCommitAndDeepNonterminal]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CoreTests testRegistryAndGeneration]' started.
+Test Case '-[DreamCoreTests.CoreTests testRegistryAndGeneration]' passed (0.630 seconds).
+Test Case '-[DreamCoreTests.CoreTests testRenderingHitchesDoNotPauseOrBankTime]' started.
+Test Case '-[DreamCoreTests.CoreTests testRenderingHitchesDoNotPauseOrBankTime]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.CoreTests testSoftFatalSlideAndDedup]' started.
+Test Case '-[DreamCoreTests.CoreTests testSoftFatalSlideAndDedup]' passed (0.002 seconds).
+Test Case '-[DreamCoreTests.CoreTests testThreeMinutePigScheduleCommitsOnceAndSurvivesPause]' started.
+Test Case '-[DreamCoreTests.CoreTests testThreeMinutePigScheduleCommitsOnceAndSurvivesPause]' passed (0.005 seconds).
+Test Case '-[DreamCoreTests.CoreTests testVisibleFootballTipMakesContact]' started.
+Test Case '-[DreamCoreTests.CoreTests testVisibleFootballTipMakesContact]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.CoreTests testWalletTransactionsRefundAndDebug]' started.
+Test Case '-[DreamCoreTests.CoreTests testWalletTransactionsRefundAndDebug]' passed (0.008 seconds).
+Test Suite 'CoreTests' passed at 2026-09-21 03:53:22.431.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.910 (0.913) seconds
+Test Suite 'DreamAudioTests' started at 2026-09-21 03:53:22.431.
+Test Case '-[DreamCoreTests.DreamAudioTests testMovementUsesAcceptedActionsAndActualGait]' started.
+Test Case '-[DreamCoreTests.DreamAudioTests testMovementUsesAcceptedActionsAndActualGait]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.DreamAudioTests testPauseDoesNotCreateMovementCues]' started.
+Test Case '-[DreamCoreTests.DreamAudioTests testPauseDoesNotCreateMovementCues]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.DreamAudioTests testScoreStripsRebuildsAndEndsWithoutChangingRun]' started.
+Test Case '-[DreamCoreTests.DreamAudioTests testScoreStripsRebuildsAndEndsWithoutChangingRun]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.DreamAudioTests testThetaIsOptInIndependentAndRequiresStereoHeadphones]' started.
+Test Case '-[DreamCoreTests.DreamAudioTests testThetaIsOptInIndependentAndRequiresStereoHeadphones]' passed (0.000 seconds).
+Test Suite 'DreamAudioTests' passed at 2026-09-21 03:53:22.433.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
+Test Suite 'DreamTransitionCadenceTests' started at 2026-09-21 03:53:22.433.
+Test Case '-[DreamCoreTests.DreamTransitionCadenceTests testEarlyTransitionAndBoundedIndependentIntervals]' started.
+Test Case '-[DreamCoreTests.DreamTransitionCadenceTests testEarlyTransitionAndBoundedIndependentIntervals]' passed (15.173 seconds).
+Test Suite 'DreamTransitionCadenceTests' passed at 2026-09-21 03:53:37.606.
+	 Executed 1 test, with 0 failures (0 unexpected) in 15.173 (15.173) seconds
+Test Suite 'JumpSequenceTests' started at 2026-09-21 03:53:37.606.
+Test Case '-[DreamCoreTests.JumpSequenceTests testAscendingLandingsAreSharedWithoutStackingAndPersist]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testAscendingLandingsAreSharedWithoutStackingAndPersist]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testBalloonDropIsNotGeneratedOrActivated]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testBalloonDropIsNotGeneratedOrActivated]' passed (0.005 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testGeneratedSequencesAreCertifiedAndDoNotBecomeEmptyScenery]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testGeneratedSequencesAreCertifiedAndDoNotBecomeEmptyScenery]' passed (5.614 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testSkippingAnyJumpFailsEvenAtMaximumLateralOffset]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testSkippingAnyJumpFailsEvenAtMaximumLateralOffset]' passed (0.292 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testSupersededLayoutCannotResumeOrSilentlyReplay]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testSupersededLayoutCannotResumeOrSilentlyReplay]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.JumpSequenceTests testThreeSeparateJumpsSurviveEveryVariantAndGrade]' started.
+Test Case '-[DreamCoreTests.JumpSequenceTests testThreeSeparateJumpsSurviveEveryVariantAndGrade]' passed (0.157 seconds).
+Test Suite 'JumpSequenceTests' passed at 2026-09-21 03:53:43.677.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 6.070 (6.071) seconds
+Test Suite 'ObstacleTests' started at 2026-09-21 03:53:43.677.
+Test Case '-[DreamCoreTests.ObstacleTests testContinueClearsTheWholeRecoverySurface]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testContinueClearsTheWholeRecoverySurface]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testCornerBallKnocksOffExposedBridgeButCentreCanRecover]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testCornerBallKnocksOffExposedBridgeButCentreCanRecover]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testDensityIncreasesAndAllConceptsAppear]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testDensityIncreasesAndAllConceptsAppear]' passed (0.008 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testEveryObstacleHasASurvivalWitnessAtOpeningAndCap]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testEveryObstacleHasASurvivalWitnessAtOpeningAndCap]' passed (0.009 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testLightningWarningCannotHitAndStrikeSurvivesSuspend]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testLightningWarningCannotHitAndStrikeSurvivesSuspend]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testMissedRequiredActionsAreFatal]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testMissedRequiredActionsAreFatal]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testOrdinaryPigRemainsASoftObstacle]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testOrdinaryPigRemainsASoftObstacle]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testSwingUsesContinuousSharedTrajectory]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testSwingUsesContinuousSharedTrajectory]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.ObstacleTests testTwentyMinuteProgressionEightSeeds]' started.
+Test Case '-[DreamCoreTests.ObstacleTests testTwentyMinuteProgressionEightSeeds]' passed (12.517 seconds).
+Test Suite 'ObstacleTests' passed at 2026-09-21 03:53:56.216.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 12.538 (12.539) seconds
+Test Suite 'ResourceCacheTests' started at 2026-09-21 03:53:56.216.
+Test Case '-[DreamCoreTests.ResourceCacheTests testEvictionRetainsRecentlyUsedResources]' started.
+Test Case '-[DreamCoreTests.ResourceCacheTests testEvictionRetainsRecentlyUsedResources]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.ResourceCacheTests testReplacementDoesNotEvictAndLongStreamsStayBounded]' started.
+Test Case '-[DreamCoreTests.ResourceCacheTests testReplacementDoesNotEvictAndLongStreamsStayBounded]' passed (0.053 seconds).
+Test Suite 'ResourceCacheTests' passed at 2026-09-21 03:53:56.269.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.053 (0.054) seconds
+Test Suite 'RunnerSwipeTests' started at 2026-09-21 03:53:56.269.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testJumpCommitsBeforeReleaseAndNeverRepeatsDuringContact]' started.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testJumpCommitsBeforeReleaseAndNeverRepeatsDuringContact]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.RunnerSwipeTests testRecognizedSwipeStartsJumpOnNextSimulationTick]' started.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testRecognizedSwipeStartsJumpOnNextSimulationTick]' passed (0.024 seconds).
+Test Case '-[DreamCoreTests.RunnerSwipeTests testSlideAndNextContact]' started.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testSlideAndNextContact]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.RunnerSwipeTests testSteeringJitterAndInvalidSamplesDoNotCommit]' started.
+Test Case '-[DreamCoreTests.RunnerSwipeTests testSteeringJitterAndInvalidSamplesDoNotCommit]' passed (0.000 seconds).
+Test Suite 'RunnerSwipeTests' passed at 2026-09-21 03:53:56.295.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.025 (0.025) seconds
+Test Suite 'ScaleCompositionTests' started at 2026-09-21 03:53:56.295.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testApproachingSceneryFadesBeforeExceedingRoleBudget]' started.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testApproachingSceneryFadesBeforeExceedingRoleBudget]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.ScaleCompositionTests testEventFrequencyAndStableSceneSelection]' started.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testEventFrequencyAndStableSceneSelection]' passed (0.057 seconds).
+Test Case '-[DreamCoreTests.ScaleCompositionTests testSceneHierarchyHasOnlyOnePossibleLandmark]' started.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testSceneHierarchyHasOnlyOnePossibleLandmark]' passed (0.004 seconds).
+Test Case '-[DreamCoreTests.ScaleCompositionTests testUnderfootLayersAndPartialLandmarkFraming]' started.
+Test Case '-[DreamCoreTests.ScaleCompositionTests testUnderfootLayersAndPartialLandmarkFraming]' passed (0.001 seconds).
+Test Suite 'ScaleCompositionTests' passed at 2026-09-21 03:53:56.357.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.062 (0.062) seconds
+Test Suite 'StrawDamageTests' started at 2026-09-21 03:53:56.357.
+Test Case '-[DreamCoreTests.StrawDamageTests testBalesUseSafeSupportAndDedicatedDeterministicStream]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testBalesUseSafeSupportAndDedicatedDeterministicStream]' passed (0.003 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testFourBallHitsLoseArmsThenLegsAndWake]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testFourBallHitsLoseArmsThenLegsAndWake]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testHayRepairsOneLimbWithoutCurrencyAndCannotReplay]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testHayRepairsOneLimbWithoutCurrencyAndCannotReplay]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testHayWaitsForClearSectionAndCannotRollAcrossItsBoundary]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testHayWaitsForClearSectionAndCannotRollAcrossItsBoundary]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testLiveStreamNeverOffersMoreThanOneHayPerFourSportsBalls]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testLiveStreamNeverOffersMoreThanOneHayPerFourSportsBalls]' passed (0.052 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testRollingHayTrajectoryAndBankedRebuild]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testRollingHayTrajectoryAndBankedRebuild]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.StrawDamageTests testSingleBallImmunityAndFullBodyBanksHay]' started.
+Test Case '-[DreamCoreTests.StrawDamageTests testSingleBallImmunityAndFullBodyBanksHay]' passed (0.001 seconds).
+Test Suite 'StrawDamageTests' passed at 2026-09-21 03:53:56.416.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.059 (0.059) seconds
+Test Suite 'TrackArtTests' started at 2026-09-21 03:53:56.416.
+Test Case '-[DreamCoreTests.TrackArtTests testCuratedSkiesAndMirrorChange]' started.
+Test Case '-[DreamCoreTests.TrackArtTests testCuratedSkiesAndMirrorChange]' passed (0.002 seconds).
+Test Case '-[DreamCoreTests.TrackArtTests testPlateDeckVisitsEveryPhotoWithoutRepeatingAtBoundaries]' started.
+Test Case '-[DreamCoreTests.TrackArtTests testPlateDeckVisitsEveryPhotoWithoutRepeatingAtBoundaries]' passed (0.130 seconds).
+Test Case '-[DreamCoreTests.TrackArtTests testSurfaceVarietyIsStableAndUsuallyQuiet]' started.
+Test Case '-[DreamCoreTests.TrackArtTests testSurfaceVarietyIsStableAndUsuallyQuiet]' passed (0.006 seconds).
+Test Suite 'TrackArtTests' passed at 2026-09-21 03:53:56.555.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.138 (0.139) seconds
+Test Suite 'TrackTranslucencyTests' started at 2026-09-21 03:53:56.555.
+Test Case '-[DreamCoreTests.TrackTranslucencyTests testChapterBoundaryIsSmoothAndVoidIsConcrete]' started.
+Test Case '-[DreamCoreTests.TrackTranslucencyTests testChapterBoundaryIsSmoothAndVoidIsConcrete]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.TrackTranslucencyTests testHierarchyAndNearFootingAcrossSeedsAndStates]' started.
+Test Case '-[DreamCoreTests.TrackTranslucencyTests testHierarchyAndNearFootingAcrossSeedsAndStates]' passed (0.100 seconds).
+Test Suite 'TrackTranslucencyTests' passed at 2026-09-21 03:53:56.656.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.101 (0.101) seconds
+Test Suite 'TraversalTests' started at 2026-09-21 03:53:56.656.
+Test Case '-[DreamCoreTests.TraversalTests testCertifiedManifestRetainsEncountersAndTutorial]' started.
+Test Case '-[DreamCoreTests.TraversalTests testCertifiedManifestRetainsEncountersAndTutorial]' passed (0.126 seconds).
+Test Case '-[DreamCoreTests.TraversalTests testContinueGrantSurvivesCrashAndCannotDuplicate]' started.
+Test Case '-[DreamCoreTests.TraversalTests testContinueGrantSurvivesCrashAndCannotDuplicate]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.TraversalTests testFailedWritePreservesMemoryAndBackupRecovery]' started.
+Test Case '-[DreamCoreTests.TraversalTests testFailedWritePreservesMemoryAndBackupRecovery]' passed (0.003 seconds).
+Test Case '-[DreamCoreTests.TraversalTests testFastNarrowOpeningTwelveSeeds]' started.
+Test Case '-[DreamCoreTests.TraversalTests testFastNarrowOpeningTwelveSeeds]' passed (1.708 seconds).
+Test Case '-[DreamCoreTests.TraversalTests testFatalTieBeatsThirdPig]' started.
+Test Case '-[DreamCoreTests.TraversalTests testFatalTieBeatsThirdPig]' passed (0.001 seconds).
+Test Case '-[DreamCoreTests.TraversalTests testHorizonRejectsIncompatibleGapAndUnderpass]' started.
+Test Case '-[DreamCoreTests.TraversalTests testHorizonRejectsIncompatibleGapAndUnderpass]' passed (0.021 seconds).
+Test Case '-[DreamCoreTests.TraversalTests testOracleSixHoursTwentySeeds]' started.
+Test Case '-[DreamCoreTests.TraversalTests testOracleSixHoursTwentySeeds]' passed (220.276 seconds).
+Test Case '-[DreamCoreTests.TraversalTests testThirdPigContactFreezesAndResumeEnding]' started.
+Test Case '-[DreamCoreTests.TraversalTests testThirdPigContactFreezesAndResumeEnding]' passed (0.015 seconds).
+Test Suite 'TraversalTests' passed at 2026-09-21 03:57:38.808.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 222.151 (222.152) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-21 03:57:38.808.
+	 Executed 87 tests, with 0 failures (0 unexpected) in 258.008 (258.020) seconds
+Test Suite 'All tests' passed at 2026-09-21 03:57:38.808.
+	 Executed 87 tests, with 0 failures (0 unexpected) in 258.008 (258.025) seconds
+CERTIFIED manifest: 8 encounter kinds, 26 gaps, 0/300 fallbacks
+SOAK seed 0: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 1: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 2: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 3: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 4: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 5: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 6: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 7: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 8: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 9: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 10: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 11: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 12: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 13: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 14: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 15: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 16: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 17: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 18: 1296060 ticks, 473017m, pigs committed 120
+SOAK seed 19: 1296060 ticks, 473017m, pigs committed 120
+SOAK maxima: chunks=13, hazards=13, pickup dedup=4
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

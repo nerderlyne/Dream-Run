@@ -77,7 +77,9 @@ public struct RunState: Codable, Sendable {
         return 1-Double(activeTicks-lastSoftTick)/60
     }
     public var speed:Double {unhinderedSpeed*(1-0.25*stumbleWeight)}
-    public func floorHeight(at distance:Double)->Double {chunks.reduce(0){$0+($1.step?.height(at:distance) ?? 0)}}
+    public func floorHeight(at distance:Double)->Double {
+        chunks.first{$0.start<=distance && $0.end>distance}?.step?.height(at:distance) ?? 0
+    }
     public func halfWidth(at distance:Double)->Double {chunks.first{$0.start<=distance && $0.end>distance}?.halfWidth ?? 2}
     public var unbroken: Bool { mode == .fresh && continueCount == 0 }
     public var visual: VisualPhase { pigs.count == 3 ? .luckyWhite : .at(seconds: seconds) }
@@ -146,7 +148,7 @@ public struct GameSimulation: Sendable {
                 chunk.candidateAttempts=attempt
                 if HorizonCertification.validate(history:state.chunks,candidate:chunk,rulesVersion:state.identity.rulesVersion) {certified=true;break}
                 chunk=original
-                if let gap=chunk.gap {let length=max(1.8,(gap.upperBound-gap.lowerBound)-Double(attempt)*0.3);chunk.gap=gap.lowerBound...(gap.lowerBound+length)}
+                if let gap=chunk.gap {let length=max(min(4,gap.upperBound-gap.lowerBound),(gap.upperBound-gap.lowerBound)-Double(attempt)*0.3);chunk.gap=gap.lowerBound...(gap.lowerBound+length)}
                 for h in chunk.hazards.indices where chunk.hazards[h].encounter == .dodge || chunk.hazards[h].encounter == .rolling {chunk.hazards[h].lateral=(attempt%2 == 0 ? -1 : 1)*0.9}
             }
             if !certified {chunk.hazards=[];chunk.gap=nil;chunk.step=nil;chunk.collapsing=false;chunk.halfWidth=2;chunk.routeFamily = .trackStraight;chunk.candidateAttempts=8;chunk.fallbackReason="no certified horizon trajectory"}
@@ -205,7 +207,9 @@ public struct GameSimulation: Sendable {
             state.player.height -= state.floorHeight(at:state.distance)-state.floorHeight(at:oldDistance)
             state.player.height += state.player.velocityY*dt; state.player.velocityY -= state.rules.gravity*dt
             if supported && state.player.height <= 0 && state.player.velocityY <= 0 {
-                if oldHeight < -0.35 { wake("gap"); return [.waking] }
+                // A runner below the landing rim cannot snap upward onto it.
+                // The old 35 cm tolerance let short gaps be run across at high speed.
+                if oldHeight < -0.000001 { wake("gap"); return [.waking] }
                 state.player.height = 0; state.player.velocityY = 0; state.player.grounded = true
             }
             if state.player.height < -1.6 { wake("gap"); return [.waking] }
@@ -306,9 +310,6 @@ public struct GameSimulation: Sendable {
             wake("fell from edge");events.append(.waking)
         }
         if state.phase == .mirrorCrossing && state.activeTicks >= state.mirrorUntilTick { state.phase = .running }
-        let block=Int(state.distance/1800), local=state.distance.truncatingRemainder(dividingBy:1800)
-        if local >= 900 && local < 916 && state.pigs.count < 3 && state.phase == .running { state.phase = .safeDrop }
-        if state.phase == .safeDrop && local >= 916 { state.phase = .running; if state.lastDropBlock != block { state.dropCount += 1; state.lastDropBlock=block; events.append(.drop) } }
         if state.paletteIndex == 5 { if state.voidEntryTick == nil { state.voidEntryTick=state.activeTicks } }
         else if let entered=state.voidEntryTick { if state.activeTicks-entered >= 7200 { state.escapedVoid=true }; state.voidEntryTick=nil }
         if state.activeTicks == 648000 { events.append(.mastery) }

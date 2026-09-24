@@ -53,8 +53,8 @@ public struct Profile: Codable, Sendable {
     public var schema = 1
     public var lots: [WalletLot] = []
     public var ledger: [WalletEntry] = []
-    public var owned: Set<String> = ["bare_head"]
-    public var equipped: [String:String] = ["hat":"bare_head"]
+    public var owned: Set<String> = ["bare_head", "plain_ribbon", "plain_bottom", "straw_skirt"]
+    public var equipped: [String:String] = ["hat":"bare_head", "top":"plain_ribbon", "bottom":"plain_bottom"]
     public var achievements: Set<String> = []
     public var settled: [String:Int] = [:]
     public var records: [String:UInt64] = [:]
@@ -62,6 +62,8 @@ public struct Profile: Codable, Sendable {
     public var grants: [ContinueGrant] = []
     public var snapshot: RunState?
     public var lastResult: RunState?
+    public var reviewEligibleRunIDs: Set<UUID> = []
+    public var reviewLastRequestRunCount = 0
     public var settings = Settings()
     public var balance: Int { lots.reduce(0) { $0+$1.remaining } }
     public init() {}
@@ -87,6 +89,9 @@ public struct Profile: Codable, Sendable {
     }
     public mutating func settle(_ run: RunState, finished: Bool, catalogue: [AchievementDefinition]) {
         guard run.mode.earns else { return }
+        if finished && run.mode == .fresh {
+            reviewEligibleRunIDs.insert(run.id)
+        }
         let key=run.id.uuidString, previous=settled[key,default:0], delta=max(0,run.balloons-previous)
         if delta > 0 { credit(id:"run:\(key):settlement:\(run.balloons)",amount:delta,source:"earned"); settled[key]=run.balloons }
         var unlocks: Set<String> = []
@@ -106,6 +111,23 @@ public struct Profile: Codable, Sendable {
         for id in unlocks { unlock(id,catalogue:catalogue) }
         if finished { lastResult=run }
     }
+    public mutating func claimReviewRequest() -> Bool {
+        let completed=reviewEligibleRunIDs.count
+        guard completed > reviewLastRequestRunCount, Self.isPrime(completed) else { return false }
+        reviewLastRequestRunCount=completed
+        return true
+    }
+    private static func isPrime(_ number:Int) -> Bool {
+        guard number >= 2 else { return false }
+        if number == 2 { return true }
+        if number.isMultiple(of:2) { return false }
+        var divisor=3
+        while divisor <= number/divisor {
+            if number.isMultiple(of:divisor) { return false }
+            divisor += 2
+        }
+        return true
+    }
     public mutating func unlock(_ id: String, catalogue: [AchievementDefinition]) {
         guard !achievements.contains(id) else { return }; achievements.insert(id)
         if id == "first_dream" { credit(id:"bonus:first_dream",amount:100,source:"bonus") }
@@ -120,10 +142,18 @@ public struct Profile: Codable, Sendable {
         grants[i].consumed=true; snapshot=simulation.state; return true
     }
 }
+public enum ProfileWriteError:Error,LocalizedError,Sendable {
+    case backlogFull
+    public var errorDescription:String? {"Saving is taking too long. Your dream is paused while earlier saves finish."}
+}
 /// A serialized copy-on-write transaction. The envelope, including wallet and snapshot,
 /// is replaced atomically; in-memory state only changes after a successful durable write.
 public final class ProfileStore: @unchecked Sendable {
-    private let lock=NSRecursiveLock()
+    private let writer=DispatchQueue(label:"dream.profile-writer",qos:.utility)
+    // Readers only copy the last durable value; they never wait for encoding/I/O.
+    private let valueLock=NSLock()
+    private let pendingLock=NSLock()
+    private var pendingWrites=0
     public let url: URL
     private var value: Profile
     public private(set) var recoveredBackup = false
@@ -156,13 +186,34 @@ public final class ProfileStore: @unchecked Sendable {
         let payload=try encoder.encode(p)
         return try encoder.encode(Envelope(checksum:SplitMix64.fnv(payload.base64EncodedString()),payload:payload))
     }
-    public var profile: Profile { lock.lock(); defer { lock.unlock() }; return value }
+    public var profile: Profile { valueLock.lock(); defer { valueLock.unlock() }; return value }
     public func transaction(_ body: (inout Profile) throws -> Void) throws {
-        lock.lock(); defer { lock.unlock() }
-        var next=value; try body(&next)
-        let bytes=try Self.encode(next), previous=try Self.encode(value)
+        // Synchronous lifecycle/commerce transactions drain earlier checkpoints,
+        // so an older queued snapshot can never overwrite a pause or final result.
+        try writer.sync {try commit(body)}
+    }
+    public func transactionAsync(_ body:@escaping @Sendable (inout Profile)throws->Void,
+                                 completion:@escaping @Sendable (Result<Void,Error>)->Void) {
+        // Bound retained snapshots even if storage stops making progress. The
+        // host pauses on rejection; accepted transactions still finish in order.
+        pendingLock.lock()
+        guard pendingWrites < 8 else {
+            pendingLock.unlock();completion(.failure(ProfileWriteError.backlogFull));return
+        }
+        pendingWrites += 1
+        pendingLock.unlock()
+        writer.async { [self] in
+            let result=Result {try commit(body)}
+            pendingLock.lock();pendingWrites -= 1;pendingLock.unlock()
+            completion(result)
+        }
+    }
+    private func commit(_ body:(inout Profile)throws->Void) throws {
+        let current=profile
+        var next=current; try body(&next)
+        let bytes=try Self.encode(next), previous=try Self.encode(current)
         try previous.write(to:url.appendingPathExtension("backup"),options:.atomic)
         try bytes.write(to:url,options:.atomic)
-        value=next
+        valueLock.lock();value=next;valueLock.unlock()
     }
 }

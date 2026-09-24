@@ -1,4 +1,4 @@
-# Dream Again implementation status
+# Dreamlooper implementation status
 
 Native SwiftUI + non-AR RealityKit first playable, with a separate deterministic Swift core,
 shared Xcode scheme, offline progression, save/share, suspend/resume, achievements and audio.
@@ -26,12 +26,92 @@ Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after contin
   Logs: `evidence/reposts-core.log`, `reposts-native.log`, `reposts-build.log`, `reposts-spec.log`.
   No physical-device test, full-suite rerun or sustained performance measurement in this pass.
 
+## Floating stair progression — September 22, 2026
+
+- Removed the fallen-column encounter, procedural hurdle mesh, Lab option and its
+  rejected screenshot. Architectural columns remain scenery within the existing registry.
+- Replaced column runs with detached ascending stair flights: 3 m gaps initially,
+  widening to 4 m from 1,200 m. The other ascending variant adds two 3 m gaps from
+  1,200 m, then three 4 m gaps from 4,500 m. Ordinary intact stairs stay automatic.
+- Gaps end at raised landings, use real unsupported intervals, and retain 24 m action
+  spacing and a recovery chunk. Edge markers now follow each landing's actual elevation.
+- Progression tests cover 12 seeds, three difficulty tiers, four speeds and both grade
+  extremes, including intentionally omitted jumps. Certification checks later flights
+  without replacing them with empty track.
+- PASS: `swift test -c release` — 89 tests, zero failures (303.3 s), including
+  twenty six-hour traversals. The 300-chunk certified manifest retains 66 gaps,
+  eight encounter kinds and zero fallbacks. Soak maxima: 13 chunks/13 hazards/4 pickup IDs.
+  Evidence: `evidence/floating-stairs-core-tests.log`.
+- PASS: `python3 tools/validate_spec.py` — 54 checks (`evidence/floating-stairs-spec.log`).
+- Simulator command: `xcodebuild -project 'Dream Again.xcodeproj' -scheme 'Dream Again'
+  -configuration Debug -destination 'platform=iOS Simulator,id=80DBBEEC-A752-43F6-A60E-2419BAE5B77E'
+  -derivedDataPath /tmp/dream-jump-build -resultBundlePath /tmp/dream-floating-stairs-tests.xcresult
+  CODE_SIGNING_ALLOWED=NO test`, using `-only-testing:` for
+  `Dream AgainTests/Dream_AgainTests/testFloatingStairGapMarkersFollowRaisedLanding` and
+  `Dream AgainUITests/Dream_AgainUITests/testFloatingStairProgressionPreviews`.
+  PASS: simulator build, native gap-marker test and UI progression preview test.
+  Log: `evidence/floating-stairs-simulator-tests.log`; inspected early and late screenshots:
+  `evidence/floating-stairs-screenshots/` (iPhone 16 Pro Max, iOS 26.5).
+  XCTest logged a transient event-loop idle timeout during the first launch, then recovered
+  and completed both captures without an assertion failure; this is not device performance evidence.
+- PASS: `git diff --check`.
+- No physical-device checks or additional profile reset.
+
+## Required jump sequences — September 21, 2026 (column variant superseded above)
+
+- Removed the wide automatic balloon drop from generation, route elevation, near/far
+  surface rendering and automatic transition activation.
+- Added seeded three-jump runs: full-width fallen columns, furniture/gap combinations,
+  and raised staircase landings at 0.72 / 1.44 / 2.16 m. Jumps are 24 m apart
+  (1.09 seconds at 22 m/s), followed by a recovery chunk. Mirror buffers and pig
+  runway protections remain authoritative; ordinary stairs remain automatic.
+- Shared staircase profiles are evaluated once per containing chunk, so rendering,
+  collision and saved state agree. Fallen columns reuse registered family #10.
+- Fixed below-rim landing snap and prevented certification retries from reducing
+  normal gaps below 4 m. These gaps must require a jump even at capped speed.
+- Current identities/configuration use G2/R2/C1. Old prerelease layouts are rejected;
+  original G1/R1 RNG/seed/pig fixtures still verify the encoding and sampling algorithms.
+- PASS: `python3 tools/validate_spec.py` — 54 data/reference checks (`evidence/jump-sequences-spec.log`).
+- PASS: simulator column geometry matches its collision envelope; UI preview test captured
+  ascending/column/mixed sequences on iPhone 16 Pro Max, iOS 26.5. All three PNGs were
+  inspected; risers, barriers and the actual missing floor are visible from the close camera.
+  Log: `evidence/jump-sequences-simulator-tests.log`; images/manifest:
+  `evidence/jump-sequences-screenshots/`.
+- Core command: `swift test -c release` (full suite including six-hour/20-seed traversal).
+  PASS: 87 tests, zero failures (258.0 s), including all 20 six-hour seeds.
+  Certified 300-chunk manifest retained 26 gaps and 8 encounter kinds with zero fallbacks.
+  Soak maxima: 13 chunks, 13 hazards, 4 retained pickup IDs.
+  Evidence: `evidence/jump-sequences-core-tests.log`.
+- PASS: final simulator build (`evidence/jump-sequences-simulator-build.log`) and
+  two native tests (`evidence/jump-sequences-final-simulator-tests.log`).
+- PASS: `git diff --check`. Existing unrelated workspace changes were preserved.
+- Native command: `xcodebuild -project 'Dream Again.xcodeproj' -scheme 'Dream Again'
+  -configuration Debug -destination 'platform=iOS Simulator,id=80DBBEEC-A752-43F6-A60E-2419BAE5B77E'
+  -derivedDataPath /tmp/dream-jump-build CODE_SIGNING_ALLOWED=NO test`, narrowed with
+  `-only-testing:` to the new column envelope, current identity, and jump preview tests.
+- NOT RUN: human timing playtest, physical tilt and thermal checks. No physical iPhone used.
+
+## Performance investigation and fixes — September 20, 2026
+
+- The owner temporarily authorized physical testing, then ended it and requested static/local work. Two completed two-minute recordings on iPhone 17e (iOS 26.4.2), seed 42, optimized Debug (`-O`, whole-module optimization), used normal simulation and oracle input in an isolated nonrewarding profile. Further testing remains simulator-only.
+- Measured callback gaps over 100 ms: **6 → 0**; over 50 ms: **192 → 2**; worst gap **163.634 → 82.224 ms**. Audio-update median **1.866 → 0.049 ms**. Baseline thermal state was fair; comparison state was serious and activated the existing reduced-detail mode. This is not a controlled graphics comparison, GPU FPS, or proof of stall-free play. Raw reports and summaries are in `evidence/performance-{baseline,audio}*.json`.
+- Audio graph startup now occurs before gameplay advances. Silent player stops, effect-player stop/start churn, disabled-theta route queries, and motif restarts are avoided. Added engine-reuse and pause/resume checks. Existing sound tests had stale 25-buffer and 0.2-peak expectations after straw sounds were added; tests now require the exact cue set, retain ambient limits and channel separation, and apply the straw generator's documented 0.8 ceiling to those two transients.
+- After device testing ended: prebuild reusable material maps and fixed-color gameplay prefabs during preparation; share hay and obstacle meshes across independent entity clones; use bounded incremental LRU eviction; sample Debug entity diagnostics once per second. Async checkpoints use a FIFO writer, short durable-value read lock, and an eight-write backlog cap; synchronous pause/end/commerce operations drain earlier writes. Queue rejection or write failure pauses play without publishing uncommitted profile changes.
+- Added opt-in signposts, bounded frame capture with capture identity/date, automated nonrewarding runs and `tools/summarize_performance.py`. Release excludes the automation launch hook. See [PERFORMANCE.md](PERFORMANCE.md) for commands, interpretation and remaining coverage. Later caching/persistence refinements have **no device speedup measurement**.
+- **PASS:** 54 specification checks; full Release core suite (80 tests, including 20 seeded six-hour simulations); final focused persistence/cache suite (6 tests, including blocked-reader behavior, FIFO draining, failed-write backup, bounded backlog and 10,000 cache inserts); native simulator suite (37 tests, all passed); Release simulator build with signing disabled. Logs: `evidence/performance-final-core-tests.log`, `performance-final-persistence-tests.log`, `performance-final-native-tests.log`, `performance-release-simulator-build.log`.
+- **FAILED / corrected:** the initial native audio test run failed on stale bundled-audio expectations described above. Focused rerun passed. **Unavailable:** Instruments CLI attach/launch did not produce a usable device trace; no GPU or device-memory result is claimed. The full native suite emitted simulator drawable-allocation warnings despite passing. The separate final fresh-process smoke test passed (15-second automated capture, paused without save errors, screenshot inspected) with no drawable-allocation messages; its three audio regression tests also passed. Log: `evidence/performance-final-smoke-tests.log`; screenshot: `evidence/performance-smoke-attachments/859A7C63-78BD-491E-BBBB-BC47804E1F69.png`. This unoptimized simulator run checks function, not device performance. The final Release rebuild also succeeded without the earlier captured-self concurrency warning.
+
 ## Hay spawn balance and bounded rolling — September 19, 2026
 
 - Hay candidates now require four certified moving sports balls before one is admitted; unused eligibility is reset after an offer. This counts actual accepted obstacle chunks, not rejected generator candidates. The budget persists with the run.
 - Hay starts rolling only after the runner enters its empty support section, and its travel stops one metre inside that section. It cannot travel backward across earlier stairs, gaps, drops or static obstacle setups. Collapsing support is excluded. Shared active-time distance math now drives both sports balls and hay; collision and rendering use the same bounded position.
 - Collection, banked straw and repair feedback remain. This is controlled route motion, not rigid-body ball-to-ball physics. Verification: 7 focused Release core tests passed (2.007 seconds), the Debug iOS Simulator build succeeded, and all 54 specification checks passed. Logs: `evidence/hay-routing-core.log`, `hay-routing-build.log`, `hay-routing-spec.log`. No simulator gameplay session, full-suite rerun or performance benchmark in this pass. No physical iPhone testing.
 
+## Dreamlooper identity and icon prototype — September 17, 2026
+
+- App display name, home title, alerts, share caption and unsupported-version copy now use Dreamlooper. Debug/Release bundle ID is the owner-confirmed signed explicit ID `dev.shivanshi.dream-run`; test IDs use `.tests` and `.uitests`. Import scheme is `dreamlooper`; seed document type is `dev.shivanshi.dream-run.seed`. Internal project/scheme/module filenames remain Dream Again / DreamAgain. Retry copy remains “dream again.”
+- Original imagegen concept saved in `art/branding/dreamlooper-icon-prototype.png`; exact prompt and provenance are in that folder's README. Prototype only; existing bundled icon retained. No signing change, live products or physical-device testing.
+- PASS: Debug generic iOS Simulator build with signing disabled. Built Info.plist readback confirms `CFBundleIdentifier=dev.shivanshi.dream-run`, `CFBundleDisplayName=Dreamlooper`, and URL scheme `dreamlooper`. A generic physical-iOS Release build also succeeded with automatic signing: app signature identifier `dev.shivanshi.dream-run`, Team `BZ2SH7NUDM`, Apple Development identity `Shivanshi Tyagi (RS52HCDR44)`, and Xcode wildcard development profile `BZ2SH7NUDM.*`. This verifies local development signing, not App Store distribution export. Specification validator passed 54 checks; `git diff --check` passed. Evidence: `evidence/dreamlooper-identity-build.log` and `evidence/dreamlooper-signed-build.log`. Swift seed golden-vector and invalid-ID tests passed: 2 tests, 0 failures (`swift test --filter 'CoreTests.testAllGoldenVectors|CoreTests.testIDsRejectBadInput'`); evidence: `evidence/dreamlooper-identity-tests.log`. Initial `Determinism` filter matched zero tests and was corrected. No simulator launch/UI test or App Store archive/export in this pass.
 
 ## Rolling hay and stored straw — September 17, 2026
 
@@ -319,3 +399,23 @@ were run for this isolated mesh correction.
 
 Use `README.md` for building and `docs/OWNER_SETUP.md` for external service configuration.
 See `KNOWN_LIMITATIONS.md` for unverified acceptance criteria; this is not App Store certification.
+
+The G2/R2 prerelease uses a fresh `profile-g2-r2.json` development profile. The previous
+`profile.json` stays on disk unchanged; its wallet, settings and bookmarks are not migrated.
+
+## Wardrobe preview and categories — September 24, 2026
+
+- The wardrobe displays the existing RealityKit straw doll as the try-on model. Tapping any catalogue item temporarily dresses that model without a wallet transaction or ownership grant; Buy and Equip remain explicit actions.
+- Items are grouped under Head, Top and Bottom. The former body selection is now a free skirt in Bottom; Top colors tint the ribbon and sash. The shared straw rig never changes for an outfit.
+- Specification validation: 54 checks passed. iOS Simulator Debug build: succeeded. Focused wardrobe UI test: passed. Two straw-doll renderer tests: passed. Focused Swift wallet test: passed. The older combined gameplay/menu UI test failed before reaching the wardrobe because the run ended before its pause assertion.
+# Review request (2026-09-24)
+
+- The results screen waits two seconds and requests Apple's standard review sheet after a prime-numbered completed Fresh run (2, 3, 5, 7, 11, …). The most recent requested run count is persisted so a reopened result cannot trigger another request. Tutorial, Revisit and Debug runs do not count. Apple controls whether a sheet appears; no rating or review is rewarded or required.
+- The focused prime-run review test and `python3 tools/validate_spec.py` passed; a Debug arm64 iOS Simulator build was checked. Actual review-sheet display was not exercised; StoreKit may suppress it. Ad-removal product behavior remains a product decision because the current only ad is an optional rewarded continue.
+
+### AdMob rewarded continue integration (2026-09-24)
+
+- Reused Align&Reveal's pinned Google Mobile Ads 13.9.0 and UMP 3.1.0 Swift packages. The owner's AdMob app ID is in `Configuration/Info.plist`; the rewarded unit ID is in `DreamAdConfiguration` and the disabled example service configuration.
+- The Google adapter refreshes consent, loads a rewarded ad, records an earned callback against the run that offered it, and reloads after dismissal. Settings exposes UMP privacy options when required.
+- The Debug Lab can request Google's test rewarded unit without granting a production continue. Live inventory stays disabled pending owner consent setup and explicit authorization.
+- `python3 tools/validate_spec.py`, plist lint, and Debug and Release arm64 iOS Simulator builds passed. No live ad or on-device test was performed.

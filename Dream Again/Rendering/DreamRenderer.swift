@@ -25,6 +25,10 @@ import simd
     private var equippedCache:[String:String]?
     var gallery:Entity?
     var renderEntities = 0
+    var strawBallPrototype:Entity?
+    var obstacleCache=BoundedLRUCache<String,Entity>(capacity:24)
+    private var resourcesPrepared=false
+    private var lastEntityCountTime = -Double.infinity
     let balloonPops=BalloonPopEffects()
     let strawBursts=StrawBurstEffects()
     var lastHayCount=0
@@ -44,14 +48,24 @@ import simd
         wardrobeLight.light.intensity=1600;wardrobeLight.light.attenuationRadius=12;wardrobeLight.position=[-1,2.5,-3];wardrobeLight.isEnabled=false;anchor.addChild(wardrobeLight)
         buildStrawDoll()
     }
+    /// Called while preparing a run, before its active clock starts.
+    func prepareGameplay() {
+        guard !resourcesPrepared else{return}
+        resourcesPrepared=true
+        factory.prepareGameplay()
+        _ = strawBall()
+        for (asset,encounter) in [(AssetID.moon,Encounter.swing),(.window,.slide),(.bed,.jump),(.chair,.jump)] {
+            _ = obstacleModel(HazardDescription(id:"prewarm",asset:asset,encounter:encounter,distance:0,lateral:0,radius:0.5,height:1))
+        }
+    }
     func dress(_ equipped:[String:String]) {
         guard equipped != equippedCache else {return};equippedCache=equipped
-        let feminine=equipped["character"] == "girl"
+        let skirt=equipped["bottom"] == "straw_skirt"
         headAttachment.children.removeAll()
         runner.children.filter{$0.name == "equipped-trail"}.forEach{$0.removeFromParent()}
         let colors=["pearl_body":"#E9E6E2","rose_body":"#CBA6B7","mint_body":"#ACCFBE"]
-        let bodyColor=UIColor(hex:colors[equipped["body_color"] ?? ""] ?? (feminine ? "#C8A7BC" : "#B5C8C3"))
-        strawCostume(feminine:feminine,color:bodyColor)
+        let bodyColor=UIColor(hex:colors[equipped["top"] ?? ""] ?? "#B5C8C3")
+        strawCostume(feminine:skirt,color:bodyColor)
         if equipped["trail"] == "void_ribbon" {
             var g=Geometry();g.tube([[0,0.5,0.2],[0.15,0.35,0.65],[-0.1,0.2,1.1]],radius:0.03)
             if let mesh=try? g.resource() {let trail=ModelEntity(mesh:mesh,materials:[factory.material(UIColor(hex:"#D5C6D6").withAlphaComponent(0.25),style:0)]);trail.name="equipped-trail";runner.addChild(trail)}
@@ -110,9 +124,7 @@ import simd
             for n in 0..<24 {
                 let s=c.start+Double(n), middle=s+0.5
                 if !cinematic && c.gap?.contains(middle) == true { continue }
-                let dropPosition=middle.truncatingRemainder(dividingBy:1800)
-                if !cinematic && dropPosition >= 900 && dropPosition < 916 {continue}
-                // Real gaps and drops never receive an invisible collision floor.
+                // Every missing surface is backed by a real simulation gap.
                 let sampleA=generator.sample(s),sampleB=generator.sample(s+1)
                 let elevation=Float(c.step?.height(at:middle) ?? 0)
                 let a=local(sampleA,origin:origin)+[0,elevation,0], b=local(sampleB,origin:origin)+[0,elevation,0]
@@ -157,7 +169,7 @@ import simd
             }
         }
         animateTerrain(run)
-        distantPath.update(run:run,origin:origin,palette:surfacePalettes[palette],world:world)
+        PerformanceTrace.measure("DistantPath") {distantPath.update(run:run,origin:origin,palette:surfacePalettes[palette],world:world)}
         let activeHazards=Set(run.hazards.filter{ !$0.resolved }.map(\.id))
         for (id,e) in hazards where !activeHazards.contains(id) { e.removeFromParent(); hazards.removeValue(forKey:id) }
         for h in run.hazards where !h.resolved {
@@ -261,7 +273,12 @@ import simd
             evolution.update(seconds:run.seconds,palettes:surfacePalettes,art:art)
         }
         func count(_ entity:Entity)->Int {1+entity.children.reduce(0){$0+count($1)}}
-        renderEntities=count(anchor)
+        // Diagnostic traversal is not animation. Sample once per second in Lab
+        // and telemetry, without walking the whole scene on every normal frame.
+        #if DEBUG
+        let now=ProcessInfo.processInfo.systemUptime
+        if now-lastEntityCountTime >= 1 {renderEntities=count(anchor);lastEntityCountTime=now}
+        #endif
     }
     func mix(_ a:UIColor,_ b:UIColor,_ t:CGFloat)->UIColor {
         var ar:CGFloat=0,ag:CGFloat=0,ab:CGFloat=0,aa:CGFloat=0,br:CGFloat=0,bg:CGFloat=0,bb:CGFloat=0,ba:CGFloat=0

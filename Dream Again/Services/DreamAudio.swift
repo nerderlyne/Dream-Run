@@ -14,6 +14,7 @@ import UIKit
     private(set) var buffers:[String:AVAudioPCMBuffer]=[:]
     private(set) var thunderBuffer:AVAudioPCMBuffer?
     private(set) var running=false
+    private(set) var engineStartCount=0
     private var runID:UUID?
     private var variant = -1
     private var lastBalloonTick:UInt64?
@@ -63,10 +64,10 @@ import UIKit
     @objc private func routeChanged() {
         // Stop immediately on a route change; the next game update re-evaluates
         // eligibility. Phone speakers, AirPlay and mono accessibility never play it.
-        theta.stop(); theta.volume=0
+        if theta.isPlaying {theta.stop()}; theta.volume=0
     }
     private func startEngine()->Bool {
-        if !engine.isRunning { do { try engine.start() } catch { return false } }
+        if !engine.isRunning { do { try engine.start(); engineStartCount += 1 } catch { return false } }
         return true
     }
     private func loop(_ node:AVAudioPlayerNode,_ name:String,target:Float,amount:Float) {
@@ -74,34 +75,48 @@ import UIKit
         if target>0 && !node.isPlaying {
             node.volume=0; node.scheduleBuffer(buffer,at:nil,options:.loops); node.play()
         }
-        node.volume += (target-node.volume)*amount
-        if target == 0 && node.volume<0.0001 { node.stop(); node.volume=0 }
+        if abs(target-node.volume)>0.0001 {node.volume += (target-node.volume)*amount}
+        if target == 0 && node.volume<0.0001 { if node.isPlaying {node.stop()}; if node.volume != 0 {node.volume=0} }
+    }
+    /// Activate the graph behind the ready screen, before advancing gameplay.
+    func prepare(run:RunState,settings:Settings) {
+        var preparing=run
+        preparing.phase = .running
+        update(run:preparing,settings:settings,delta:0)
     }
     func update(run:RunState,settings:Settings,delta:Double) {
         guard [.running,.safeDrop,.mirrorCrossing,.luckyTransition,.whiteEnding].contains(run.phase) else { return }
         if runID != run.id {
             stop(); runID=run.id; variant = -1; lastBalloonTick=nil; pickupNote=0
         }
-        guard settings.music || settings.effects || settings.thetaEnabled else { stop(); return }
+        guard settings.music || settings.effects || settings.thetaEnabled else {
+            if running || engine.isRunning {stop()}
+            return
+        }
         guard startEngine() else { return }
         running=true
         let scene=DreamSoundscape(run:run)
         let dt=max(0,min(0.1,delta.isFinite ? delta : 0))
         let amount=Float(1-exp(-dt/(run.phase == .mirrorCrossing ? 0.018 : 1.8)))
         let space:Float=scene.bed == "water" ? 32 : scene.bed == "void" ? 8 : 23
-        reverb.wetDryMix += (space-reverb.wetDryMix)*amount
+        if abs(space-reverb.wetDryMix)>0.01 {reverb.wetDryMix += (space-reverb.wetDryMix)*amount}
         let music=Float(settings.music ? DreamSoundscape.level(settings.musicLevel) : 0)
         for (name,node) in beds {
             loop(node,name,target:name == scene.bed ? Float(scene.bedGain)*music : 0,amount:amount)
         }
-        if variant != scene.motifVariant { motif.stop(); variant=scene.motifVariant }
+        if variant != scene.motifVariant {
+            variant=scene.motifVariant
+            if motif.isPlaying,let buffer=buffers["motif-\(variant)"] {
+                motif.scheduleBuffer(buffer,at:nil,options:[.loops,.interrupts])
+            }
+        }
         loop(motif,"motif-\(variant)",target:Float(scene.motifGain)*music,amount:amount)
         loop(pulse,"pulse",target:Float(scene.pulseGain)*music,amount:amount)
-        let eligible=DreamSoundscape.thetaAllowed(settings:settings,headphones:stereoHeadphoneRoute,mono:UIAccessibility.isMonoAudioEnabled)
+        let eligible=settings.thetaEnabled && DreamSoundscape.thetaAllowed(settings:settings,headphones:stereoHeadphoneRoute,mono:UIAccessibility.isMonoAudioEnabled)
         if eligible {
             loop(theta,"theta",target:Float(DreamSoundscape.level(settings.thetaLevel)*scene.thetaGain),amount:Float(1-exp(-dt/2)))
-        } else { theta.stop(); theta.volume=0 }
-        if !settings.effects { for node in voices { node.stop() }; thunder.stop() }
+        } else if theta.isPlaying { theta.stop(); theta.volume=0 }
+        if !settings.effects { for node in voices where node.isPlaying { node.stop() }; if thunder.isPlaying {thunder.stop()} }
     }
     func movement(before:RunState,after:RunState,settings:Settings) {
         for cue in DreamMovementAudio().cues(before:before,after:after) { play(cue,settings:settings) }
@@ -116,15 +131,19 @@ import UIKit
         // Running stays just perceptible beneath the score. Preserve the contact
         // transient and surface timbre, but attenuate every footfall by ~17 dB.
         let cueGain:Float = [.step,.waterStep,.stoneStep].contains(cue) ? 0.14 : 1
-        node.stop(); node.volume=Float(DreamSoundscape.level(settings.effectsLevel))*cueGain
-        node.scheduleBuffer(buffer); node.play()
+        node.volume=Float(DreamSoundscape.level(settings.effectsLevel))*cueGain
+        // Keep the four players running. stop/play synchronously tears down their
+        // render state; scheduling an interrupt reuses the graph for each footfall.
+        node.scheduleBuffer(buffer,at:nil,options:.interrupts)
+        if !node.isPlaying {node.play()}
     }
     func feedback(_ event:GameEvent,settings:Settings,tick:UInt64?=nil) {
         if event == .thunder {
             if settings.haptics { UIImpactFeedbackGenerator(style:.heavy).impactOccurred(intensity:1) }
             guard settings.effects,let buffer=thunderBuffer,startEngine() else { return }
-            thunder.stop(); thunder.volume=Float(DreamSoundscape.level(settings.effectsLevel))
-            thunder.scheduleBuffer(buffer); thunder.play(); return
+            thunder.volume=Float(DreamSoundscape.level(settings.effectsLevel))
+            thunder.scheduleBuffer(buffer,at:nil,options:.interrupts)
+            if !thunder.isPlaying {thunder.play()}; return
         }
         if event == .balloon,let tick {
             if let last=lastBalloonTick,tick>=last,tick-last<8 { return }
@@ -152,9 +171,9 @@ import UIKit
         play(.menu,settings:settings)
     }
     func stop(preserveThunder:Bool=false) {
-        for node in Array(beds.values)+[motif,pulse,theta] { node.stop(); node.volume=0 }
-        for node in voices { node.stop() }
+        for node in Array(beds.values)+[motif,pulse,theta] { if node.isPlaying {node.stop()}; node.volume=0 }
+        for node in voices where node.isPlaying { node.stop() }
         running=false
-        if !preserveThunder || !thunder.isPlaying { thunder.stop(); engine.pause() }
+        if !preserveThunder || !thunder.isPlaying { if thunder.isPlaying {thunder.stop()}; if engine.isRunning {engine.pause()} }
     }
 }

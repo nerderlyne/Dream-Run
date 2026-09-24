@@ -1,0 +1,540 @@
+{
+  "note": "Optimized DEBUG; automated oracle inputs; isolated nonrewarding profile. Intervals are display-link callbacks, not measured GPU presentation. Includes cold and warm frames.",
+  "duration_seconds": 120.00916541670449,
+  "recording_overflow": 0,
+  "seeds": [
+    "42"
+  ],
+  "phases": {
+    "running": 5735,
+    "safeDrop": 44
+  },
+  "thermal_states": {
+    "1": 5779
+  },
+  "max_entities": 333,
+  "active_intervals": {
+    "count": 5778,
+    "p50_ms": 16.697,
+    "p95_ms": 36.294,
+    "p99_ms": 52.061,
+    "p999_ms": 110.029,
+    "max_ms": 163.634,
+    "over_33_34ms": 654,
+    "over_50ms": 192,
+    "over_100ms": 6
+  },
+  "warm_active_intervals": {
+    "count": 5271,
+    "p50_ms": 16.698,
+    "p95_ms": 47.847,
+    "p99_ms": 52.07,
+    "p999_ms": 84.017,
+    "max_ms": 113.846,
+    "over_33_34ms": 617,
+    "over_50ms": 189,
+    "over_100ms": 5
+  },
+  "active_cpu_work": {
+    "count": 5779,
+    "p50_ms": 2.925,
+    "p95_ms": 16.255,
+    "p99_ms": 25.466,
+    "p999_ms": 56.297,
+    "max_ms": 151.322,
+    "over_33_34ms": 33,
+    "over_50ms": 8,
+    "over_100ms": 1
+  },
+  "stages_when_executed": {
+    "Audio": {
+      "count": 5778,
+      "p50_ms": 1.866,
+      "p95_ms": 2.422,
+      "p99_ms": 2.888,
+      "p999_ms": 27.074,
+      "max_ms": 150.659,
+      "over_33_34ms": 2,
+      "over_50ms": 1,
+      "over_100ms": 1
+    },
+    "DistantPath": {
+      "count": 5778,
+      "p50_ms": 0.058,
+      "p95_ms": 0.127,
+      "p99_ms": 1.254,
+      "p999_ms": 3.389,
+      "max_ms": 6.339,
+      "over_33_34ms": 0,
+      "over_50ms": 0,
+      "over_100ms": 0
+    },
+    "Persistence": {
+      "count": 8,
+      "p50_ms": 3.502,
+      "p95_ms": 5.08,
+      "p99_ms": 5.08,
+      "p999_ms": 5.08,
+      "max_ms": 5.08,
+      "over_33_34ms": 0,
+      "over_50ms": 0,
+      "over_100ms": 0
+    },
+    "Render": {
+      "count": 5778,
+      "p50_ms": 0.848,
+      "p95_ms": 1.966,
+      "p99_ms": 7.59,
+      "p999_ms": 26.486,
+      "max_ms": 63.291,
+      "over_33_34ms": 3,
+      "over_50ms": 1,
+      "over_100ms": 0
+    },
+    "Simulation": {
+      "count": 5776,
+      "p50_ms": 0.077,
+      "p95_ms": 0.179,
+      "p99_ms": 0.235,
+      "p999_ms": 0.419,
+      "max_ms": 0.498,
+      "over_33_34ms": 0,
+      "over_50ms": 0,
+      "over_100ms": 0
+    }
+  },
+  "worst_intervals": [
+    {
+      "frame": {
+        "workMS": 2.1359166130423546,
+        "elapsed": 0.20227191667072475,
+        "entities": 299,
+        "tick": 5,
+        "thermal": 1,
+        "intervalMS": 163.63375005312264,
+        "distance": 1.0209635416666667,
+        "seed": "42",
+        "stages": {
+          "Audio": 1.477416604757309,
+          "Simulation": 0.06516661960631609,
+          "DistantPath": 0.03679178189486265,
+          "Render": 0.5520416889339685
+        },
+        "phase": "running"
+      },
+      "preceding_frame": {
+        "workMS": 151.3216666644439,
+        "elapsed": 0.18782391666900367,
+        "entities": 299,
+        "tick": 1,
+        "thermal": 1,
+        "intervalMS": 36.502250004559755,
+        "distance": 0.20417534722222222,
+        "seed": "42",
+        "stages": {
+          "Audio": 150.65870829857886,
+          "Simulation": 0.0475000124424696,
+          "Render": 0.5760416388511658,
+          "DistantPath": 0.033624935895204544
+        },
+        "phase": "running"
+      }
+    },
+    {
+      "frame": {
+        "workMS": 4.500375012867153,
+        "elapsed": 10.312952250009403,
+        "entities": 305,
+        "tick": 601,
+        "thermal": 1,
+        "intervalMS": 113.84604161139578,
+        "distance": 124.27448784722223,
+        "seed": "42",
+        "stages": {
+          "Audio": 2.4216666352003813,
+          "Simulation": 0.14670833479613066,
+          "DistantPath": 0.1124583650380373,
+          "Render": 1.8630833365023136
+        },
+        "phase": "running"
+      },
+      "preceding_frame": {
+        "workMS": 2.921125036664307,
+        "elapsed": 10.197526958421804,
+        "entities": 305,
+        "tick": 600,
+        "thermal": 1,
+        "intervalMS": 16.808416694402695,
+        "distance": 124.06510416666667,
+        "seed": "42",
+        "stages": {
+          "Audio": 1.9982500234618783,
+          "Simulation": 0.07945834659039974,
+          "DistantPath": 0.0576250022277236,
+          "Render": 0.810125027783215
+        },
+        "phase": "running"
+      }
+    },
+    {
+      "frame": {
+        "elapsed": 94.81454283336643,
+        "intervalMS": 111.65304167661816,
+        "workMS": 4.322791704908013,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 5648,
+        "seed": "42",
+        "distance": 1291.6122916666668,
+        "stages": {
+          "DistantPath": 0.1137083163484931,
+          "Audio": 2.4196250597015023,
+          "Simulation": 0.13958336785435677,
+          "Render": 1.6919582849368453
+        },
+        "entities": 314
+      },
+      "preceding_frame": {
+        "elapsed": 94.70141425007023,
+        "intervalMS": 16.80816663429141,
+        "workMS": 2.847250085324049,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 5647,
+        "seed": "42",
+        "distance": 1291.3590972222223,
+        "stages": {
+          "DistantPath": 0.05120830610394478,
+          "Audio": 1.947375014424324,
+          "Simulation": 0.08254172280430794,
+          "Render": 0.7858333410695195
+        },
+        "entities": 314
+      }
+    },
+    {
+      "frame": {
+        "elapsed": 93.86537600005977,
+        "intervalMS": 111.18183331564069,
+        "workMS": 23.508958402089775,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 5595,
+        "seed": "42",
+        "distance": 1278.2049479166667,
+        "stages": {
+          "Audio": 2.3814166197553277,
+          "DistantPath": 0.12591667473316193,
+          "Simulation": 0.12874999083578587,
+          "Render": 1.7305416986346245
+        },
+        "entities": 314
+      },
+      "preceding_frame": {
+        "elapsed": 93.73350500001106,
+        "intervalMS": 16.944708302617073,
+        "workMS": 2.819791669026017,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 5594,
+        "seed": "42",
+        "distance": 1277.9522135416667,
+        "stages": {
+          "Audio": 2.015333389863372,
+          "DistantPath": 0.06604171358048916,
+          "Simulation": 0.05108339246362448,
+          "Render": 0.7219583494588733
+        },
+        "entities": 314
+      }
+    },
+    {
+      "frame": {
+        "entities": 323,
+        "tick": 1700,
+        "intervalMS": 110.41212489362806,
+        "workMS": 5.1359167555347085,
+        "elapsed": 28.691836000070907,
+        "seed": "42",
+        "thermal": 1,
+        "phase": "running",
+        "stages": {
+          "Render": 1.6843333141878247,
+          "DistantPath": 0.10729162022471428,
+          "Simulation": 0.1408749958500266,
+          "Audio": 3.2380000920966268
+        },
+        "distance": 359.6341145833333
+      },
+      "preceding_frame": {
+        "entities": 323,
+        "tick": 1699,
+        "intervalMS": 16.913583385758102,
+        "workMS": 2.542916568927467,
+        "elapsed": 28.578830874990672,
+        "seed": "42",
+        "thermal": 1,
+        "phase": "running",
+        "stages": {
+          "Render": 0.7074583554640412,
+          "DistantPath": 0.06287498399615288,
+          "Simulation": 0.05095836240798235,
+          "Audio": 1.7579583218321204
+        },
+        "distance": 359.4151909722222
+      }
+    },
+    {
+      "frame": {
+        "distance": 763.5463802083332,
+        "phase": "running",
+        "workMS": 4.55075001809746,
+        "elapsed": 58.45990695839282,
+        "seed": "42",
+        "tick": 3482,
+        "stages": {
+          "DistantPath": 0.10883330833166838,
+          "Render": 1.9215000793337822,
+          "Simulation": 0.16070844139903784,
+          "Audio": 2.398999989964068
+        },
+        "entities": 313,
+        "intervalMS": 110.02933338750154,
+        "thermal": 1
+      },
+      "preceding_frame": {
+        "distance": 763.3119878472221,
+        "phase": "running",
+        "workMS": 2.7722916565835476,
+        "elapsed": 58.348099166643806,
+        "seed": "42",
+        "tick": 3481,
+        "stages": {
+          "DistantPath": 0.06604171358048916,
+          "Render": 0.9159584296867251,
+          "Simulation": 0.09237497579306364,
+          "Audio": 1.7311666160821915
+        },
+        "entities": 313,
+        "intervalMS": 16.890374943614006,
+        "thermal": 1
+      }
+    },
+    {
+      "frame": {
+        "workMS": 2.4652916472405195,
+        "elapsed": 6.091089958325028,
+        "entities": 305,
+        "tick": 355,
+        "thermal": 1,
+        "intervalMS": 97.26258332375437,
+        "distance": 73.02769097222223,
+        "seed": "42",
+        "stages": {
+          "Simulation": 0.062041799537837505,
+          "Audio": 1.6386249335482717,
+          "DistantPath": 0.049333320930600166,
+          "Render": 0.7169999880716205
+        },
+        "phase": "running"
+      },
+      "preceding_frame": {
+        "workMS": 85.29712504241616,
+        "elapsed": 6.07665920839645,
+        "entities": 305,
+        "tick": 351,
+        "thermal": 1,
+        "intervalMS": 16.794833354651928,
+        "distance": 72.19875,
+        "seed": "42",
+        "stages": {
+          "Simulation": 0.09520829189568758,
+          "Audio": 1.7913749907165766,
+          "DistantPath": 1.2542917393147945,
+          "Render": 63.29137505963445
+        },
+        "phase": "running"
+      }
+    },
+    {
+      "frame": {
+        "elapsed": 95.18744300003164,
+        "intervalMS": 84.01679166126996,
+        "workMS": 4.541208385489881,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 5671,
+        "seed": "42",
+        "distance": 1297.438159722222,
+        "stages": {
+          "Audio": 2.0810000132769346,
+          "DistantPath": 0.13449997641146183,
+          "Simulation": 0.1720417058095336,
+          "Render": 2.1809167228639126
+        },
+        "entities": 315
+      },
+      "preceding_frame": {
+        "elapsed": 95.16474020841997,
+        "intervalMS": 16.717624966986477,
+        "workMS": 65.85520843509585,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 5667,
+        "seed": "42",
+        "distance": 1296.4246354166667,
+        "stages": {
+          "Audio": 18.136458355002105,
+          "DistantPath": 3.3809583401307464,
+          "Simulation": 0.3316249931231141,
+          "Render": 26.485541719011962
+        },
+        "entities": 315
+      }
+    },
+    {
+      "frame": {
+        "elapsed": 93.91845841670875,
+        "intervalMS": 72.28095841128379,
+        "workMS": 4.310416639782488,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 5599,
+        "seed": "42",
+        "distance": 1279.2159722222223,
+        "stages": {
+          "DistantPath": 0.11012505274266005,
+          "Audio": 2.323791733942926,
+          "Simulation": 0.17666653729975224,
+          "Render": 1.699791639111936
+        },
+        "entities": 314
+      },
+      "preceding_frame": {
+        "elapsed": 93.86537600005977,
+        "intervalMS": 111.18183331564069,
+        "workMS": 23.508958402089775,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 5595,
+        "seed": "42",
+        "distance": 1278.2049479166667,
+        "stages": {
+          "Audio": 2.3814166197553277,
+          "DistantPath": 0.12591667473316193,
+          "Simulation": 0.12874999083578587,
+          "Render": 1.7305416986346245
+        },
+        "entities": 314
+      }
+    },
+    {
+      "frame": {
+        "elapsed": 73.96959250001237,
+        "intervalMS": 68.90266668051481,
+        "workMS": 2.624208340421319,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 4411,
+        "seed": "42",
+        "distance": 985.0467534722221,
+        "stages": {
+          "Audio": 1.5049583744257689,
+          "DistantPath": 0.067333341576159,
+          "Simulation": 0.09237509220838547,
+          "Render": 0.97287492826581
+        },
+        "entities": 312
+      },
+      "preceding_frame": {
+        "elapsed": 73.96314945840277,
+        "intervalMS": 15.037541626952589,
+        "workMS": 65.08383341133595,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 4407,
+        "seed": "42",
+        "distance": 984.0769791666665,
+        "stages": {
+          "DistantPath": 3.1079583568498492,
+          "Audio": 1.8688333220779896,
+          "Simulation": 0.2550834324210882,
+          "Render": 46.046333271078765
+        },
+        "entities": 312
+      }
+    },
+    {
+      "frame": {
+        "elapsed": 113.05604933341965,
+        "intervalMS": 68.05225007701665,
+        "workMS": 3.8313333643600345,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 6740,
+        "seed": "42",
+        "distance": 1573.2809895833332,
+        "stages": {
+          "DistantPath": 0.1156666548922658,
+          "Audio": 2.3287084186449647,
+          "Simulation": 0.11987495236098766,
+          "Render": 1.3035833835601807
+        },
+        "entities": 305
+      },
+      "preceding_frame": {
+        "elapsed": 113.04607758333441,
+        "intervalMS": 16.68849994894117,
+        "workMS": 61.91183335613459,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 6736,
+        "seed": "42",
+        "distance": 1572.2303472222222,
+        "stages": {
+          "DistantPath": 0.12204167433083057,
+          "Audio": 2.2161250235512853,
+          "Simulation": 0.09175005834549665,
+          "Render": 4.223499912768602
+        },
+        "entities": 305
+      }
+    },
+    {
+      "frame": {
+        "elapsed": 83.22153350000735,
+        "intervalMS": 65.6088333344087,
+        "workMS": 5.166999995708466,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 4964,
+        "seed": "42",
+        "distance": 1120.4549479166667,
+        "stages": {
+          "Audio": 2.7280832873657346,
+          "DistantPath": 0.14104158617556095,
+          "Simulation": 0.17274986021220684,
+          "Render": 2.1581249311566353
+        },
+        "entities": 313
+      },
+      "preceding_frame": {
+        "elapsed": 83.19971154164523,
+        "intervalMS": 50.04916666075587,
+        "workMS": 48.953874967992306,
+        "phase": "running",
+        "thermal": 1,
+        "tick": 4960,
+        "seed": "42",
+        "distance": 1119.4659722222223,
+        "stages": {
+          "DistantPath": 0.11324998922646046,
+          "Audio": 2.168916631489992,
+          "Simulation": 0.15354168135672808,
+          "Render": 2.9091666219756007
+        },
+        "entities": 313
+      }
+    }
+  ]
+}

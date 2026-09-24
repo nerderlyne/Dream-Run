@@ -2,6 +2,10 @@
 
 Record **PASS / FAIL / NOT RUN**, test name, command/device and relevant output in `IMPLEMENTATION_STATUS.md`. A test described here is not already passed. The Python tools included with this pack check specification data only, not the Swift app. Automated oracle success is not a substitute for human playtesting or physical-device performance.
 
+September 21 creator override: D06 and the safe-drop portions of D08/E04 are retired for
+generated play. `JumpSequenceTests` verifies removal of the automatic balloon drop, three
+individually required jumps, ascending landings, persistence and certification.
+
 ## A. Project and offline boot
 
 **A01 — Real native project.** Open the committed Xcode project and shared scheme. Build a generic iOS Simulator destination without signing. App is Swift/SwiftUI/RealityKit, not a web view, Unity export or SceneKit placeholder. No unavailable source file or absent asset bundle.

@@ -29,7 +29,7 @@ final class ObstacleTests:XCTestCase {
         }
     }
     func testMissedRequiredActionsAreFatal() {
-        for kind:DreamObstacle in [.stairs,.brokenFloor,.window,.collapse,.furniture,.lightning] {
+        for kind:DreamObstacle in [.stairs,.brokenFloor,.window,.collapse,.furniture,.floatingStairs,.lightning] {
             var s=scenario(kind)
             for _ in 0..<300 {_=s.step()}
             XCTAssertEqual(s.state.phase,.waking,"\(kind) must require action")

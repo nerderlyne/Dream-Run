@@ -32,10 +32,11 @@ import simd
             while s < end {
                 let next=min(s+4,end),middle=(s+next)/2,index=Int(middle/24)
                 if cachedChunk?.id != index {cachedChunk=generator.chunk(index,tutorial:run.mode == .tutorial)}
-                let local=middle.truncatingRemainder(dividingBy:1800)
                 let gap=cachedChunk?.gap.map{$0.lowerBound < next && $0.upperBound > s} ?? false
-                if run.pigs.count == 3 || (!gap && !(local >= 900 && local < 916)) {
-                    let a=generator.sample(s),b=generator.sample(next)
+                if run.pigs.count == 3 || !gap {
+                    var a=generator.sample(s),b=generator.sample(next)
+                    a.y += cachedChunk?.step?.height(at:s) ?? 0
+                    b.y += cachedChunk?.step?.height(at:next) ?? 0
                     let width=cachedChunk?.halfWidth ?? 2
                     let leftA=point(a,-width),rightA=point(a,width),leftB=point(b,-width),rightB=point(b,width)
                     geometry.quad(leftA,rightA,rightB,leftB)

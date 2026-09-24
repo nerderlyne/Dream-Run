@@ -1,0 +1,37 @@
+Building for production...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/5] Compiling DreamCore BalloonMotion.swift
+[5/6] Compiling DreamCoreTests AsyncPersistenceTests.swift
+[6/8] Compiling DreamCorePackageTests runner.swift
+[6/8] Write Objects.LinkFileList
+[7/8] Linking DreamCorePackageTests
+Build complete! (32.36s)
+Test Suite 'Selected tests' started at 2026-09-20 02:01:49.714.
+Test Suite 'DreamCorePackageTests.xctest' started at 2026-09-20 02:01:49.726.
+Test Suite 'AsyncPersistenceTests' started at 2026-09-20 02:01:49.726.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testBlockedStorageCannotAccumulateUnboundedSnapshots]' started.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testBlockedStorageCannotAccumulateUnboundedSnapshots]' passed (0.019 seconds).
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testFailedAsyncWriteDoesNotPublishOrLoseKnownGoodBackup]' started.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testFailedAsyncWriteDoesNotPublishOrLoseKnownGoodBackup]' passed (0.063 seconds).
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testReadersSeeLastDurableProfileWithoutWaitingForWriter]' started.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testReadersSeeLastDurableProfileWithoutWaitingForWriter]' passed (0.004 seconds).
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testSynchronousBarrierDrainsQueuedCheckpointsInOrder]' started.
+Test Case '-[DreamCoreTests.AsyncPersistenceTests testSynchronousBarrierDrainsQueuedCheckpointsInOrder]' passed (0.010 seconds).
+Test Suite 'AsyncPersistenceTests' passed at 2026-09-20 02:01:49.822.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.095 (0.095) seconds
+Test Suite 'ResourceCacheTests' started at 2026-09-20 02:01:49.822.
+Test Case '-[DreamCoreTests.ResourceCacheTests testEvictionRetainsRecentlyUsedResources]' started.
+Test Case '-[DreamCoreTests.ResourceCacheTests testEvictionRetainsRecentlyUsedResources]' passed (0.000 seconds).
+Test Case '-[DreamCoreTests.ResourceCacheTests testReplacementDoesNotEvictAndLongStreamsStayBounded]' started.
+Test Case '-[DreamCoreTests.ResourceCacheTests testReplacementDoesNotEvictAndLongStreamsStayBounded]' passed (0.043 seconds).
+Test Suite 'ResourceCacheTests' passed at 2026-09-20 02:01:49.865.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.043 (0.043) seconds
+Test Suite 'DreamCorePackageTests.xctest' passed at 2026-09-20 02:01:49.865.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.138 (0.139) seconds
+Test Suite 'Selected tests' passed at 2026-09-20 02:01:49.865.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.138 (0.151) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

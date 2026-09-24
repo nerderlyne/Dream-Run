@@ -5,7 +5,10 @@ import UniformTypeIdentifiers
 struct ContentView:View {
     @StateObject private var game=GameModel()
     @Environment(\.scenePhase) var scenePhase
+    @Environment(\.requestReview) private var requestReview
     @State private var code=""
+    @State private var previewItemID:String?
+    @State private var wardrobeCategory="Head"
     @State private var showImport=false
     @State private var deleteBookmark:UUID?
     @State private var renameID:UUID?
@@ -35,7 +38,7 @@ struct ContentView:View {
         }
         .tint(Color(red:0.83,green:0.92,blue:0.89))
         .preferredColorScheme(.dark)
-        .alert("Dream Again",isPresented:Binding(get:{game.error != nil},set:{if !$0 {game.error=nil}})) { Button("OK"){game.error=nil} } message:{Text(game.error ?? "")}
+        .alert("Dreamlooper",isPresented:Binding(get:{game.error != nil},set:{if !$0 {game.error=nil}})) { Button("OK"){game.error=nil} } message:{Text(game.error ?? "")}
         .alert("Delete this saved dream?",isPresented:Binding(get:{deleteBookmark != nil},set:{if !$0 {deleteBookmark=nil}})) {
             Button("Delete",role:.destructive){if let id=deleteBookmark {game.transact{$0.bookmarks.removeAll{$0.id == id}}};deleteBookmark=nil}
             Button("Cancel",role:.cancel){deleteBookmark=nil}
@@ -52,8 +55,20 @@ struct ContentView:View {
         .sheet(isPresented:$game.sharing){ShareSheet(items:game.shareItems)}
         .fileImporter(isPresented:$showImport,allowedContentTypes:[.json,.data],allowsMultipleSelection:false){result in do { if let url=try result.get().first {game.importURL(url)} } catch {game.error=error.localizedDescription}}
         .onOpenURL{game.importURL($0)}
-        .onChange(of:game.screen){_,screen in if screen == "wardrobe" {game.renderer?.previewAvatar(equipped:game.profile.equipped,wardrobe:true)} else if screen == "home" {game.renderer?.render(game.run,equipped:game.profile.equipped)} }
+        .onChange(of:game.screen){_,screen in
+            if screen == "wardrobe" {previewItemID=nil;game.renderer?.previewAvatar(equipped:game.profile.equipped,wardrobe:true)}
+            else if screen == "home" {game.renderer?.render(game.run,equipped:game.profile.equipped)}
+            else if screen == "results" { scheduleReviewRequest() }
+        }
         .onChange(of:scenePhase){_,phase in if phase != .active {game.audio.stop();game.pause()} }
+    }
+    private func scheduleReviewRequest() {
+        guard !ProcessInfo.processInfo.arguments.contains("--ui-test") else { return }
+        Task { @MainActor in
+            try? await Task.sleep(for:.seconds(2))
+            guard game.screen == "results", scenePhase == .active, game.claimReviewRequest() else { return }
+            requestReview()
+        }
     }
     func button(_ title:String,_ action:@escaping ()->Void)->some View {
         Button(action:{game.audio.menuFeedback(settings:game.settings);action()}) {
@@ -71,7 +86,7 @@ struct ContentView:View {
     }
     var home:some View {
         VStack(spacing:14){Spacer()
-            Text("DREAM AGAIN").font(.system(size:13,weight:.medium,design:.rounded)).tracking(6)
+            Text("DREAMLOOPER").font(.system(size:13,weight:.medium,design:.rounded)).tracking(6)
             Text("somewhere\nelse.").font(.system(size:58,weight:.light,design:.serif)).multilineTextAlignment(.center)
             Text("a dream you can return to").font(.subheadline).foregroundStyle(.white.opacity(0.75))
             Spacer()
@@ -180,25 +195,48 @@ struct ContentView:View {
             button("home"){game.screen="home"}
         }.padding(28).frame(maxWidth:560).foregroundStyle(game.run.pigs.count == 3 ? Color.black : Color.white)
     }
+    private func preview(_ item:CosmeticDefinition) {
+        previewItemID=item.id
+        var outfit=game.profile.equipped
+        outfit[item.slot]=item.id
+        game.renderer?.previewAvatar(equipped:outfit,wardrobe:true)
+    }
     var wardrobe:some View {
         menu("wardrobe") {
             Color.clear.frame(height:220).allowsHitTesting(false)
-            Text("your character").font(.headline)
-            HStack {
-                Button(game.profile.equipped["character"] == "girl" ? "Girl · wearing dress" : "Girl · dress") {game.chooseCharacter("girl")}
-                Button(game.profile.equipped["character"] != "girl" ? "Doll · wearing ribbon" : "Doll · ribbon") {game.chooseCharacter("runner")}
-            }.buttonStyle(.bordered)
-            Text("Both looks are free. Hats and colours work with either.").font(.caption)
-            Button("No hat") {if let item=game.catalogue.first(where:{$0.id == "bare_head"}) {game.equip(item)}}
-            Button("No trail") {game.removeTrail()}
+            Text("Your straw looper").font(.headline)
+            Text("Tap any item to try it on the doll above. Previewing costs nothing.").font(.caption).multilineTextAlignment(.center)
+            Picker("Outfit category",selection:$wardrobeCategory) {
+                ForEach(["Head","Top","Bottom"],id:\.self){Text($0)}
+            }.pickerStyle(.segmented)
             Text("\(game.profile.balance) balloons").font(.title3)
             button("balloon packs"){game.screen="store"}
-            ForEach(game.catalogue){item in
-                HStack{VStack(alignment:.leading,spacing:4){Text(item.name);Text(game.profile.owned.contains(item.id) ? "owned · \(item.slot)" : item.balloon_price.map{"\($0) balloons"} ?? "achievement only").font(.caption).foregroundStyle(.secondary)};Spacer()
-                    if game.profile.owned.contains(item.id) {Button(game.profile.equipped[item.slot] == item.id ? "equipped" : "equip"){game.equip(item)}}
-                    else if item.balloon_price != nil {Button("buy"){game.buy(item)}}
-                    else {Image(systemName:"lock")}
-                }.padding().background(.white.opacity(0.07),in:RoundedRectangle(cornerRadius:14))
+            ForEach(game.catalogue.filter { item in
+                switch wardrobeCategory {
+                case "Head": return item.slot == "hat" || item.slot == "accessory"
+                case "Top": return item.slot == "top"
+                default: return item.slot == "bottom" || item.slot == "trail"
+                }
+            }) { item in
+                let selected=previewItemID == item.id
+                let owned=game.profile.owned.contains(item.id) || (item.balloon_price == 0 && item.required_achievement == nil)
+                HStack {
+                    Button {preview(item)} label: {
+                        VStack(alignment:.leading,spacing:4) {
+                            Text(item.name).font(.headline)
+                            Text(owned ? "owned" : item.balloon_price.map{"\($0) balloons"} ?? "achievement reward")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }.frame(maxWidth:.infinity,alignment:.leading).contentShape(Rectangle())
+                    }.buttonStyle(.plain).accessibilityIdentifier("preview \(item.id)")
+                    if owned {
+                        Button(game.profile.equipped[item.slot] == item.id ? "equipped" : "equip") {
+                            game.equip(item);preview(item)
+                        }.disabled(game.profile.equipped[item.slot] == item.id)
+                    } else if item.balloon_price != nil {
+                        Button("buy") {game.buy(item)}
+                    } else {Image(systemName:"lock").accessibilityLabel("Achievement locked")}
+                }
+                .padding().background(selected ? .white.opacity(0.2) : .white.opacity(0.07),in:RoundedRectangle(cornerRadius:14))
             }
         }
     }
@@ -222,7 +260,7 @@ struct ContentView:View {
     var importView:some View {
         menu("import dream") {
             Text("A shared dream begins again in Revisit mode. It cannot resume somebody else’s attempt.")
-            TextField("DR1-G1-R1-C1-…",text:$code,axis:.vertical).textInputAutocapitalization(.characters).autocorrectionDisabled().textFieldStyle(.roundedBorder).accessibilityIdentifier("dream code")
+            TextField("DR1-G2-R2-C1-…",text:$code,axis:.vertical).textInputAutocapitalization(.characters).autocorrectionDisabled().textFieldStyle(.roundedBorder).accessibilityIdentifier("dream code")
             button("revisit code"){game.importCode(code)}
             button("open .dream file"){showImport=true}
         }
@@ -251,6 +289,9 @@ struct ContentView:View {
             }
             Toggle("Haptics",isOn:$game.settings.haptics);Toggle("Lower visual detail",isOn:$game.settings.lowPower)
             button("save settings"){game.saveSettings();game.notice="Settings saved."}
+            #if canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
+            if game.adPrivacyOptionsRequired { button("Ad privacy options"){Task{await game.showAdPrivacyOptions()}} }
+            #endif
             button("replay introduction"){game.start(mode:.tutorial)}
             Text("Pause and recalibrate at any time. Sound respects silent mode. Wallet and dreams are stored on this device; consumable balance is not automatically restored across reinstalls.").font(.footnote).foregroundStyle(.secondary)
             Text("Purchases: local testing in Debug; disabled in Release. Google rewarded ads are integrated but live serving is disabled pending owner consent setup and authorization. Game Center, cloud and Universal Links are not configured. The privacy policy will be at dreamlooper.shivanshi.dev/privacy; a support URL is still needed before publishing.").font(.footnote).foregroundStyle(.secondary)
@@ -275,6 +316,9 @@ struct ContentView:View {
                 HStack{TextField("Dream ID for world preview",text:$code).font(.caption).textFieldStyle(.roundedBorder);Button("preview"){game.labWorld(code)};Button("+24m"){game.labStep()}}
                 ScrollView(.horizontal){HStack{ForEach(["Rabbit","Nazar","Zebra","Ball","Mirror","Drop","Ordinary pig","Clover pig","Lucky Dream","Three hours","Sparse","Beyond","Void","Waking","Straw damage","Straw burst"],id:\.self){event in Button(event){game.labEvent(event)}.buttonStyle(.bordered)}}}
                 HStack{Button("test reward"){game.labEvent("Waking");game.provider=MockRewardProvider(outcome:.earned("debug:\(UUID().uuidString)"))};Button("dismissed ad"){game.provider=MockRewardProvider(outcome:.dismissed);game.labEvent("Waking")};Button("failed ad"){game.provider=MockRewardProvider(outcome:.failed("Developer test failure"));game.labEvent("Waking")}}
+                #if canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
+                Button("Google test rewarded ad"){Task{await game.labGoogleTestAd()}}
+                #endif
                 HStack{Button("ledger scenarios"){game.labCommerce()};Button("export diagnostics"){game.labExport()}}
                 if !game.notice.isEmpty {Text(game.notice).font(.caption2)}
                 Text("\(game.run.identity.code)\ntick \(game.run.activeTicks) · chunks \(game.run.chunks.count)/16 · entities \(game.renderer?.renderEntities ?? 0)\ngeometry cache \(game.renderer?.factory.cache.count ?? 0) · local preview only").font(.caption2.monospaced())
@@ -289,9 +333,6 @@ struct StoreView:View {
     var body:some View {VStack(spacing:22){Button("‹ wardrobe",action:onBack);Text("balloons").font(.largeTitle);Text(commerce.status).multilineTextAlignment(.center);ForEach(commerce.products){p in Button("\(BalloonStore.quantities[p.id] ?? 0) balloons · \(p.displayPrice)"){Task{await commerce.purchase(p)}}.buttonStyle(.borderedProminent)};Button("reconcile purchases"){Task{await commerce.reconcile()}};Text("Currency buys cosmetics only. No luck, clovers, or skill advantages.").font(.footnote)}.padding(30).task{await commerce.load()}}
 }
 struct ShareSheet:UIViewControllerRepresentable {
-            #if canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
-            if game.adPrivacyOptionsRequired { button("Ad privacy options"){Task{await game.showAdPrivacyOptions()}} }
-            #endif
     var items:[Any]
     func makeUIViewController(context:Context)->UIActivityViewController {UIActivityViewController(activityItems:items,applicationActivities:nil)}
     func updateUIViewController(_ controller:UIActivityViewController,context:Context){}
@@ -302,6 +343,3 @@ struct ShareCard:View {
         VStack(spacing:24){Text("D R E A M   A G A I N").font(.caption);Text(run.pigs.count == 3 ? "Lucky Dream" : "you woke up.").font(.system(size:40,design:.serif));Text("\(Int(run.seconds/60)) minutes · \(run.pigs.count)/3 clover pigs");Text("\(run.mode.rawValue) · \(run.continueCount) continues · rules \(run.identity.rulesVersion)").font(.caption);Text(run.identity.code).font(.system(size:12,design:.monospaced));Text("A seed remembers a place, not a performance.").font(.caption)}.padding(36).frame(width:420,height:420).foregroundStyle(Color(red:0.25,green:0.21,blue:0.3)).background(Color(red:0.92,green:0.88,blue:0.91))
     }
 }
-                #if canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
-                Button("Google test rewarded ad"){Task{await game.labGoogleTestAd()}}
-                #endif

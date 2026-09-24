@@ -12,7 +12,7 @@ public enum HorizonCertification {
     /// Samples continuous steering through the authoritative movement/collision engine.
     /// A passing trajectory is an existence witness, not a guarantee for arbitrary input.
     /// Width/clearance margins are those of the real capsule, not a point runner.
-    public static func validate(history:[ChunkDescription],candidate:ChunkDescription,rulesVersion:UInt16 = 1)->Bool {
+    public static func validate(history:[ChunkDescription],candidate:ChunkDescription,rulesVersion:UInt16 = 2)->Bool {
         guard FairnessValidator.validate(candidate) else {return false}
         let beginning=max(0,candidate.start-48)
         var pieces=Array(history.suffix(2))+[candidate]
@@ -27,7 +27,7 @@ public enum HorizonCertification {
         let hazards=pieces.flatMap(\.hazards)
         let gaps=pieces.compactMap(\.gap)
         // Serialize only geometry and motion that affect authority. No palette/seed cache key.
-        let key="R\(rulesVersion)|"+hazards.map{"\($0.fatal),\($0.contactHalfWidth),\($0.encounter.rawValue),\($0.distance),\($0.lateral),\($0.radius),\($0.height),\($0.speed),\($0.motionPhase)"}.joined(separator:"|")+gaps.map{"g\($0.lowerBound),\($0.upperBound)"}.joined()+pieces.map{"width\($0.halfWidth)step\($0.step?.start ?? -1)"}.joined()+"end\(candidate.end-beginning)"
+        let key="R\(rulesVersion)|"+hazards.map{"\($0.fatal),\($0.contactHalfWidth),\($0.encounter.rawValue),\($0.distance),\($0.lateral),\($0.radius),\($0.height),\($0.speed),\($0.motionPhase)"}.joined(separator:"|")+gaps.map{"g\($0.lowerBound),\($0.upperBound)"}.joined()+pieces.map{"start\($0.start)width\($0.halfWidth)step\($0.step?.start ?? -1)ascending\($0.step?.ascendingRun ?? false)"}.joined()+"end\(candidate.end-beginning)"
         if let cached=CertificationMemo.shared.value(key) {return cached}
         if hazards.isEmpty && gaps.isEmpty {CertificationMemo.shared.set(key,true);return true}
         let result=certify(pieces:pieces,ending:candidate.end-beginning+56,rulesVersion:rulesVersion)

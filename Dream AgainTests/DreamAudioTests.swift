@@ -3,15 +3,39 @@ import AVFAudio
 @testable import DreamAgain
 
 final class NativeDreamAudioTests:XCTestCase {
+    @MainActor func testPreparingAudioAndRepeatedEffectsReuseRunningEngine() {
+        let audio=DreamAudio()
+        var settings=Settings();settings.haptics=false
+        var run=RunState(identity:.current(seed:42),mode:.debug)
+        audio.prepare(run:run,settings:settings)
+        XCTAssertEqual(run.phase,.ready,"Preparing audio cannot advance gameplay")
+        XCTAssertEqual(audio.engineStartCount,1)
+        run.phase = .running
+        for tick in 1...120 {
+            run.activeTicks=UInt64(tick)
+            audio.update(run:run,settings:settings,delta:1.0/60)
+            if tick%15 == 0 {audio.play(.step,settings:settings)}
+        }
+        XCTAssertEqual(audio.engineStartCount,1,"Footfalls and frame updates must reuse the prepared engine")
+        audio.stop()
+        XCTAssertFalse(audio.engine.isRunning)
+        audio.prepare(run:run,settings:settings)
+        XCTAssertEqual(audio.engineStartCount,2,"Resume restarts once behind the ready screen")
+        audio.stop()
+    }
     @MainActor func testBundledSoundAndThetaChannelSeparation() throws {
         let audio=DreamAudio()
-        XCTAssertEqual(audio.buffers.count,25)
+        let expected=Set(DreamAudio.bedNames+["motif-0","motif-1","motif-2","pulse","theta","balloon-1","balloon-2"]+DreamSoundCue.allCases.map(\.rawValue))
+        XCTAssertEqual(Set(audio.buffers.keys),expected)
         for (name,buffer) in audio.buffers {
             XCTAssertGreaterThan(buffer.frameLength,0,name)
             let samples=try XCTUnwrap(buffer.floatChannelData?[0])
             var peak:Float=0
             for i in 0..<Int(buffer.frameLength) { XCTAssertTrue(samples[i].isFinite);peak=max(peak,abs(samples[i])) }
-            XCTAssertGreaterThan(peak,0.01,name);XCTAssertLessThan(peak,0.2,name)
+            // The separately generated straw transients are intentionally louder
+            // and clipped by their source generator at 0.8; ambient/music stays quiet.
+            let ceiling:Float = ["strawBreak","strawRepair"].contains(name) ? 0.8:0.2
+            XCTAssertGreaterThan(peak,0.01,name);XCTAssertLessThanOrEqual(peak,ceiling,name)
         }
         let theta=try XCTUnwrap(audio.buffers["theta"])
         XCTAssertEqual(theta.format.channelCount,2);XCTAssertEqual(theta.format.sampleRate,44100)

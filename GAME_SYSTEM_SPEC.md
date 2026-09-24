@@ -1,3 +1,28 @@
+## Creator override — floating stair gaps (September 22, 2026)
+
+Remove the generic fallen-column gameplay hurdles. Replace that sequence with detached
+ascending stair flights using the registered staircase/broken-track families. Each gap ends
+at a raised landing; there is no invisible bridge. Ordinary intact stairs remain automatic.
+Early floating flights have 3 m gaps. From 1,200 m, floating flights use 4 m gaps and the
+other ascending sequence gains 3 m gaps before its second and third landings. From 4,500 m,
+both ascending sequence variants have 4 m gaps before all three landings. Keep the 24 m
+jump spacing, visible takeoff/landing edges, full recovery chunk and horizon certification.
+This replaces the September 21 column sequence in the current unreleased G2/R2 course.
+
+## Creator override — required jump sequences (September 21, 2026)
+
+Remove the wide balloon-lined automatic drop from generated play, including its visual hole,
+scripted transition and collectible trail. It misleadingly suggests a required jump.
+Replace it with seeded three-jump runs: fallen columns, mixed low furniture/real gaps,
+and three raised stair landings (+0.72 m each). Each jump is 24 m from the next, with a
+recovery chunk after the sequence. Ordinary stairs still climb automatically. Actual gaps
+must not allow the runner to snap up from below the landing rim without jumping.
+The current prerelease identity is G2/R2/C1; superseded G1/R1 layouts are unsupported.
+The original G1/R1 conformance data remains an algorithm fixture, not a playable legacy mode.
+This override supersedes the earlier requirement to generate marked balloon drops.
+
+> Creator naming update — September 17, 2026: the game title is **Dreamlooper**, the signed explicit bundle ID is `dev.shivanshi.dream-run`, and the import scheme is `dreamlooper`. These supersede the working-title/placeholder identity below. The retry action remains “dream again.”
+
 ## Creator override — atmospheric scale correction (September 15, 2026)
 
 Creator-reference composition refinement (September 15, 2026): learn from `references/app_target_01.jpeg` through cropped environmental forms, transparent overlap, tiny context and a quieter route. Use varied seeded atmospheric arrangements with unequal visual emphasis, not a repeated arch/cosmos preset. Atmospheric scale remains independent of semantic giant events. Prefer solid track surfaces when dense silhouettes already supply visual complexity; retain patterned alternatives.

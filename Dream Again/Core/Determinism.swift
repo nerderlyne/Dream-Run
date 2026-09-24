@@ -24,7 +24,7 @@ public enum DreamError: Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .invalidCode: "This dream code is damaged or malformed. Check the complete code."
-        case .unsupportedVersion: "This dream needs a different version of Dream Again. Your saved dream is preserved."
+        case .unsupportedVersion: "This dream needs a different version of Dreamlooper. Your saved dream is preserved."
         case .insufficientFunds: "You need more balloons for this cosmetic."
         case .unavailable: "This service is unavailable. Offline dreams are still available."
         case .corruptStore: "The saved profile could not be validated. Your data has been preserved; retry before playing."
@@ -33,13 +33,13 @@ public enum DreamError: Error, LocalizedError {
     }
 }
 public struct DreamIdentity: Codable, Hashable, Sendable {
-    public var generatorVersion: UInt16 = 1
-    public var rulesVersion: UInt16 = 1
+    public var generatorVersion: UInt16 = 2
+    public var rulesVersion: UInt16 = 2
     public var contentVersion: UInt16 = 1
     public var seed: UInt64
     public init(seed: UInt64) { self.seed = seed }
     public static func current(seed:UInt64) -> Self {Self(seed:seed)}
-    public var supported: Bool { generatorVersion == 1 && rulesVersion == 1 && contentVersion == 1 }
+    public var supported: Bool { generatorVersion == 2 && rulesVersion == 2 && contentVersion == 1 }
     public func stream(_ domain: String, _ index: Int) -> SplitMix64 {
         SplitMix64(SplitMix64.fnv("DR1|G\(generatorVersion)|R\(rulesVersion)|C\(contentVersion)|\(String(format: "%016llX", seed))|\(domain)|\(index)"))
     }

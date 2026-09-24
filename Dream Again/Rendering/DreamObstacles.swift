@@ -22,6 +22,14 @@ extension DreamRenderer {
     /// Interactive art is authored to the same dimensions as its route-space collision contract.
     func obstacleModel(_ h:HazardDescription)->Entity? {
         guard h.encounter == .lightning || h.encounter == .swing || h.encounter == .step || h.requiresJump || h.asset == .window && h.encounter == .slide else{return nil}
+        // Only the lightning footprint uses lateral position in authored geometry.
+        let key="\(h.asset.rawValue):\(h.encounter.rawValue):\(h.encounter == .lightning ? h.lateral : 0)"
+        if let prototype=obstacleCache.value(forKey:key) {return prototype.clone(recursive:true)}
+        let prototype=PerformanceTrace.measure("ObstacleBuild") {makeObstacleModel(h)}
+        obstacleCache.insert(prototype,forKey:key)
+        return prototype.clone(recursive:true)
+    }
+    private func makeObstacleModel(_ h:HazardDescription)->Entity {
         let root=Entity();root.name="encounter:\(h.encounter.rawValue)"
         func add(_ geometry:Geometry,_ color:String,_ name:String,_ unlit:Bool=false,style:Int=11) {
             if let mesh=try? geometry.resource() {
@@ -165,7 +173,7 @@ extension DreamRenderer {
             var marks=Geometry()
             for distance in [gap.lowerBound-0.4,gap.upperBound+0.4] {
                 let sample=generator.sample(distance)
-                let center=local(sample,origin:origin),right=SIMD3<Float>(Float(cos(sample.yaw)),0,Float(sin(sample.yaw)))
+                let center=local(sample,origin:origin)+[0,Float(c.step?.height(at:distance) ?? 0),0],right=SIMD3<Float>(Float(cos(sample.yaw)),0,Float(sin(sample.yaw)))
                 for x:Float in [-1.5,-0.5,0.5,1.5] {
                     marks.triangle(center+right*(x-0.18)+[0,0.045,0.2],center+right*(x+0.18)+[0,0.045,0.2],center+right*x+[0,0.045,-0.2])
                 }

@@ -32,6 +32,12 @@ import simd
 
 extension DreamRenderer {
     func strawBall()->Entity {
+        if let prototype=strawBallPrototype {return prototype.clone(recursive:true)}
+        let prototype=PerformanceTrace.measure("StrawMeshBuild") {makeStrawBall()}
+        strawBallPrototype=prototype
+        return prototype.clone(recursive:true)
+    }
+    private func makeStrawBall()->Entity {
         let root=Entity();root.name="rolling-hay-ball"
         var core=Geometry(),fibres=Geometry()
         core.ellipsoid(.zero,[0.44,0.44,0.44],segments:20,rings:14)

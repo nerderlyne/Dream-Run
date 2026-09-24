@@ -1,5 +1,18 @@
 # Known limitations
 
+## Performance evidence — September 20, 2026
+
+Two short physical iPhone recordings were explicitly authorized and completed before the owner ended device testing. Their callback timing improved after audio fixes, but the thermal/graphics conditions differed (fair baseline versus serious with reduced detail), and two gaps over 50 ms remained. Audio timings identify a real CPU issue; these runs do not prove zero hangs, GPU frame pacing, sustained thermal stability, memory bounds or maximum performance. Instruments did not yield a usable trace. Details and raw evidence: [PERFORMANCE.md](PERFORMANCE.md).
+
+The subsequent material/prefab preparation, shared hay/obstacle resources, LRU caches, motif refinement and background checkpoint writer were verified locally only. Preparation moves work into start/retry and may increase startup latency. Resource memory and long rendered soaks remain unmeasured. Some first-use resource uploads and terrain construction still occur during rendering. Do not call the final build device-performance-certified.
+
+Async gameplay saves preserve the last durable state and an eight-request backlog limit. Abrupt process termination can lose a pending checkpoint; pause/end/commerce transactions wait for the queued writer. A persistently stalled disk can therefore delay those non-running transitions. The native suite passed 37 tests but logged simulator drawable-allocation failures under its multi-instance workload; it is not evidence of GPU health. A separate fresh-process automated simulator smoke test passed without those drawable-allocation messages, and its screenshot was inspected. Current authorization is again simulator-only.
+
+## Dreamlooper identity — September 17, 2026
+
+The owner confirms that `dev.shivanshi.dream-run` is the registered explicit bundle ID. A generic physical-iOS Release build signs successfully with that exact identifier and Team `BZ2SH7NUDM`, but it currently uses an Apple Development identity and Xcode's wildcard development profile. App Store distribution archive/export and its explicit distribution provisioning profile remain unverified. A different bundle ID uses a separate app sandbox; old development-install data is not migrated. StoreKit products remain explicitly unconfigured local-test placeholders. The icon is an uninstalled visual prototype, not a final logo or App Store export. Project/scheme/module filenames still use Dream Again / DreamAgain.
+
+
 ## Rolling hay reserve — September 17, 2026
 
 Hay rolls along the certified route rather than using rigid-body physics. It is confined to its empty track section and stops at that section’s boundary if missed; it does not bounce off other balls. Live spawning now requires four certified sports balls per hay offer. The golden tangled sphere is procedural straw geometry. Reserve straw automatically repairs one limb per second after damage; frequency and reserve balance still need subjective play evaluation. No physical-device testing is authorized.
@@ -83,6 +96,9 @@ The original synthesized 3.6-second strike is preloaded and amplitude-bounded. S
 - Local StoreKit purchase-sheet scenarios, live sandbox purchases, real ads/consent, Game Center,
   Universal Links and cloud integration were not executed. Owner provisioning remains required;
   offline gameplay is independent. See `docs/OWNER_SETUP.md`.
+- Google Mobile Ads and UMP are linked with the owner's IDs, but live ad serving remains disabled.
+  The Debug Lab uses Google's test ad unit and does not grant production rewards. Consent messaging,
+  live inventory behavior and reward callbacks still need simulator sandbox checks before release.
 - The wallet has checksums, atomic replacement, backup recovery and idempotent delivery. Actual
   disk-full/interruption tests and a cloud consumable-currency ledger remain outstanding.
 - No backward compatibility is promised for discarded prerelease art versions or development saves.
@@ -93,6 +109,25 @@ E09 (full gallery/share flow), G06/G07 (StoreKit and actual rewarded-ad scenario
 storage faults). The static contrast scene partly occludes the zebra behind the horse and
 the pig behind a balloon; it is not complete moving-encounter visibility evidence.
 No simulator screenshot establishes physical-device or store readiness.
-- Google Mobile Ads and UMP are linked with the owner's IDs, but live ad serving remains disabled.
-  The Debug Lab uses Google's test ad unit and does not grant production rewards. Consent messaging,
-  live inventory behavior and reward callbacks still need simulator sandbox checks before release.
+
+## Jump sequences — September 21, 2026
+
+The new sequences are simulator/core verified as recorded in IMPLEMENTATION_STATUS.md.
+Automated survival does not establish human timing comfort, physical tilt feel or thermal
+performance. No physical-device checks were performed for this change. G1/R1 prerelease
+bookmarks and suspended runs are unsupported by the new G2/R2 course. The former marked
+balloon drop is no longer generated; its historical acceptance requirement is superseded.
+
+The G2/R2 prerelease uses a fresh `profile-g2-r2.json` development profile. The previous
+`profile.json` stays on disk unchanged; its wallet, settings and bookmarks are not migrated.
+
+## Floating stair revision — September 22, 2026
+
+Automated traversal checks establish tested jump/landing feasibility, not human difficulty
+or timing comfort. No physical-device or thermal testing was performed for this revision.
+The existing unreleased G2/R2 course is being revised in place; exact layout replay from
+the rejected column build is not retained. No additional profile reset was introduced.
+
+## Wardrobe preview — September 24, 2026
+
+The outfit catalogue currently contains headwear, ribbon/sash colors, one skirt and achievement accessories/trail. The three wardrobe categories group those existing pieces; additional tops and bottoms would need new cosmetic definitions and procedural meshes. Preview does not grant items or affect the run.

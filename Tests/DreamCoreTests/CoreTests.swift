@@ -32,9 +32,9 @@ final class CoreTests: XCTestCase {
         let f=try fixtures(); var rng=SplitMix64(0)
         for hex in f["splitmix64_initial_zero_first_10_hex"] as! [String] { XCTAssertEqual(String(format:"%016llX",rng.next()),hex) }
         for v in f["fnv1a64_vectors"] as! [[String:String]] { XCTAssertEqual(String(format:"%016llX",SplitMix64.fnv(v["ascii"]!)),v["hex"]) }
-        for v in f["dream_ids"] as! [[String:String]] { let id=DreamIdentity(seed:UInt64(v["seed_decimal_string"]!)!); XCTAssertEqual(id.code,v["code"]); XCTAssertEqual(try DreamIdentity.parse(id.code.lowercased()),id) }
+        for v in f["dream_ids"] as! [[String:String]] { var id=DreamIdentity(seed:UInt64(v["seed_decimal_string"]!)!); id.generatorVersion=1;id.rulesVersion=1; XCTAssertEqual(id.code,v["code"]); XCTAssertEqual(try DreamIdentity.parse(id.code.lowercased(),requireSupported:false),id) }
         for trace in f["pig_traces"] as! [[String:Any]] {
-            let id=DreamIdentity(seed:UInt64(trace["seed_decimal_string"] as! String)!)
+            var id=DreamIdentity(seed:UInt64(trace["seed_decimal_string"] as! String)!);id.generatorVersion=1;id.rulesVersion=1
             for row in trace["checkpoints"] as! [[String:Any]] {
                 let k=row["checkpoint"] as! Int, a=PigDecision(identity:id,ordinal:k,continued:false), b=PigDecision(identity:id,ordinal:k,continued:true)
                 XCTAssertEqual(a.present,row["pig_present"] as! Bool); XCTAssertEqual(a.cloverDraw,UInt64(row["clover_draw"] as! Int)); XCTAssertEqual(a.clover,row["has_clover"] as! Bool); XCTAssertEqual(b.clover,row["continued_has_clover"] as! Bool)
@@ -43,7 +43,7 @@ final class CoreTests: XCTestCase {
     }
     func testIDsRejectBadInput() throws {
         for s in ["",String(repeating:"0",count:200),"DR2-G1-R1-C1-000000000001A-460B","DR1-G1-R1-C1-ZZZZZZZZZZZZZ-580X","DR1-G0-R1-C1-000000000001A-460B","DR1-G1-R1-C1-000000000001A-460C"] { XCTAssertThrowsError(try DreamIdentity.parse(s)) }
-        XCTAssertEqual(try DreamIdentity.parse("  dr1-g1-r1-c1-OOOOOOOOOOO1a-46Ob  ").seed,42)
+        XCTAssertEqual(try DreamIdentity.parse("  dr1-g1-r1-c1-OOOOOOOOOOO1a-46Ob  ",requireSupported:false).seed,42)
         var future=DreamIdentity(seed:42); future.rulesVersion=5; XCTAssertThrowsError(try DreamIdentity.parse(future.code)); XCTAssertEqual(try DreamIdentity.parse(future.code,requireSupported:false),future)
         XCTAssertThrowsError(try DreamFile.read(Data("{\"format\":1,\"dreamID\":\"a\",\"url\":\"x\"}".utf8)))
     }
@@ -195,5 +195,29 @@ final class CoreTests: XCTestCase {
         run.mode = .debug; run.balloons=999; try store.transaction { $0.settle(run,finished:true,catalogue:[]) }; XCTAssertEqual(store.profile.balance,0)
         XCTAssertEqual(try ProfileStore(url:url).profile.balance,0)
         XCTAssertThrowsError(try store.transaction { $0.credit(id:"bad",amount:50,source:"earned"); throw DreamError.unavailable }); XCTAssertEqual(store.profile.balance,0)
+    }
+    func testReviewRequestsAtPrimeFreshRunCounts() throws {
+        let url=FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathComponent("profile.json")
+        let store=try ProfileStore(url:url)
+        let identity=DreamIdentity(seed:42)
+        let tutorial=RunState(identity:identity,mode:.tutorial)
+        let revisit=RunState(identity:identity,mode:.revisit)
+        try store.transaction { p in
+            p.settle(tutorial,finished:true,catalogue:[])
+            p.settle(revisit,finished:true,catalogue:[])
+            XCTAssertFalse(p.claimReviewRequest())
+        }
+        let primes:Set<Int>=[2,3,5,7,11,13,17,19,23,29]
+        for index in 0..<30 {
+            let run=RunState(identity:DreamIdentity(seed:UInt64(index)),mode:.fresh)
+            try store.transaction { p in
+                p.settle(run,finished:true,catalogue:[])
+                p.settle(run,finished:true,catalogue:[])
+                if primes.contains(index+1) { XCTAssertTrue(p.claimReviewRequest()) }
+                XCTAssertFalse(p.claimReviewRequest())
+            }
+        }
+        XCTAssertEqual(try ProfileStore(url:url).profile.reviewEligibleRunIDs.count,30)
+        XCTAssertEqual(try ProfileStore(url:url).profile.reviewLastRequestRunCount,29)
     }
 }

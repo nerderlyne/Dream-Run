@@ -38,6 +38,7 @@ import UIKit
     var artEquipped:[String:String]?
     var artIdle=false
     private var collageCaptureSignalled=false
+    var performanceRun: FrameRecorder?
     #endif
     var store:ProfileStore?
     var commerce:BalloonStore?
@@ -77,14 +78,26 @@ import UIKit
             var directory=try FileManager.default.url(for:.applicationSupportDirectory,in:.userDomainMask,appropriateFor:nil,create:true).appendingPathComponent("DreamAgain",isDirectory:true)
             #if DEBUG
             let args=ProcessInfo.processInfo.arguments
-            if args.contains("--ui-test") || args.contains("--art-review") || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            if args.contains("--performance-run") || args.contains("--ui-test") || args.contains("--art-review") || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
                 directory=FileManager.default.temporaryDirectory.appendingPathComponent("DreamReview-\(UUID().uuidString)",isDirectory:true)
             }
             #endif
-            let store=try ProfileStore(url:directory.appendingPathComponent("profile.json")); self.store=store; profile=store.profile; settings=profile.settings
+            // This unreleased course revision uses a fresh development store;
+            // keep the superseded profile on disk rather than treating it as corrupt.
+            let store=try ProfileStore(url:directory.appendingPathComponent("profile-g2-r2.json")); self.store=store; profile=store.profile; settings=profile.settings
             if store.recoveredBackup { error="A damaged save was preserved and the last good backup was recovered. Progress since that backup may be missing." }
-            commerce=BalloonStore(store:store); renderer=DreamRenderer(palettes:palettes)
+            #if DEBUG
+            if !args.contains("--performance-run") { commerce=BalloonStore(store:store) }
+            #else
+            commerce=BalloonStore(store:store)
+            #endif
+            renderer=DreamRenderer(palettes:palettes)
             renderer?.render(run,equipped:profile.equipped,menu:true)
+            #if !DEBUG && canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
+            if DreamAdConfiguration.liveAdsEnabled {
+                Task { await configureLiveAds() }
+            }
+            #endif
             #if DEBUG
             if ProcessInfo.processInfo.arguments.contains("--ui-test") { settings.music=false; settings.effects=false }
             if ProcessInfo.processInfo.arguments.contains("--art-review") {
@@ -93,11 +106,6 @@ import UIKit
                 let theme=arguments.firstIndex(of:"--art-theme").flatMap{index in arguments.indices.contains(index+1) ? Int(arguments[index+1]) : nil} ?? 0
                 let distance=arguments.firstIndex(of:"--art-distance").flatMap{index in arguments.indices.contains(index+1) ? Double(arguments[index+1]) : nil} ?? 37.5
                 let pose=arguments.firstIndex(of:"--art-pose").flatMap{index in arguments.indices.contains(index+1) ? arguments[index+1] : nil} ?? "run"
-            #if !DEBUG && canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
-            if DreamAdConfiguration.liveAdsEnabled {
-                Task { await configureLiveAds() }
-            }
-            #endif
                 labArt(theme:theme,distance:distance,pose:pose)
                 if let i=arguments.firstIndex(of:"--collage-scene"),arguments.indices.contains(i+1),let n=Int(arguments[i+1]) {
                     labCollage(index:n);collageMotion=arguments.contains("--collage-moving")
@@ -108,9 +116,9 @@ import UIKit
                 }
 
                 if arguments.contains("--wardrobe-review") {
-                    let character=arguments.firstIndex(of:"--character").flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1] : nil} ?? "girl"
+                    let bottom=arguments.firstIndex(of:"--bottom").flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1] : nil} ?? "plain_bottom"
                     let hat=arguments.firstIndex(of:"--hat").flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1] : nil} ?? "bare_head"
-                    let equipped=["character":character,"hat":hat]
+                    let equipped=["bottom":bottom,"hat":hat]
                     artEquipped=equipped
                     renderer?.render(run,equipped:equipped)
                     if pose == "portrait" {renderer?.previewAvatar(equipped:equipped)}
@@ -119,6 +127,7 @@ import UIKit
                     func arg(_ key:String,_ fallback:String)->String {arguments.firstIndex(of:key).flatMap {i in arguments.indices.contains(i+1) ? arguments[i+1]:nil} ?? fallback}
                     labDesign(theme:theme,pose:pose,variant:Int(arg("--variant","0")) ?? 0,sky:arg("--sky",DreamCollageKit.skyIDs[0]),pattern:TrackPattern(rawValue:arg("--pattern","checker")) ?? .checker,mirror:arguments.contains("--design-mirror"),contrast:arguments.contains("--design-contrast"))
                     if let kind=DreamObstacle(rawValue:arg("--obstacle","")) {labObstacle(kind,striking:arguments.contains("--strike"))}
+                    if arguments.contains("--jump-sequence") {labJumpSequence(arg("--jump-sequence","ascending"))}
                     if arguments.contains("--straw-limbs") {
                         let n=max(0,min(4,Int(arg("--straw-limbs","0")) ?? 0))
                         simulation.state.player.missingLimbs=Array(StrawLimb.allCases.prefix(n))
@@ -144,6 +153,28 @@ import UIKit
         } catch { self.error=error.localizedDescription }
         displayTarget.owner=self
         link=CADisplayLink(target:displayTarget,selector:#selector(DreamDisplayTarget.tick(_:))); link?.add(to:.main,forMode:.common)
+        link?.preferredFramesPerSecond = settings.lowPower ? 30 : 60
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--performance-run") {
+            let args=ProcessInfo.processInfo.arguments
+            func argument(_ name:String)->String? {
+                guard let i=args.firstIndex(of:name),args.indices.contains(i+1) else{return nil}
+                return args[i+1]
+            }
+            let recorder=FrameRecorder(duration:Double(argument("--performance-seconds") ?? "120") ?? 120,seed:UInt64(argument("--performance-seed") ?? "42") ?? 42)
+            performanceRun=recorder
+            UIApplication.shared.isIdleTimerDisabled=true
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for:.seconds(2))
+                guard let self else{return}
+                self.start(identity:.current(seed:recorder.seed),mode:.debug)
+                self.audio.prepare(run:self.run,settings:self.settings)
+                self.simulation.resume()
+                self.notice="Performance test · automated · no rewards"
+                PerformanceTrace.recorder=recorder
+            }
+        }
+        #endif
         NotificationCenter.default.addObserver(self,selector:#selector(interrupted(_:)),name:AVAudioSession.interruptionNotification,object:nil)
         NotificationCenter.default.addObserver(self,selector:#selector(audioRouteChanged(_:)),name:AVAudioSession.routeChangeNotification,object:nil)
     }
@@ -159,7 +190,39 @@ import UIKit
     func refresh() { if let store { profile=store.profile } }
     func transact(_ action:(inout Profile)throws->Void) {
         guard let store else { error="Storage is unavailable. Retry after resolving the saved profile error."; return }
-        do { try store.transaction(action); refresh() } catch { self.error=error.localizedDescription; simulation.pause() }
+        do { try PerformanceTrace.measure("Persistence") {try store.transaction(action)}; refresh() } catch { self.error=error.localizedDescription; simulation.pause() }
+    }
+    func claimReviewRequest() -> Bool {
+        guard let store else { return false }
+        var claimed=false
+        do {
+            try store.transaction { claimed=$0.claimReviewRequest() }
+            refresh()
+            return claimed
+        } catch {
+            self.error=error.localizedDescription
+            return false
+        }
+    }
+    private func checkpoint(_ snapshot:RunState) {
+        guard let store else {return}
+        let catalogue=achievements
+        // Copy immutable simulation data, then encode and commit on the store's
+        // single FIFO writer. Pause/finish use its synchronous draining barrier.
+        store.transactionAsync({profile in
+            profile.snapshot=snapshot
+            profile.settle(snapshot,finished:false,catalogue:catalogue)
+        },completion:{[weak self] result in
+            guard let owner=self else{return}
+            Task { @MainActor in
+                switch result {
+                case .success:owner.refresh()
+                case .failure(let error):
+                    owner.error=error.localizedDescription
+                    owner.simulation.pause();owner.motion.stop();owner.audio.stop()
+                }
+            }
+        })
     }
     func start(identity:DreamIdentity? = nil,mode:RunMode? = nil) {
         artReview=false;renderer?.artPalette=nil;renderer?.artPattern=nil;renderer?.art.collage.previewPlate=nil
@@ -168,12 +231,16 @@ import UIKit
         #endif
         guard store != nil, renderer != nil else { error="The game resources or profile could not be loaded."; return }
         if let identity, !identity.supported { error=DreamError.unsupportedVersion.localizedDescription; return }
-        let selectedMode=mode ?? (identity == nil ? (profile.achievements.contains("first_dream") ? .fresh : .tutorial) : .revisit)
+        var selectedMode=mode ?? (identity == nil ? (profile.achievements.contains("first_dream") ? .fresh : .tutorial) : .revisit)
+        #if DEBUG
+        if performanceRun != nil {selectedMode = .debug}
+        #endif
         if selectedMode.earns,let suspended=profile.snapshot,![RunPhase.finished,.waking].contains(suspended.phase) {
             var abandoned=suspended;abandoned.phase = .finished;abandoned.cause="started another dream"
             transact {$0.settle(abandoned,finished:true,catalogue:achievements);$0.snapshot=nil}
             if error != nil {return}
         }
+        renderer?.prepareGameplay()
         simulation=GameSimulation(identity:identity ?? DreamIdentity.current(seed:UInt64.random(in:UInt64.min...UInt64.max)),mode:selectedMode)
         screen="gameplay"; input=InputFrame(); previousTime=0; clock.reset()
         renderer?.render(run,equipped:profile.equipped); persist()
@@ -182,6 +249,7 @@ import UIKit
         artReview=false
         notice="";input=InputFrame()
         if !simulatorDragInput { motion.start(); motion.calibrate() }
+        audio.prepare(run:run,settings:settings)
         simulation.resume(); previousTime=0; clock.reset(); persist()
     }
     func pause() { guard active else { return }; simulation.pause(); motion.stop(); audio.stop(); previousTime=0; clock.reset(); input=InputFrame(); persist() }
@@ -194,6 +262,7 @@ import UIKit
         artReview=false;renderer?.artPalette=nil
         guard let snapshot=profile.snapshot else { return }
         do {
+            renderer?.prepareGameplay()
             simulation=try GameSimulation(snapshot:snapshot)
             if profile.grants.contains(where:{$0.runID == snapshot.id && !$0.consumed}) {
                 var restored=simulation
@@ -231,16 +300,16 @@ import UIKit
         }
     }
     func importCode(_ code:String) {
-        do { let normalized=code.hasPrefix("dreamagain://dream/") ? String(code.dropFirst("dreamagain://dream/".count)) : code; start(identity:try DreamIdentity.parse(normalized),mode:.revisit) } catch { self.error=error.localizedDescription }
+        do { let normalized=code.hasPrefix("dreamlooper://dream/") ? String(code.dropFirst("dreamlooper://dream/".count)) : code; start(identity:try DreamIdentity.parse(normalized),mode:.revisit) } catch { self.error=error.localizedDescription }
     }
     func importURL(_ url:URL) {
-        if url.scheme == "dreamagain" { importCode(url.lastPathComponent); return }
+        if url.scheme == "dreamlooper" { importCode(url.lastPathComponent); return }
         let access=url.startAccessingSecurityScopedResource(); defer { if access { url.stopAccessingSecurityScopedResource() } }
         do { let values=try url.resourceValues(forKeys:[.fileSizeKey]); guard values.fileSize ?? 32769 <= 32768 else { throw DreamError.invalidCode }; start(identity:try DreamFile.read(Data(contentsOf:url)),mode:.revisit) } catch { self.error=error.localizedDescription }
     }
     func share() {
         let result=run
-        let caption="Dream Again · \(result.mode.rawValue) · \(time(result.activeTicks)) · \(result.continueCount) continues\n\(result.identity.code)\nRules \(result.identity.rulesVersion) · \(result.pigs.count)/3 clover pigs"
+        let caption="Dreamlooper · \(result.mode.rawValue) · \(time(result.activeTicks)) · \(result.continueCount) continues\n\(result.identity.code)\nRules \(result.identity.rulesVersion) · \(result.pigs.count)/3 clover pigs"
         do {
             let url=FileManager.default.temporaryDirectory.appendingPathComponent("DreamAgain.dream")
             try JSONEncoder().encode(DreamFile(result.identity)).write(to:url,options:.atomic)
@@ -250,16 +319,7 @@ import UIKit
         } catch { self.error=error.localizedDescription }
     }
     func buy(_ item:CosmeticDefinition) { transact { try $0.buy(item) } }
-    func chooseCharacter(_ character:String) {
-        guard ["girl","runner"].contains(character) else {return}
-        transact { $0.equipped["character"]=character }
-        renderer?.previewAvatar(equipped:profile.equipped,wardrobe:true)
-    }
-    func removeTrail() {
-        transact { $0.equipped.removeValue(forKey:"trail") }
-        renderer?.dress(profile.equipped)
-    }
-    func equip(_ item:CosmeticDefinition) { guard profile.owned.contains(item.id) else { return }; transact { $0.equipped[item.slot]=item.id }; renderer?.dress(profile.equipped) }
+    func equip(_ item:CosmeticDefinition) { guard profile.owned.contains(item.id) || (item.balloon_price == 0 && item.required_achievement == nil) else { return }; transact { $0.owned.insert(item.id); $0.equipped[item.slot]=item.id }; renderer?.dress(profile.equipped) }
     func saveSettings() { link?.preferredFramesPerSecond=settings.lowPower ? 30 : 60;transact { $0.settings=settings } }
     func time(_ ticks:UInt64)->String { let seconds=ticks/60; return String(format:"%02lld:%02lld:%02lld",seconds/3600,(seconds/60)%60,seconds%60) }
     func continueDream() async {
@@ -273,77 +333,17 @@ import UIKit
             #if DEBUG
             if provider is MockRewardProvider {
                 var isolated=Profile();_=isolated.grantContinue(eventID:event,run:candidate.state);_=isolated.consumeContinue(&candidate)
-                simulation=candidate;screen="gameplay";previousTime=0;return
+                simulation=candidate;audio.prepare(run:run,settings:settings);screen="gameplay";previousTime=0;return
             }
             #endif
             transact { _=$0.grantContinue(eventID:event,run:candidate.state) }
             transact { _=$0.consumeContinue(&candidate) }
-            if profile.snapshot?.continueCount == 1 { simulation=candidate; screen="gameplay"; previousTime=0 }
+            if profile.snapshot?.continueCount == 1 { simulation=candidate; audio.prepare(run:run,settings:settings);screen="gameplay"; previousTime=0 }
         case .dismissed: notice="No reward was earned. Clover odds are unchanged."
         case .unavailable: notice="Rewarded continue is unavailable. Start another dream for free."
         case .failed(let message): notice=message
         }
     }
-    @objc func frame(_ display:CADisplayLink) {
-        renderer?.art.collage.reducedMotion=settings.reducedMotion
-        if artReview {
-            #if DEBUG
-            if collageMotion,renderer?.art.collage.ready == true {
-                let now=display.timestamp
-                if previousTime>0 {
-                    for _ in 0..<(clock.consume(now-previousTime) ?? 0) {
-                        // Review run uses the real simulation at normal speed; no rewards.
-                        if obstacleReview == nil {simulation.state.safeUntilDistance=simulation.state.distance+1000}
-                        _=simulation.step(input);_=simulation.presentationStep(1.0/60);input.jump=false;input.slide=false
-                    }
-                }
-                previousTime=now
-            } else {previousTime=0}
-            renderer?.render(run,equipped:artEquipped ?? profile.equipped,menu:artIdle)
-            if !collageCaptureSignalled,renderer?.art.collage.ready == true {
-                let args=ProcessInfo.processInfo.arguments
-                if let i=args.firstIndex(of:"--collage-capture-token"),args.indices.contains(i+1),let token=UUID(uuidString:args[i+1]) {
-                    let path=URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("collage-ready-\(token.uuidString).txt")
-                    try? Data("Current plate and collage cutouts ready; DEBUG no rewards".utf8).write(to:path,options:.atomic)
-                    collageCaptureSignalled=true
-                }
-            }
-            #endif
-            return
-        }
-        if screen == "home",let renderer {
-            homeFrames += 1
-            if homeFrames%2 == 0 {
-                let old=Int(homeDream.state.distance/24)
-                homeDream.state.activeTicks += 2;homeDream.state.distance += 0.025
-                if Int(homeDream.state.distance/24) != old {homeDream.streamChunks()}
-                renderer.render(homeDream.state,equipped:profile.equipped,menu:true,lowPower:true)
-            }
-            previousTime=0;return
-        }
-        guard active, renderer != nil else { previousTime=0; return }
-        horizonWarmup.request(run)
-        let now=display.timestamp
-        if previousTime == 0 { previousTime=now; return }
-        let delta=now-previousTime; previousTime=now
-        if [.ready,.paused,.finished].contains(run.phase) { return }
-        if [.waking,.luckyTransition,.whiteEnding,.resuming].contains(run.phase) {
-            let events=simulation.presentationStep(delta)
-            renderer?.render(run,equipped:profile.equipped,lowPower:settings.lowPower)
-            audio.update(run:run,settings:settings,delta:delta)
-            if events.contains(.ending) { finish(); screen="results" }
-            return
-        }
-        guard let steps=clock.consume(delta) else {clock.reset();return}
-        if !simulatorDragInput {
-            if let steering=motion.sample(settings:settings,now:now,fullScaleDegrees:run.rules.tiltFullScaleDegrees) {input.steering=steering}
-            else {input.steering=0;notice="Tilt input was interrupted. Hold your device comfortably and tap ready to recalibrate.";pause();return}
-        }
-        for _ in 0..<steps {
-            let before=run
-            let events=simulation.step(input); input.jump=false; input.slide=false
-            audio.movement(before:before,after:run,settings:settings)
-            if events.contains(.thunder) {audio.feedback(.thunder,settings:settings)}
     #if canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
     private func makeGoogleProvider(unitID:String,saveRewards:Bool) -> GoogleRewardedProvider {
         GoogleRewardedProvider(unitID:unitID,currentRun:{ [weak self] in self?.run ?? GameSimulation(identity:DreamIdentity.current(seed:42),mode:.reviewDemo).state },persistEarned:{ [weak self] event,offeredRun in
@@ -385,6 +385,102 @@ import UIKit
     }
     #endif
     #endif
+    @objc func frame(_ display:CADisplayLink) {
+        renderer?.art.collage.reducedMotion=settings.reducedMotion
+        if artReview {
+            #if DEBUG
+            if collageMotion,renderer?.art.collage.ready == true {
+                let now=display.timestamp
+                if previousTime>0 {
+                    for _ in 0..<(clock.consume(now-previousTime) ?? 0) {
+                        // Review run uses the real simulation at normal speed; no rewards.
+                        if obstacleReview == nil {simulation.state.safeUntilDistance=simulation.state.distance+1000}
+                        _=simulation.step(input);_=simulation.presentationStep(1.0/60);input.jump=false;input.slide=false
+                    }
+                }
+                previousTime=now
+            } else {previousTime=0}
+            renderer?.render(run,equipped:artEquipped ?? profile.equipped,menu:artIdle)
+            if !collageCaptureSignalled,renderer?.art.collage.ready == true {
+                let args=ProcessInfo.processInfo.arguments
+                if let i=args.firstIndex(of:"--collage-capture-token"),args.indices.contains(i+1),let token=UUID(uuidString:args[i+1]) {
+                    let path=URL(fileURLWithPath:NSTemporaryDirectory()).appendingPathComponent("collage-ready-\(token.uuidString).txt")
+                    try? Data("Current plate and collage cutouts ready; DEBUG no rewards".utf8).write(to:path,options:.atomic)
+                    collageCaptureSignalled=true
+                }
+            }
+            #endif
+            return
+        }
+        if screen == "home",let renderer {
+            homeFrames += 1
+            if homeFrames%2 == 0 {
+                let old=Int(homeDream.state.distance/24)
+                homeDream.state.activeTicks += 2;homeDream.state.distance += 0.025
+                if Int(homeDream.state.distance/24) != old {homeDream.streamChunks()}
+                renderer.render(homeDream.state,equipped:profile.equipped,menu:true,lowPower:true)
+            }
+            previousTime=0;return
+        }
+        guard active, renderer != nil else { previousTime=0; return }
+        #if DEBUG
+        if let recorder=performanceRun, !recorder.complete {
+            recorder.begin()
+        }
+        defer {
+            if let recorder=performanceRun, !recorder.complete {
+                recorder.end(run:run,entities:renderer?.renderEntities ?? 0)
+                if recorder.complete {
+                    simulation.pause(); audio.stop(); motion.stop()
+                    UIApplication.shared.isIdleTimerDisabled=false
+                    PerformanceTrace.recorder=nil
+                    recorder.export()
+                    notice="Performance test complete"
+                }
+            }
+        }
+        if let recorder=performanceRun,!recorder.complete,run.phase == .finished {
+            start(identity:.current(seed:run.identity.seed &+ 1),mode:.debug)
+            audio.prepare(run:run,settings:settings)
+            simulation.resume()
+        }
+        #endif
+        horizonWarmup.request(run)
+        let now=display.timestamp
+        if previousTime == 0 { previousTime=now; return }
+        let delta=now-previousTime; previousTime=now
+        if [.ready,.paused,.finished].contains(run.phase) { return }
+        if [.waking,.luckyTransition,.whiteEnding,.resuming].contains(run.phase) {
+            let events=simulation.presentationStep(delta)
+            renderer?.render(run,equipped:profile.equipped,lowPower:settings.lowPower)
+            audio.update(run:run,settings:settings,delta:delta)
+            if events.contains(.ending) {
+                finish()
+                #if DEBUG
+                if performanceRun == nil { screen="results" }
+                #else
+                screen="results"
+                #endif
+            }
+            return
+        }
+        guard let steps=clock.consume(delta) else {clock.reset();return}
+        var automated=false
+        #if DEBUG
+        automated=performanceRun != nil
+        #endif
+        if !simulatorDragInput && !automated {
+            if let steering=motion.sample(settings:settings,now:now,fullScaleDegrees:run.rules.tiltFullScaleDegrees) {input.steering=steering}
+            else {input.steering=0;notice="Tilt input was interrupted. Hold your device comfortably and tap ready to recalibrate.";pause();return}
+        }
+        for _ in 0..<steps {
+            #if DEBUG
+            if performanceRun != nil { input=EncounterOracle.input(run) }
+            #endif
+            let before=run
+            let events=PerformanceTrace.measure("Simulation") {simulation.step(input)}; input.jump=false; input.slide=false
+            PerformanceTrace.measure("MovementAudio") {audio.movement(before:before,after:run,settings:settings)}
+            if events.contains(.thunder) {audio.feedback(.thunder,settings:settings)}
             if events.contains(.strawBreak) {audio.feedback(.strawBreak,settings:settings)}
             if events.contains(.strawRepair) {audio.feedback(.strawRepair,settings:settings)}
             if events.contains(.stumble) && !events.contains(.strawBreak) { audio.feedback(.stumble,settings:settings) }
@@ -393,14 +489,14 @@ import UIKit
             if events.contains(.mirror) { audio.feedback(.mirror,settings:settings) }
             if events.contains(.drop) { audio.feedback(.drop,settings:settings) }
             if events.contains(.waking) && run.cause != "unravelled" { finish() }
-            if run.mode.earns && (events.contains(.strawBreak) || events.contains(.strawRepair) || events.contains(.pigCommitted) || events.contains(.clover) || run.activeTicks%900 == 0) {
+            if (run.mode.earns || automated) && (events.contains(.strawBreak) || events.contains(.strawRepair) || events.contains(.pigCommitted) || events.contains(.clover) || run.activeTicks%900 == 0) {
                 let snapshot=run
-                transact { $0.snapshot=snapshot; $0.settle(snapshot,finished:false,catalogue:achievements) }
+                PerformanceTrace.measure("CheckpointEnqueue") {checkpoint(snapshot)}
             }
             if [.waking,.luckyTransition].contains(run.phase) { break }
         }
-        renderer?.render(run,equipped:profile.equipped,lowPower:settings.lowPower || ProcessInfo.processInfo.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue)
-        audio.update(run:run,settings:settings,delta:delta)
+        PerformanceTrace.measure("Render") {renderer?.render(run,equipped:profile.equipped,lowPower:settings.lowPower || ProcessInfo.processInfo.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue)}
+        PerformanceTrace.measure("Audio") {audio.update(run:run,settings:settings,delta:delta)}
     }
     #if DEBUG
     func labScale(_ event:DreamScaleEvent,framing:DreamScaleFraming?=nil) {
@@ -415,6 +511,26 @@ import UIKit
         renderer?.art.collage.previewVignette=kind
         simulation.state.distance=150
         renderer?.art.collage.reset();renderer?.lastRun=nil;renderer?.render(run,equipped:profile.equipped)
+    }
+    func labJumpSequence(_ variant:String) {
+        labCollage(index:0)
+        let first=variant == "late" ? 196:4
+        let seed=(UInt64(0)..<100).first {seed in
+            let c=WorldGenerator(.current(seed:seed)).jumpSequenceChunk(first)!
+            if variant == "late" {return c.step != nil}
+            if variant == "ascending" {return c.step != nil && c.gap == nil}
+            if variant == "floating" {return c.step != nil && c.gap != nil}
+            return c.step == nil
+        } ?? 0
+        simulation.state.identity = .current(seed:seed)
+        simulation.state.safeUntilDistance=0;simulation.state.activeTicks=36000
+        simulation.state.distance=Double(first)*24+4
+        let generator=WorldGenerator(simulation.state.identity)
+        simulation.state.chunks=(first-2...first+10).map {i in
+            generator.jumpSequenceChunk(i) ?? ChunkDescription(id:i,routeFamily:.trackStraight,start:Double(i)*24,hazards:[],pickups:[],scenery:[],recipe:0)
+        }
+        simulation.state.hazards=simulation.state.chunks.flatMap(\.hazards)
+        renderer?.lastRun=nil;renderer?.render(run,equipped:profile.equipped)
     }
     func labObstacle(_ kind:DreamObstacle,striking:Bool=false) {
         labCollage(index:0);obstacleReview=kind
@@ -439,7 +555,7 @@ import UIKit
         labCollage(index:0)
         renderer?.artPalette=max(0,min(palettes.count-1,theme));renderer?.artPattern=pattern
         renderer?.art.collage.previewPlate=sky
-        let looks:[[String:String]]=[[:],["character":"girl","hat":"bow","body_color":"rose_body"],["character":"girl","hat":"nightcap","body_color":"pearl_body"],["hat":"moon_hat","body_color":"mint_body"],["hat":"beyond_crown","body_color":"pearl_body"]]
+        let looks:[[String:String]]=[[:],["bottom":"straw_skirt","hat":"bow","top":"rose_body"],["bottom":"straw_skirt","hat":"nightcap","top":"pearl_body"],["hat":"moon_hat","top":"mint_body"],["hat":"beyond_crown","top":"pearl_body"]]
         artEquipped=looks[((variant%looks.count)+looks.count)%looks.count]
         artIdle=pose == "idle"
         simulation.state.distance=61.3;simulation.state.activeTicks=300

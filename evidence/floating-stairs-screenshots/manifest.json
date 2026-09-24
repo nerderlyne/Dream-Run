@@ -1,0 +1,26 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "80DBBEEC-A752-43F6-A60E-2419BAE5B77E",
+        "deviceName" : "iPhone 16 Pro Max",
+        "exportedFileName" : "51E0FE62-6E0C-46AD-AE08-3208F1CB2BF6.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Jump sequence - late_0_922C56B4-3EFB-4267-B65E-1C98C0FCE181.png",
+        "timestamp" : 1790057511.257
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "80DBBEEC-A752-43F6-A60E-2419BAE5B77E",
+        "deviceName" : "iPhone 16 Pro Max",
+        "exportedFileName" : "E664F233-D23E-4DA3-A087-B7D7BD9B1CEF.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Jump sequence - floating_0_EEEDFCE1-035A-4C84-8678-783A2792A1A1.png",
+        "timestamp" : 1790057479.27
+      }
+    ],
+    "testIdentifier" : "Dream_AgainUITests/testFloatingStairProgressionPreviews()",
+    "testIdentifierURL" : "test://com.apple.xcode/Dream%20Again/Dream%20AgainUITests/Dream_AgainUITests/testFloatingStairProgressionPreviews"
+  }
+]

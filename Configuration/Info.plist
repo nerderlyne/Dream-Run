@@ -4,8 +4,9 @@
 <key>GADApplicationIdentifier</key><string>ca-app-pub-8817570052706911~3587360903</string>
 <key>SKAdNetworkItems</key><array><dict><key>SKAdNetworkIdentifier</key><string>cstr6suwn9.skadnetwork</string></dict></array>
 <key>CFBundleIcons</key><dict><key>CFBundlePrimaryIcon</key><dict><key>CFBundleIconFiles</key><array><string>DreamAgainIcon</string></array></dict></dict>
-<key>CFBundleURLTypes</key><array><dict><key>CFBundleURLName</key><string>Dream identity import</string><key>CFBundleURLSchemes</key><array><string>dreamagain</string></array></dict></array>
-<key>CFBundleDocumentTypes</key><array><dict><key>CFBundleTypeName</key><string>Dream Again seed</string><key>LSHandlerRank</key><string>Owner</string><key>LSItemContentTypes</key><array><string>com.example.dreamagain.seed</string></array></dict></array>
-<key>UTExportedTypeDeclarations</key><array><dict><key>UTTypeIdentifier</key><string>com.example.dreamagain.seed</string><key>UTTypeConformsTo</key><array><string>public.json</string></array><key>UTTypeDescription</key><string>Versioned Dream Again seed</string><key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>dream</string></array></dict></dict></array>
+<key>CFBundleURLTypes</key><array><dict><key>CFBundleURLName</key><string>Dream identity import</string><key>CFBundleURLSchemes</key><array><string>dreamlooper</string></array></dict></array>
+<key>CFBundleDocumentTypes</key><array><dict><key>CFBundleTypeName</key><string>Dreamlooper seed</string><key>LSHandlerRank</key><string>Owner</string><key>LSItemContentTypes</key><array><string>dev.shivanshi.dream-run.seed</string></array></dict></array>
+<key>LSSupportsOpeningDocumentsInPlace</key><false/>
+<key>UTExportedTypeDeclarations</key><array><dict><key>UTTypeIdentifier</key><string>dev.shivanshi.dream-run.seed</string><key>UTTypeConformsTo</key><array><string>public.json</string></array><key>UTTypeDescription</key><string>Versioned Dreamlooper seed</string><key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>dream</string></array></dict></dict></array>
 <key>NSMotionUsageDescription</key><string>Tilt gently to steer through your dream.</string>
 </dict></plist>

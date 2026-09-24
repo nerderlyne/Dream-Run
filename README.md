@@ -1,4 +1,6 @@
-# Dream Again
+# Dreamlooper
+
+App display name: **Dreamlooper**. Signed explicit bundle ID: `dev.shivanshi.dream-run`. Xcode project, scheme and internal module currently retain the `Dream Again` / `DreamAgain` filenames.
 
 Native SwiftUI + non-AR RealityKit runner for iPhone and iPad, targeting iOS 18. The supplied specification and reference data remain at the repository root. Original procedural geometry and synthesized audio are implemented in the app; mood-reference images are not production resources.
 
@@ -51,7 +53,7 @@ The serialized profile uses a checksummed JSON envelope with atomic replacement,
 
 Snapshots occur every 15 active seconds and on pause, rare-event commitment/collection and endpoint changes. Abrupt termination can lose progress since the last successful snapshot. Purchases finish only after the grant is persisted. Consumable balances are local data, not automatically reconstructed from StoreKit history.
 
-A `.dream` file contains only `format` and `dreamID`, is limited to 32 KiB and always imports as Revisit. The custom URL is `dreamagain://dream/<code>`; no owned HTTPS domain or universal association is claimed.
+A `.dream` file contains only `format` and `dreamID`, is limited to 32 KiB and always imports as Revisit. The custom URL is `dreamlooper://dream/<code>`; no owned HTTPS domain or universal association is claimed.
 
 Current running speed starts at **12.25 m/s**, rising to **16 m/s at two minutes, 19 m/s at five minutes, and a 22 m/s cap at ten minutes**. Steering spans **±0.9 m**,
 with 6 m/s lateral movement, 40 ms smoothing and 12° calibrated full-scale tilt.
@@ -71,12 +73,16 @@ from the actual simulator renderer. Historical art branches and superseded revie
 
 ## Difficulty and obstacles
 
-New runs use one current ruleset and a fresh `profile.json` development store. Old prerelease
+New runs use one current ruleset and a fresh `profile-g2-r2.json` development store. Old prerelease
 rules/saves are unsupported; no compatibility implementation is retained.
 The deterministic generator mixes oversized stair jumps, broken floors, exposed bridges,
 low windows, swinging moons, collapsing tiles, sleeping furniture, ball volleys and the
-existing animal hazards. Ordinary stairs remain automatic. Amber broken-edge marks identify
-fatal gaps; the established white double marks identify safe drops. Ball hits slow and push
+existing animal hazards. Three-jump sequences combine floating stair flights, mixed furniture/gaps, and
+three progressively raised stair landings. Early floating flights have 3 m gaps. After
+1,200 m, floating gaps widen to 4 m and other ascending runs gain two 3 m gaps; after
+4,500 m every raised landing has a 4 m approach gap. Jumps remain 24 m apart with a recovery chunk.
+Ordinary stairs remain automatic. The wide balloon-lined automatic drop is removed;
+broken-edge marks identify real gaps that require jumping. Ball hits slow and push
 the runner sideways, so contact near an exposed bridge edge can end the run.
 
 Lightning marks a fixed circle at least two active seconds before a short strike. Tilt clear
@@ -108,3 +114,7 @@ shows normal seeded dreams and a scene with a separate rare landmark.
 Composition refinement: [reasoning](docs/COMPOSITION_REVIEW.md) and [eight consecutive simulator seeds](evidence/composition-gallery.html).
 
 Curated photographic backgrounds: see [DreamPlates import and runtime](docs/DREAM_PLATES.md).
+
+Jump-sequence screenshot previews (DEBUG, no rewards): launch with
+`--ui-test --art-review --design-review --jump-sequence ascending` (or `floating` / `late` / `mixed`).
+Current dream IDs use G2/R2/C1; old prerelease layouts are rejected rather than replayed differently.

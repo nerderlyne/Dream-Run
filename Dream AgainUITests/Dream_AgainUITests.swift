@@ -1,5 +1,17 @@
 import XCTest
 final class Dream_AgainUITests:XCTestCase {
+    @MainActor func testWardrobeTryOnWithoutPurchase() throws {
+        let app=XCUIApplication();app.launchArguments=["--ui-test"];app.launch()
+        XCTAssertTrue(app.buttons["wardrobe"].waitForExistence(timeout:10))
+        app.buttons["wardrobe"].tap()
+        XCTAssertTrue(app.staticTexts["Your straw looper"].waitForExistence(timeout:5))
+        let hat=app.buttons["preview paper_hat"]
+        XCTAssertTrue(hat.waitForExistence(timeout:5))
+        hat.tap()
+        XCTAssertTrue(app.buttons["buy"].exists,"Preview must leave the item unowned")
+        XCTAssertTrue(app.staticTexts["Smiley paper bag"].exists)
+        let attachment=XCTAttachment(screenshot:app.screenshot());attachment.name="Wardrobe try-on";attachment.lifetime = .keepAlways;add(attachment)
+    }
     @MainActor func testOfflineStartPauseAndMenus() throws {
         let app=XCUIApplication();app.launchArguments=["--ui-test"];app.launch()
         XCTAssertTrue(app.buttons["dream"].waitForExistence(timeout:10))
@@ -12,10 +24,10 @@ final class Dream_AgainUITests:XCTestCase {
         XCTAssertTrue(app.buttons["pause"].waitForExistence(timeout:5));app.buttons["pause"].tap()
         XCTAssertTrue(app.buttons["save & leave"].waitForExistence(timeout:5));app.buttons["save & leave"].tap()
         app.buttons["wardrobe"].tap()
-        let girl=app.buttons["Girl · dress"]
-        if girl.waitForExistence(timeout:3) {girl.tap()}
-        XCTAssertTrue(app.buttons["Girl · wearing dress"].waitForExistence(timeout:5))
-        XCTAssertTrue(app.staticTexts["Paper hat"].waitForExistence(timeout:5))
+        XCTAssertTrue(app.staticTexts["Your straw looper"].waitForExistence(timeout:5))
+        XCTAssertTrue(app.buttons["preview paper_hat"].waitForExistence(timeout:5))
+        app.buttons["preview paper_hat"].tap()
+        XCTAssertTrue(app.buttons["buy"].exists)
         let attachment=XCTAttachment(screenshot:app.screenshot());attachment.name="Wardrobe";attachment.lifetime = .keepAlways;add(attachment)
     }
 }
@@ -31,5 +43,21 @@ extension Dream_AgainUITests {
         alive.isInverted=true;wait(for:[alive],timeout:12)
         let screenshot=XCTAttachment(screenshot:app.screenshot());screenshot.name="Translucent checker over underwater photograph";screenshot.lifetime = .keepAlways;add(screenshot)
         XCTAssertEqual(app.state,.runningForeground)
+    }
+}
+
+extension Dream_AgainUITests {
+    @MainActor func testFloatingStairProgressionPreviews() throws {
+        for variant in ["floating","late"] {
+            let app=XCUIApplication()
+            app.launchArguments=["--ui-test","--art-review","--design-review","--jump-sequence",variant,"--pattern","checker"]
+            app.launch()
+            XCTAssertTrue(app.staticTexts["PREVIEW · NO REWARDS"].waitForExistence(timeout:30))
+            let stillRunning=XCTNSPredicateExpectation(predicate:NSPredicate(format:"exists == false"),object:app.staticTexts["PREVIEW · NO REWARDS"])
+            stillRunning.isInverted=true;wait(for:[stillRunning],timeout:4)
+            let shot=XCTAttachment(screenshot:app.screenshot());shot.name="Jump sequence - \(variant)";shot.lifetime = .keepAlways;add(shot)
+            XCTAssertEqual(app.state,.runningForeground)
+            app.terminate()
+        }
     }
 }
