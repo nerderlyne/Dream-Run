@@ -253,7 +253,7 @@ struct ContentView:View {
             button("save settings"){game.saveSettings();game.notice="Settings saved."}
             button("replay introduction"){game.start(mode:.tutorial)}
             Text("Pause and recalibrate at any time. Sound respects silent mode. Wallet and dreams are stored on this device; consumable balance is not automatically restored across reinstalls.").font(.footnote).foregroundStyle(.secondary)
-            Text("Purchases: local testing in Debug; disabled in Release. Ads, Game Center, cloud and Universal Links are not configured. Privacy/support URLs must be supplied by the owner before publishing.").font(.footnote).foregroundStyle(.secondary)
+            Text("Purchases: local testing in Debug; disabled in Release. Google rewarded ads are integrated but live serving is disabled pending owner consent setup and authorization. Game Center, cloud and Universal Links are not configured. The privacy policy will be at dreamlooper.shivanshi.dev/privacy; a support URL is still needed before publishing.").font(.footnote).foregroundStyle(.secondary)
         }
     }
     #if DEBUG
@@ -289,6 +289,9 @@ struct StoreView:View {
     var body:some View {VStack(spacing:22){Button("‹ wardrobe",action:onBack);Text("balloons").font(.largeTitle);Text(commerce.status).multilineTextAlignment(.center);ForEach(commerce.products){p in Button("\(BalloonStore.quantities[p.id] ?? 0) balloons · \(p.displayPrice)"){Task{await commerce.purchase(p)}}.buttonStyle(.borderedProminent)};Button("reconcile purchases"){Task{await commerce.reconcile()}};Text("Currency buys cosmetics only. No luck, clovers, or skill advantages.").font(.footnote)}.padding(30).task{await commerce.load()}}
 }
 struct ShareSheet:UIViewControllerRepresentable {
+            #if canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
+            if game.adPrivacyOptionsRequired { button("Ad privacy options"){Task{await game.showAdPrivacyOptions()}} }
+            #endif
     var items:[Any]
     func makeUIViewController(context:Context)->UIActivityViewController {UIActivityViewController(activityItems:items,applicationActivities:nil)}
     func updateUIViewController(_ controller:UIActivityViewController,context:Context){}
@@ -299,3 +302,6 @@ struct ShareCard:View {
         VStack(spacing:24){Text("D R E A M   A G A I N").font(.caption);Text(run.pigs.count == 3 ? "Lucky Dream" : "you woke up.").font(.system(size:40,design:.serif));Text("\(Int(run.seconds/60)) minutes · \(run.pigs.count)/3 clover pigs");Text("\(run.mode.rawValue) · \(run.continueCount) continues · rules \(run.identity.rulesVersion)").font(.caption);Text(run.identity.code).font(.system(size:12,design:.monospaced));Text("A seed remembers a place, not a performance.").font(.caption)}.padding(36).frame(width:420,height:420).foregroundStyle(Color(red:0.25,green:0.21,blue:0.3)).background(Color(red:0.92,green:0.88,blue:0.91))
     }
 }
+                #if canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
+                Button("Google test rewarded ad"){Task{await game.labGoogleTestAd()}}
+                #endif

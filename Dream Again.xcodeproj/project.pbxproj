@@ -29,6 +29,11 @@
 		58E1F04A3056BC2200E09E28 /* Dream AgainUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Dream AgainUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXBuildFile section */
+		DAAD00000000000000000003 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = DAAD00000000000000000001 /* GoogleMobileAds */; };
+		DAAD00000000000000000004 /* GoogleUserMessagingPlatform in Frameworks */ = {isa = PBXBuildFile; productRef = DAAD00000000000000000002 /* GoogleUserMessagingPlatform */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		58E1F0333056BC1F00E09E28 /* Dream Again */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAAD00000000000000000003 /* GoogleMobileAds in Frameworks */,
+				DAAD00000000000000000004 /* GoogleUserMessagingPlatform in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +119,8 @@
 			);
 			name = "Dream Again";
 			packageProductDependencies = (
+				DAAD00000000000000000001 /* GoogleMobileAds */,
+				DAAD00000000000000000002 /* GoogleUserMessagingPlatform */,
 			);
 			productName = "Dream Again";
 			productReference = 58E1F0313056BC1F00E09E28 /* Dream Again.app */;
@@ -195,6 +204,10 @@
 			);
 			mainGroup = 58E1F0283056BC1E00E09E28;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DAAD00000000000000000005 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				DAAD00000000000000000006 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 58E1F0323056BC1F00E09E28 /* Products */;
 			projectDirPath = "";
@@ -585,3 +598,21 @@
 	};
 	rootObject = 58E1F0293056BC1E00E09E28 /* Project object */;
 }
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DAAD00000000000000000005 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {kind = exactVersion; version = 13.9.0; };
+		};
+		DAAD00000000000000000006 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-user-messaging-platform.git";
+			requirement = {kind = exactVersion; version = 3.1.0; };
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DAAD00000000000000000001 /* GoogleMobileAds */ = {isa = XCSwiftPackageProductDependency; package = DAAD00000000000000000005 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */; productName = GoogleMobileAds; };
+		DAAD00000000000000000002 /* GoogleUserMessagingPlatform */ = {isa = XCSwiftPackageProductDependency; package = DAAD00000000000000000006 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */; productName = GoogleUserMessagingPlatform; };
+/* End XCSwiftPackageProductDependency section */

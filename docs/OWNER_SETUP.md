@@ -1,6 +1,6 @@
 # Owner setup and integration boundaries
 
-The offline dependency graph creates neither a Google ad client nor Game Center authentication. Release sales are disabled. `Dream Again/Configuration/Services.example.json` describes the intended disabled configuration; it is a preflight input, not a switch that silently enables services.
+The project pins Google Mobile Ads 13.9.0 and UMP 3.1.0 using the same package versions as Align&Reveal. Live Google ads and Release sales remain disabled. `Dream Again/Configuration/Services.example.json` records the supplied AdMob IDs and disabled state; it is a preflight input, not a switch that silently enables services.
 
 ## Signing and devices
 
@@ -21,11 +21,11 @@ Before enabling production sales:
 
 ## Optional rewarded ads
 
-`DisabledRewardProvider` is the default. Debug mocks are nonrewarding Lab attempts only. `LiveRewardProvider` accepts an owner SDK bridge. `OptionalGoogleAds.swift` additionally supplies a `GoogleRewardedProvider` under `canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)`. Those dependencies are not installed/pinned here, so that optional branch is **not compiled or runtime-tested**.
+`DisabledRewardProvider` is the default. Debug mocks are nonrewarding Lab attempts only. `OptionalGoogleAds.swift` supplies `GoogleRewardedProvider` with the pinned Google packages. The AdMob app ID is in `Configuration/Info.plist`; the rewarded unit ID is in `DreamAdConfiguration` and the example service file. The Debug Lab offers Google's test rewarded unit; it never grants a production continue. `DreamAdConfiguration.liveAdsEnabled` must remain false until consent setup and live serving are explicitly authorized.
 
-The adapter follows the documented load/present/earned callback and full-screen delegate lifecycle. Consent is refreshed and required forms are shown before requesting ads. The owner must expose the privacy-options action when the adapter reports it required. Reward callbacks persist an entitlement immediately; dismissal only decides whether the result returns as earned or unearned. The host binds `persistEarned` to the current run UUID through `Profile.grantContinue`, then consumes it after dismissal. A pending unconsumed entitlement is recovered without another ad. Never bind an ad callback to a newly started run.
+The adapter follows the documented load/present/earned callback and full-screen delegate lifecycle. Consent is refreshed and required forms are shown before requesting ads. The owner must expose the privacy-options action when the adapter reports it required. Reward callbacks persist an entitlement immediately; dismissal only decides whether the result returns as earned or unearned. The host captures the offered run and uses `Profile.grantContinue` for it, then consumes it after dismissal. A pending unconsumed entitlement is recovered without another ad.
 
-To integrate, add and pin Google's official Mobile Ads and UMP packages, supply your app/ad IDs and consent messages, then wire the provider at explicit opt-in. Use Google's documented test inventory during development; do not enable live inventory without owner authorization. Tracking permission and consent are separate requirements, and refusal must not block dreams. Before shipping, test no-fill, presentation failure, dismissal without reward, late callbacks, duplicates and interruption with the actual pinned SDK.
+Before enabling live ads, configure AdMob Privacy & messaging consent using `https://dreamlooper.shivanshi.dev/privacy`, publish the policy at that URL, finish the privacy/data disclosures, and authorize live inventory. Settings already exposes UMP privacy options when required. Tracking permission and consent are separate requirements, and refusal must not block dreams. Before shipping, test no-fill, presentation failure, dismissal without reward, late callbacks, duplicates and interruption with the actual pinned SDK.
 
 API references checked during implementation:
 

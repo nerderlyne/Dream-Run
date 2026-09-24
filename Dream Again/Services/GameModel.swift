@@ -51,7 +51,7 @@ import UIKit
     var previousTime=0.0
     var clock=FixedStepClock()
     private let horizonWarmup=HorizonWarmup()
-    var provider:any RewardedContinueProvider = DisabledRewardProvider()
+    @Published var provider:any RewardedContinueProvider = DisabledRewardProvider()
     var active:Bool { screen == "gameplay" }
     // Simulator has no motion sensor. This is a test-environment adapter, not a player setting.
     var simulatorDragInput:Bool {
@@ -93,6 +93,11 @@ import UIKit
                 let theme=arguments.firstIndex(of:"--art-theme").flatMap{index in arguments.indices.contains(index+1) ? Int(arguments[index+1]) : nil} ?? 0
                 let distance=arguments.firstIndex(of:"--art-distance").flatMap{index in arguments.indices.contains(index+1) ? Double(arguments[index+1]) : nil} ?? 37.5
                 let pose=arguments.firstIndex(of:"--art-pose").flatMap{index in arguments.indices.contains(index+1) ? arguments[index+1] : nil} ?? "run"
+            #if !DEBUG && canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
+            if DreamAdConfiguration.liveAdsEnabled {
+                Task { await configureLiveAds() }
+            }
+            #endif
                 labArt(theme:theme,distance:distance,pose:pose)
                 if let i=arguments.firstIndex(of:"--collage-scene"),arguments.indices.contains(i+1),let n=Int(arguments[i+1]) {
                     labCollage(index:n);collageMotion=arguments.contains("--collage-moving")
@@ -339,6 +344,47 @@ import UIKit
             let events=simulation.step(input); input.jump=false; input.slide=false
             audio.movement(before:before,after:run,settings:settings)
             if events.contains(.thunder) {audio.feedback(.thunder,settings:settings)}
+    #if canImport(GoogleMobileAds) && canImport(UserMessagingPlatform)
+    private func makeGoogleProvider(unitID:String,saveRewards:Bool) -> GoogleRewardedProvider {
+        GoogleRewardedProvider(unitID:unitID,currentRun:{ [weak self] in self?.run ?? GameSimulation(identity:DreamIdentity.current(seed:42),mode:.reviewDemo).state },persistEarned:{ [weak self] event,offeredRun in
+            guard let self else { return false }
+            if !saveRewards { self.notice="Google test reward callback received. No continue was granted."; return false }
+            guard let store=self.store else { return false }
+            do {
+                var granted=false
+                try store.transaction { granted=$0.grantContinue(eventID:event,run:offeredRun) }
+                self.refresh()
+                return granted
+            } catch { self.error=error.localizedDescription; return false }
+        },availabilityChanged:{ [weak self] in self?.objectWillChange.send() })
+    }
+    private func configureLiveAds() async {
+        let google=makeGoogleProvider(unitID:DreamAdConfiguration.rewardedUnitID,saveRewards:true)
+        do { try await google.prepare(); provider=google }
+        catch { notice="Rewarded ads are unavailable: \(error.localizedDescription)" }
+    }
+    var adPrivacyOptionsRequired:Bool { (provider as? GoogleRewardedProvider)?.privacyOptionsRequired == true }
+    func showAdPrivacyOptions() async {
+        guard let google=provider as? GoogleRewardedProvider else { return }
+        do { try await google.privacyOptions() }
+        catch { notice="Ad privacy options unavailable: \(error.localizedDescription)" }
+    }
+    #if DEBUG
+    func labGoogleTestAd() async {
+        let google=makeGoogleProvider(unitID:DreamAdConfiguration.testRewardedUnitID,saveRewards:false)
+        do {
+            try await google.prepare()
+            let outcome=await google.present()
+            switch outcome {
+            case .earned: notice="Google test reward callback received. No continue was granted."
+            case .dismissed: notice="Google test ad closed without a reward."
+            case .unavailable: notice="Google test ad unavailable."
+            case .failed(let message): notice=message
+            }
+        } catch { notice="Google test ad unavailable: \(error.localizedDescription)" }
+    }
+    #endif
+    #endif
             if events.contains(.strawBreak) {audio.feedback(.strawBreak,settings:settings)}
             if events.contains(.strawRepair) {audio.feedback(.strawRepair,settings:settings)}
             if events.contains(.stumble) && !events.contains(.strawBreak) { audio.feedback(.stumble,settings:settings) }

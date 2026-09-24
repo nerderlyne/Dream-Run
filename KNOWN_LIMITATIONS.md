@@ -93,3 +93,6 @@ E09 (full gallery/share flow), G06/G07 (StoreKit and actual rewarded-ad scenario
 storage faults). The static contrast scene partly occludes the zebra behind the horse and
 the pig behind a balloon; it is not complete moving-encounter visibility evidence.
 No simulator screenshot establishes physical-device or store readiness.
+- Google Mobile Ads and UMP are linked with the owner's IDs, but live ad serving remains disabled.
+  The Debug Lab uses Google's test ad unit and does not grant production rewards. Consent messaging,
+  live inventory behavior and reward callbacks still need simulator sandbox checks before release.
