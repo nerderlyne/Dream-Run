@@ -247,7 +247,7 @@ extension UIColor {
         case .rabbit:
             body.sculpt([([0,0.34,-0.04],[0.32,0.34,0.38]),([0,0.66,0.19],[0.23,0.24,0.23]),([-0.14,0.98,0.17],[0.075,0.32,0.065]),([0.13,1.02,0.16],[0.08,0.34,0.07]),([-0.21,0.08,0.18],[0.13,0.09,0.22]),([0.21,0.08,0.18],[0.13,0.09,0.22]),([0,0.3,-0.4],[0.15,0.15,0.15])],min:[-0.45,-0.03,-0.59],max:[0.45,1.42,0.51],step:lod == 0 ? 0.032 : 0.05,blend:0.1)
             for x:Float in [-0.13,0.13] { sphere(&trim,[x,1.03,0.222],[0.035,0.22,0.012]); sphere(&dark,[x,0.73,0.382],[0.021,0.027,0.017]) }
-            sphere(&trim,[0,0.63,0.417],[0.035,0.021,0.017]);bodyColor=UIColor(hex:"#EFE7DC");trimColor=UIColor(hex:"#C8A1AA");darkColor=UIColor(hex:"#382E36")
+            sphere(&trim,[0,0.63,0.417],[0.035,0.021,0.017]);bodyColor=UIColor(hex:"#EFE7DC");trimColor=UIColor(hex:"#C8A1AA");darkColor=UIColor(hex:"#9B4651")
         case .pig:
             bodyColor=UIColor(hex:"#E8ADB9"); trimColor=UIColor(hex:"#CE859B"); darkColor=UIColor(hex:"#51404B")
             sphere(&body,[0,0.4,0],[0.42,0.32,0.52]); sphere(&body,[0,0.52,0.38],[0.32,0.28,0.3]); sphere(&trim,[0,0.48,0.66],[0.21,0.14,0.09])

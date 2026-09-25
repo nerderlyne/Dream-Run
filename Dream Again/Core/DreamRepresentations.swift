@@ -39,10 +39,6 @@ public enum DreamRepresentationRegistry {
     }
     public static func definition(for id:AssetID)->DreamConceptDefinition {concepts[id.rawValue-1]}
 }
-public enum DreamMemeLibrary {
-    public static let entries=["chicken_chef","stove_chrome","tv_cloud","telephone_banana"]+DreamRepostKit.assets.map(\.id)
-}
-
 /// A stable slot description. All positions derive from distance cells, never load timing.
 public struct DreamCollagePlacement:Equatable,Sendable {
     public let representation:DreamRepresentation
@@ -84,7 +80,7 @@ public enum DreamCollageComposition {
         let cell=Int(floor((distance+offset)/period))
         let anchor=Double(cell)*period-offset
         var rng=identity.stream("collage-slot-\(slot)",cell)
-        let families:Set<AssetID>=slot<4 ? [.moon,.cloud,.house,.arch,.rock,.water,.seaCreatures] : slot<12 ? [.horse,.tree,.house,.arch,.window,.chair,.bed,.flower,.seaCreatures,.rock] : [.cloud,.tree,.water,.ribbon,.flower]
+        let families:Set<AssetID>=slot<4 ? [.moon,.star,.cloud,.house,.arch,.rock,.water,.seaCreatures] : slot<12 ? [.horse,.tree,.house,.arch,.window,.chair,.bed,.flower,.seaCreatures,.rock] : [.cloud,.tree,.water,.ribbon,.flower]
         let choices=DreamCollageKit.assets.filter{$0.concept.map{families.contains($0)} ?? false}
         // A shuffled deck visits every eligible ingredient before repeating it in this slot.
         func deck(_ cycle:Int)->[DreamRepresentation] {

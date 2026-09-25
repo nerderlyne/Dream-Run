@@ -22,8 +22,10 @@ extension DreamRenderer {
     /// Interactive art is authored to the same dimensions as its route-space collision contract.
     func obstacleModel(_ h:HazardDescription)->Entity? {
         guard h.encounter == .lightning || h.encounter == .swing || h.encounter == .step || h.requiresJump || h.asset == .window && h.encounter == .slide else{return nil}
-        // Only the lightning footprint uses lateral position in authored geometry.
-        let key="\(h.asset.rawValue):\(h.encounter.rawValue):\(h.encounter == .lightning ? h.lateral : 0)"
+        // The storm texture may finish loading after the encounter is placed.
+        // Keep its live holder, not a clone of an empty cached prototype.
+        if h.encounter == .lightning {return PerformanceTrace.measure("ObstacleBuild") {makeObstacleModel(h)}}
+        let key="\(h.asset.rawValue):\(h.encounter.rawValue)"
         if let prototype=obstacleCache.value(forKey:key) {return prototype.clone(recursive:true)}
         let prototype=PerformanceTrace.measure("ObstacleBuild") {makeObstacleModel(h)}
         obstacleCache.insert(prototype,forKey:key)
@@ -54,7 +56,7 @@ extension DreamRenderer {
                 let x=Float(sin(Double(i)*2.399))*2.8,z=Float(cos(Double(i)*4.13))*1.6,y=Float(i%13)*0.34+0.8
                 rain.tube([[x,y,z],[x-0.08,y-0.5,z]],radius:0.006,segments:3)
             }
-            add(rain,"#8A9AAE","storm-rain",true)
+            add(rain,"#BCC8DC","storm-rain",true)
             // Opaque, irregular char rather than translucent concentric target rings.
             var char=Geometry(),embers=Geometry(),charge=Geometry()
             for i in 0..<32 {
@@ -64,7 +66,7 @@ extension DreamRenderer {
                 }
                 char.triangle([0,0.035,0],point(i+1),point(i))
             }
-            add(char,"#201D25","storm-char",style:0)
+            add(char,"#594866","storm-char",style:0)
             for i in 0..<7 {
                 let x=Float(i-3)*0.16
                 embers.tube([[x,0.047,-0.65],[x+0.16,0.047,-0.2],[x-0.08,0.047,0.25]],radius:0.012,segments:3)
@@ -145,13 +147,8 @@ extension DreamRenderer {
             let approach=Float(max(0,min(1,(40-(h.distance-run.distance))/30)))
             if let cloud=e.findEntity(named:"storm-cloud") {
                 cloud.orientation=camera.orientation(relativeTo:e)*simd_quatf(angle:0.025*sin(t*1.7),axis:[0,0,1])
-                cloud.scale=[12*(1+0.045*sin(t*2.1)),8*(1+0.035*cos(t*2.7)),1]
-                cloud.position=[0.16*sin(t*1.9),7.3+0.12*sin(t*2.3),0]
-                if let scud=cloud.findEntity(named:"storm-scud") {
-                    scud.position=[0.055*sin(t*0.9),-0.05+0.02*cos(t*1.4),0.025]
-                    scud.scale=[1.04+0.04*cos(t*1.1),0.8+0.06*sin(t*1.3),1]
-                    scud.components.set(OpacityComponent(opacity:0.16+0.1*buzz))
-                }
+                cloud.scale=[8.4*(1+0.025*sin(t*2.1)),5.6*(1+0.025*cos(t*2.7)),1]
+                cloud.position=[0.12*sin(t*1.9),6.9+0.09*sin(t*2.3),0]
             }
             if let charge=e.findEntity(named:"storm-charge") {
                 charge.components.set(OpacityComponent(opacity:buzz*(0.35+0.65*approach)))

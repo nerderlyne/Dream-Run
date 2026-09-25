@@ -7,8 +7,9 @@ struct ContentView:View {
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.requestReview) private var requestReview
     @State private var code=""
-    @State private var previewItemID:String?
+    @State private var previewOutfit:[String:String]=[:]
     @State private var wardrobeCategory="Head"
+    @State private var wardrobeRotation:Float=0
     @State private var showImport=false
     @State private var deleteBookmark:UUID?
     @State private var renameID:UUID?
@@ -56,7 +57,7 @@ struct ContentView:View {
         .fileImporter(isPresented:$showImport,allowedContentTypes:[.json,.data],allowsMultipleSelection:false){result in do { if let url=try result.get().first {game.importURL(url)} } catch {game.error=error.localizedDescription}}
         .onOpenURL{game.importURL($0)}
         .onChange(of:game.screen){_,screen in
-            if screen == "wardrobe" {previewItemID=nil;game.renderer?.previewAvatar(equipped:game.profile.equipped,wardrobe:true)}
+            if screen == "wardrobe" {previewOutfit=game.profile.equipped;wardrobeRotation=0;game.renderer?.previewAvatar(equipped:previewOutfit,wardrobe:true)}
             else if screen == "home" {game.renderer?.render(game.run,equipped:game.profile.equipped)}
             else if screen == "results" { scheduleReviewRequest() }
         }
@@ -140,7 +141,6 @@ struct ContentView:View {
                 if game.run.stumbleWeight > 0 && game.run.phase == .running {
                     Text("stumbled").font(.callout.weight(.semibold)).padding(.horizontal,14).padding(.vertical,8).background(.black.opacity(0.5),in:Capsule()).allowsHitTesting(false)
                 }
-                if game.run.mode == .tutorial {Text(tutorialPrompt).font(.callout).padding().background(.ultraThinMaterial,in:Capsule())}
                 Spacer()
                 if [.luckyTransition,.whiteEnding,.waking].contains(game.run.phase) {Button("skip presentation"){let events=game.simulation.presentationStep(0,skip:true);if events.contains(.ending){game.finish();game.screen="results"}}.padding().disabled(game.run.endingElapsed < (game.run.pigs.count == 3 ? 5 : 0.35)).foregroundStyle(game.run.pigs.count == 3 ? Color.black.opacity(0.65) : .white)}
                 #if DEBUG
@@ -154,6 +154,22 @@ struct ContentView:View {
                 }
                 #endif
             }
+            let whisper=DreamWhispers.message(for:game.run)
+            ZStack(alignment:.top) {
+                if let whisper {
+                    ScrawledMessage(text:whisper,palette:game.palettes.indices.contains(game.run.paletteIndex) ? game.palettes[game.run.paletteIndex] : nil)
+                        .frame(maxWidth:390)
+                        .padding(.horizontal,24)
+                        .padding(.top,128)
+                        .id(whisper)
+                        .transition(game.settings.reducedMotion ? .opacity : .asymmetric(
+                            insertion:.opacity.combined(with:.scale(scale:0.92)).combined(with:.offset(y:12)),
+                            removal:.opacity.combined(with:.scale(scale:1.05)).combined(with:.offset(y:-10))))
+                }
+            }
+            .frame(maxWidth:.infinity,maxHeight:.infinity,alignment:.top)
+            .animation(.easeInOut(duration:game.settings.reducedMotion ? 0.25 : 0.55),value:whisper)
+            .allowsHitTesting(false)
             if [.ready,.paused].contains(game.run.phase) {
                 VStack(spacing:12){Text(game.run.phase == .ready ? "a little tilt.\na leap. a dream." : "paused").font(.largeTitle).multilineTextAlignment(.center)
                     Text(game.simulatorDragInput ? "Drag left or right to steer. Swipe up to jump, down to slide." : "Tilt left or right to steer. Swipe up to jump, down to slide. Hold comfortably, then tap ready to calibrate.").font(.callout).multilineTextAlignment(.center)
@@ -177,9 +193,6 @@ struct ContentView:View {
         swipe=RunnerSwipe()
         if game.simulatorDragInput {game.input.steering=0}
     }
-    var tutorialPrompt:String {
-        switch game.run.distance {case ..<80:"steer gently toward the balloons";case ..<155:"swipe up to jump across the gap";case ..<255:"swipe down to slide beneath the zebra";case ..<345:"cute, but keep clear of the rabbit";default:"follow the dream. you’re ready."}
-    }
     var results:some View {
         VStack(spacing:14){Spacer();Text(game.run.pigs.count == 3 ? "Lucky Dream" : "you woke up.").font(.system(size:42,weight:.light,design:.serif));if game.run.pigs.count == 3 {Text("You were very lucky.")}
             Text(game.time(game.run.activeTicks)).font(.title.monospacedDigit())
@@ -196,16 +209,45 @@ struct ContentView:View {
         }.padding(28).frame(maxWidth:560).foregroundStyle(game.run.pigs.count == 3 ? Color.black : Color.white)
     }
     private func preview(_ item:CosmeticDefinition) {
-        previewItemID=item.id
-        var outfit=game.profile.equipped
-        outfit[item.slot]=item.id
-        game.renderer?.previewAvatar(equipped:outfit,wardrobe:true)
+        previewOutfit[item.slot]=item.id
+        game.renderer?.previewAvatar(equipped:previewOutfit,wardrobe:true,rotation:wardrobeRotation)
+    }
+    private func turnWardrobe(_ amount:Float) {
+        wardrobeRotation += amount
+        game.renderer?.rotateWardrobe(to:wardrobeRotation)
     }
     var wardrobe:some View {
-        menu("wardrobe") {
-            Color.clear.frame(height:220).allowsHitTesting(false)
+        VStack(spacing:0) {
+            HStack {
+                Button("‹ home"){game.screen="home"}
+                Spacer()
+                Text("wardrobe").font(.title2)
+                Spacer()
+                Color.clear.frame(width:54,height:1)
+            }
+            .padding(.horizontal,24).padding(.top,10)
+            Color.clear
+                .contentShape(Rectangle())
+                .gesture(DragGesture(minimumDistance:4)
+                    .onChanged { value in game.renderer?.rotateWardrobe(to:wardrobeRotation+Float(value.translation.width)*0.012) }
+                    .onEnded { value in turnWardrobe(Float(value.translation.width)*0.012) })
+                .overlay(alignment:.bottom) {
+                    HStack(spacing:16) {
+                        Button("Turn left"){turnWardrobe(-.pi/4)}
+                        Button("Reset view"){wardrobeRotation=0;game.renderer?.rotateWardrobe(to:0)}
+                        Button("Turn right"){turnWardrobe(.pi/4)}
+                    }
+                    .font(.caption).buttonStyle(.bordered)
+                    .padding(.bottom,8)
+                }
+                .frame(height:310)
+            ScrollView {
+                VStack(spacing:14) {
             Text("Your straw looper").font(.headline)
-            Text("Tap any item to try it on the doll above. Previewing costs nothing.").font(.caption).multilineTextAlignment(.center)
+                .accessibilityValue(["hat","top","bottom"].compactMap { slot in
+                    game.catalogue.first(where:{$0.id == previewOutfit[slot]})?.name
+                }.joined(separator:", "))
+            Text("Tap any item to try it on. Drag the doll to see every side. Previewing costs nothing.").font(.caption).multilineTextAlignment(.center)
             Picker("Outfit category",selection:$wardrobeCategory) {
                 ForEach(["Head","Top","Bottom"],id:\.self){Text($0)}
             }.pickerStyle(.segmented)
@@ -218,7 +260,7 @@ struct ContentView:View {
                 default: return item.slot == "bottom" || item.slot == "trail"
                 }
             }) { item in
-                let selected=previewItemID == item.id
+                let selected=previewOutfit[item.slot] == item.id
                 let owned=game.profile.owned.contains(item.id) || (item.balloon_price == 0 && item.required_achievement == nil)
                 HStack {
                     Button {preview(item)} label: {
@@ -238,7 +280,14 @@ struct ContentView:View {
                 }
                 .padding().background(selected ? .white.opacity(0.2) : .white.opacity(0.07),in:RoundedRectangle(cornerRadius:14))
             }
+                }
+                .frame(maxWidth:600)
+                .padding(.horizontal,24)
+                .padding(.bottom,24)
+            }
+            .clipped()
         }
+        .frame(maxWidth:680)
     }
     var saved:some View {
         menu("saved dreams") {
@@ -326,6 +375,56 @@ struct ContentView:View {
         }.padding()
     }
     #endif
+}
+struct ScrawledMessage:UIViewRepresentable {
+    let text:String
+    let palette:PaletteDefinition?
+    final class Coordinator {var lastStyleID:String?;var lastText:String?}
+    func makeCoordinator()->Coordinator {Coordinator()}
+    func makeUIView(context:Context)->UILabel {
+        let label=UILabel()
+        label.numberOfLines=0
+        label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory=true
+        label.layer.shadowOpacity=0.45
+        label.layer.shadowRadius=3
+        label.layer.shadowOffset=CGSize(width:0,height:1)
+        label.accessibilityIdentifier="dream whisper"
+        return label
+    }
+    func updateUIView(_ label:UILabel,context:Context) {
+        guard context.coordinator.lastText != text || context.coordinator.lastStyleID != palette?.id else {return}
+        context.coordinator.lastText=text
+        context.coordinator.lastStyleID=palette?.id
+        let pale=palette.map{blend(UIColor(hex:$0.accent_a),UIColor(hex:$0.track_light),0.55)} ?? UIColor(hex:"#E8C9DB")
+        let ink=palette.map{blend(UIColor(hex:$0.track_dark),UIColor(hex:"#302838"),0.4)} ?? UIColor(hex:"#4A3858")
+        label.layer.shadowColor=ink.cgColor
+        let base=UIFont(name:"Baskerville-SemiBold",size:30) ?? UIFont(name:"Baskerville",size:30) ?? UIFont.systemFont(ofSize:30,weight:.medium)
+        let font=UIFontMetrics(forTextStyle:.title2).scaledFont(for:base)
+        let paragraph=NSMutableParagraphStyle();paragraph.alignment = .center;paragraph.lineSpacing=1
+        label.attributedText=NSAttributedString(string:text,attributes:[
+            .font:font,
+            .foregroundColor:pale,
+            .strokeColor:ink,
+            .strokeWidth:-1.25,
+            .kern:0.8,
+            .paragraphStyle:paragraph
+        ])
+        label.accessibilityLabel=text.replacingOccurrences(of:"\n",with:" ")
+        label.invalidateIntrinsicContentSize()
+    }
+    private func blend(_ a:UIColor,_ b:UIColor,_ amount:CGFloat)->UIColor {
+        var ar:CGFloat=0,ag:CGFloat=0,ab:CGFloat=0,aa:CGFloat=0
+        var br:CGFloat=0,bg:CGFloat=0,bb:CGFloat=0,ba:CGFloat=0
+        a.getRed(&ar,green:&ag,blue:&ab,alpha:&aa)
+        b.getRed(&br,green:&bg,blue:&bb,alpha:&ba)
+        return UIColor(red:ar+(br-ar)*amount,green:ag+(bg-ag)*amount,blue:ab+(bb-ab)*amount,alpha:1)
+    }
+    func sizeThatFits(_ proposal:ProposedViewSize,uiView:UILabel,context:Context)->CGSize? {
+        let width=proposal.width ?? 360
+        let measured=uiView.sizeThatFits(CGSize(width:width,height:.greatestFiniteMagnitude))
+        return CGSize(width:width,height:max(measured.height,120))
+    }
 }
 struct StoreView:View {
     @ObservedObject var commerce:BalloonStore

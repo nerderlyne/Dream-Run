@@ -34,7 +34,7 @@ extension Dream_AgainTests {
     func testRepresentationRegistryKeepsExactlyFortyTwoSemanticConcepts() throws {
         XCTAssertEqual(DreamRepresentationRegistry.concepts.count,42)
         XCTAssertEqual(Set(DreamRepresentationRegistry.concepts.map(\.semanticID)),Set(AssetID.allCases))
-        XCTAssertEqual(DreamMemeLibrary.entries.count,12)
+        XCTAssertFalse(DreamCollageKit.assets.contains{$0.orientation == "forumRepost"})
         for concept in DreamRepresentationRegistry.concepts {
             XCTAssertFalse(concept.proceduralRepresentationID.isEmpty)
             XCTAssertTrue(concept.representations.allSatisfy{$0.concept == concept.semanticID})
@@ -56,14 +56,14 @@ extension Dream_AgainTests {
         let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
         await renderer.art.collage.waitForPreload()
         XCTAssertEqual(renderer.art.collage.loadErrors,[])
-        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,57)
+        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,DreamCollageKit.assets.filter{!$0.isPlate}.count+3)
         game.labCollage(index:0)
         renderer.render(game.run,equipped:game.profile.equipped)
         XCTAssertGreaterThan(renderer.art.collage.activeCardCount,5)
         XCTAssertGreaterThanOrEqual(renderer.art.collage.activeAtmosphereCount,1)
         XCTAssertEqual(renderer.art.collage.pooledCardCount,25)
         for _ in 0..<30 {renderer.render(game.run,equipped:game.profile.equipped)}
-        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,57)
+        XCTAssertLessThanOrEqual(renderer.art.collage.loadedTextureCount,DreamCollageKit.assets.filter{!$0.isPlate}.count+3)
         XCTAssertTrue(renderer.art.collage.root.children.allSatisfy{$0.components[CollisionComponent.self] == nil})
         for asset in DreamCollageKit.assets {
             XCTAssertNotNil(Bundle.main.url(forResource:asset.resource,withExtension:asset.resourceExtension))
@@ -178,6 +178,41 @@ extension Dream_AgainTests {
             XCTAssertNotNil(r.runner.findEntity(named:"straw-skirt"))
         }
         r.dress([:]);XCTAssertNil(r.runner.findEntity(named:"straw-skirt"))
+        r.dress(["bottom":"hawaiian_tutu"])
+        XCTAssertTrue(r.runner.findEntity(named:"straw-head") === head)
+        XCTAssertEqual(r.legs.map{ObjectIdentifier($0)},hips)
+        XCTAssertNotNil(r.runner.findEntity(named:"hawaiian-tutu"))
+        XCTAssertNotNil(r.runner.findEntity(named:"tutu-flowers"))
+        XCTAssertNil(r.runner.findEntity(named:"straw-skirt"))
+    }
+    @MainActor func testWardrobeLayersCanBeCombinedAndRemoved() throws {
+        let game=GameModel(),r=try XCTUnwrap(game.renderer)
+        XCTAssertEqual(Profile().equipped["top"],"bare_top")
+        let head=try XCTUnwrap(r.runner.findEntity(named:"straw-head"))
+        let hips=r.legs.map(ObjectIdentifier.init)
+        r.dress(["top":"plain_ribbon","bottom":"hawaiian_tutu"])
+        XCTAssertNotNil(r.runner.findEntity(named:"top-ribbon"))
+        r.dress(["top":"bare_top","bottom":"hawaiian_tutu"])
+        XCTAssertNil(r.runner.findEntity(named:"top-ribbon"))
+        XCTAssertNotNil(r.runner.findEntity(named:"hawaiian-tutu"))
+        r.dress(["top":"coconut_top","bottom":"hawaiian_tutu","hat":"flower_crown"])
+        XCTAssertNotNil(r.runner.findEntity(named:"coconut-shells"))
+        XCTAssertNotNil(r.runner.findEntity(named:"coconut-straps"))
+        XCTAssertNotNil(r.headAttachment.findEntity(named:"fitted-flower_crown"))
+        XCTAssertNil(r.runner.findEntity(named:"top-ribbon"))
+        r.dress(["top":"office_jacket","bottom":"tuxedo_pants"])
+        XCTAssertNotNil(r.runner.findEntity(named:"office-jacket"))
+        XCTAssertNotNil(r.runner.findEntity(named:"office-tie"))
+        XCTAssertNotNil(r.runner.findEntity(named:"tuxedo-waist"))
+        XCTAssertEqual(r.legs.filter{$0.findEntity(named:"outfit-tuxedo-upper-leg") != nil}.count,2)
+        XCTAssertEqual(r.arms.filter{$0.findEntity(named:"outfit-office-upper-sleeve") != nil}.count,2)
+        XCTAssertNil(r.runner.findEntity(named:"coconut-shells"))
+        r.dress(["top":"bare_top","bottom":"plain_bottom"])
+        XCTAssertNil(r.runner.findEntity(named:"office-jacket"))
+        XCTAssertTrue(r.arms.allSatisfy{$0.findEntity(named:"outfit-office-upper-sleeve") == nil})
+        XCTAssertTrue(r.legs.allSatisfy{$0.findEntity(named:"outfit-tuxedo-upper-leg") == nil})
+        XCTAssertTrue(r.runner.findEntity(named:"straw-head") === head)
+        XCTAssertEqual(r.legs.map(ObjectIdentifier.init),hips)
     }
     @MainActor func testArtPreviewCannotEarnOrPersistRewards() throws {
         let game=GameModel(),balance=game.profile.balance,snapshot=game.profile.snapshot
@@ -203,7 +238,7 @@ extension Dream_AgainTests {
     @MainActor func testAllHatsFitBothCharactersWithoutChangingTheRun() throws {
         let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
         let originalRun=game.run, originalBalance=game.profile.balance
-        for bottom in ["straw_skirt","plain_bottom"] {
+        for bottom in ["straw_skirt","plain_bottom","hawaiian_tutu"] {
             for item in game.catalogue where item.slot == "hat" {
                 renderer.dress(["bottom":bottom,"hat":item.id])
                 XCTAssertEqual(renderer.legs.count,2)
@@ -224,6 +259,7 @@ extension Dream_AgainTests {
                 } else {XCTAssertTrue(renderer.headAttachment.children.isEmpty)}
                 XCTAssertNotNil(renderer.runner.findEntity(named:"straw-head"))
                 XCTAssertEqual(renderer.runner.findEntity(named:"straw-skirt") != nil,bottom == "straw_skirt")
+                XCTAssertEqual(renderer.runner.findEntity(named:"hawaiian-tutu") != nil,bottom == "hawaiian_tutu")
             }
         }
         XCTAssertEqual(game.run.id,originalRun.id)
@@ -243,6 +279,23 @@ extension Dream_AgainTests {
 }
 
 extension Dream_AgainTests {
+    @MainActor func testCameraDriftRespectsReducedMotionInRenderer() throws {
+        let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
+        var run=game.run
+        run.mode = .tutorial
+        run.phase = .running
+        run.activeTicks=600
+        renderer.art.collage.reducedMotion=false
+        renderer.render(run,equipped:game.profile.equipped)
+        let drifting=renderer.camera.position
+        renderer.art.collage.reducedMotion=true
+        renderer.render(run,equipped:game.profile.equipped)
+        let steady=renderer.camera.position
+        XCTAssertGreaterThan(simd_distance(drifting,steady),0.0001)
+        renderer.render(run,equipped:game.profile.equipped)
+        XCTAssertEqual(renderer.camera.position,steady)
+    }
+
     @MainActor func testSteadyRendererFrameCost() throws {
         let game=GameModel(),renderer=try XCTUnwrap(game.renderer)
         game.labArt(theme:0)
@@ -493,13 +546,14 @@ extension Dream_AgainTests {
 }
 
 extension Dream_AgainTests {
-    @MainActor func testStormTextureThreatAndLightingRecovery() async throws {
+    @MainActor func testStitchedStormThreatAndLightingRecovery() async throws {
         let game=GameModel(),r=try XCTUnwrap(game.renderer)
-        await r.storm.waitUntilReady();XCTAssertNil(r.storm.loadError)
         game.labObstacle(.lightning)
-        let h=try XCTUnwrap(game.run.hazards.first),e=try XCTUnwrap(r.obstacleModel(h))
-        XCTAssertNotNil(e.findEntity(named:"storm-photo"))
+        let h=try XCTUnwrap(game.run.hazards.first),e=try XCTUnwrap(r.hazards[h.id])
+        await r.storm.waitUntilReady();XCTAssertNil(r.storm.loadError)
+        XCTAssertNotNil(e.findEntity(named:"storm-silk"))
         XCTAssertNotNil(e.findEntity(named:"storm-rain"))
+        XCTAssertNil(e.findEntity(named:"storm-photo"))
         XCTAssertNil(e.findEntity(named:"strike-outline"))
         game.simulation.state.distance=h.distance-10;r.render(game.run,equipped:[:])
         XCTAssertLessThan(r.daylight.light.intensity,2000)
@@ -576,12 +630,13 @@ extension Dream_AgainTests {
     }
     @MainActor func testStormMovesWithoutRebuildingAndHasOpaqueScorch() async throws {
         let game=GameModel(),r=try XCTUnwrap(game.renderer)
-        await r.storm.waitUntilReady();game.labObstacle(.lightning)
+        await r.storm.waitUntilReady()
+        game.labObstacle(.lightning)
         let h=try XCTUnwrap(game.run.hazards.first),e=try XCTUnwrap(r.hazards[h.id])
         let cloud=try XCTUnwrap(e.findEntity(named:"storm-cloud"))
         let char=try XCTUnwrap(e.findEntity(named:"storm-char"))
         XCTAssertNil(char.components[OpacityComponent.self]);XCTAssertNotNil(e.findEntity(named:"storm-charge"))
-        XCTAssertNotNil(e.findEntity(named:"storm-scud"));XCTAssertNil(e.findEntity(named:"storm-shade-0"))
+        XCTAssertNotNil(e.findEntity(named:"storm-silk"));XCTAssertNil(e.findEntity(named:"storm-scud"))
         let before=cloud.transform,ids=e.children.map(ObjectIdentifier.init)
         var later=game.run;later.activeTicks += 11;r.animateObstacle(e,h:h,run:later)
         XCTAssertNotEqual(before,cloud.transform);XCTAssertEqual(ids,e.children.map(ObjectIdentifier.init))

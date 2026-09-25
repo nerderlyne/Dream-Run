@@ -1,27 +1,10 @@
 # Asset provenance
 
-The 35 collage ingredients were generated for this project using the built-in OpenAI image
-generation tool on September 14, 2026 (local time). No stock photography or downloaded model
-files are included. Photographic describes the generated visual medium, not a claim that the
-image is an actual photograph. No third-party brand, character or meme image ships.
+The runtime collage uses 122 owner-curated full-frame photographs and 22 transparent object cutouts from the owner's 59-photo Unsplash batch. The 46 generated collage cutouts and eight fictional repost cards were removed. The six supplied mood references remain reference-only and are not production resources.
 
-The six supplied references are reference-only and remain outside the app resources.
-The new ingredient prompts did not ask to reproduce their full compositions.
-Prompts and original master paths are recorded in `art-review/kit-generation.json`.
-One earlier isolated fuzzy tree was retained; its precise prompt is in the task history.
-Abandoned full-scene experiments and superseded exports have been deleted.
-Production copies were resized with macOS sips. Transparent cutouts retain actual alpha.
-The sole runtime metadata catalog is `Dream Again/Core/DreamCollageKit.swift`.
-This record describes provenance; it does not assert exclusive copyright or a legal warranty.
+`data/dream_objects_intake.json` records the new batch's original filenames, hashes, Unsplash photo URLs, license URLs, content tags and individual curation decisions. The original downloads stay untouched in the ignored workspace-root `DreamObjects/` folder. Twenty selected backgrounds are optimized into `Dream Again/Resources/DreamPlates/`; the other 102 earlier backgrounds have filename/hash records but no individual source links. The 22 selected object photos were isolated with the built-in image editing tool, reviewed on a contrasting background, and optimized into `Dream Again/Resources/DreamCollage/`.
 
-Eight `repost_*` forum cards are deterministic composites generated locally from those same
-project-original cutouts by `tools/generate_repost_cards.swift`. Their interface, handles,
-timestamps and text are original fictional material; they do not reproduce a third-party meme,
-website interface, person, brand or character. The deliberately degraded thumbnails are generated
-from chicken_chef, whale_opal, seahorse_gold, horse_pink, telephone_banana, tv_cloud,
-chair_velvet and jellyfish_lilac. Shipping cards can be reproduced without a network service.
-
-Shipping assets: horse_white, horse_black, horse_red, horse_brown, horse_pink, tree_fuzzy, tree_dead, tree_blue, tree_oak, tree_painted, house_photo, house_fuzzy, house_brutal, house_painted, cloud_white, cloud_dark, cloud_pink, fog_silver, fog_lavender, moon_real, moon_red, moon_pearl, arch_pearl, arch_ruined, arch_glass, window_pink, sky_blue, sky_storm, sky_pink, sky_cosmos, sky_underwater, sky_aurora, sky_mirage, sky_lavender_mist, sky_opal_dawn.
+Photo rights under the Unsplash license do not automatically cover visible third-party marks or people. Two public-figure images and one prominent branded image were held out; a chalk-on-pavement image was held for compositional reasons. This record describes provenance, not a legal warranty.
 
 ## Adaptive dream audio — September 16, 2026
 

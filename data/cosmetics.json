@@ -83,12 +83,44 @@
       "notes": "Small pearl crescent fixed to a head-fitting circlet."
     },
     {
+      "id": "flower_crown",
+      "name": "Flower crown",
+      "slot": "hat",
+      "balloon_price": 550,
+      "required_achievement": null,
+      "notes": "Fine leaf circlet with small coral, cream and lilac blossoms fitted around the straw head."
+    },
+    {
       "id": "plain_ribbon",
       "name": "Straw ribbon",
       "slot": "top",
       "balloon_price": 0,
       "required_achievement": null,
       "notes": "Default ribbon and sash on the shared straw body."
+    },
+    {
+      "id": "bare_top",
+      "name": "No ribbon",
+      "slot": "top",
+      "balloon_price": 0,
+      "required_achievement": null,
+      "notes": "Uncovered straw torso; removes the default sash and bow."
+    },
+    {
+      "id": "coconut_top",
+      "name": "Coconut bra",
+      "slot": "top",
+      "balloon_price": 600,
+      "required_achievement": null,
+      "notes": "Two carved coconut shells with twine straps, designed to pair with the Hawaiian tutu on the same neutral straw body."
+    },
+    {
+      "id": "office_jacket",
+      "name": "Office tuxedo jacket",
+      "slot": "top",
+      "balloon_price": 850,
+      "required_achievement": null,
+      "notes": "Tailored ink-plum jacket, pearl shirt and tie; pairs with tuxedo pants."
     },
     {
       "id": "plain_bottom",
@@ -105,6 +137,22 @@
       "balloon_price": 0,
       "required_achievement": null,
       "notes": "Skirt and apron costume layer; the straw body and rig stay unchanged."
+    },
+    {
+      "id": "hawaiian_tutu",
+      "name": "Hawaiian tutu",
+      "slot": "bottom",
+      "balloon_price": 700,
+      "required_achievement": null,
+      "notes": "Open seafoam raffia fringe with a woven belt and coral hibiscus flowers; the shared straw body and rig stay unchanged."
+    },
+    {
+      "id": "tuxedo_pants",
+      "name": "Tuxedo pants",
+      "slot": "bottom",
+      "balloon_price": 700,
+      "required_achievement": null,
+      "notes": "Tailored ink-plum trousers with a pale side seam and dark shoes; pairs with the office tuxedo jacket."
     },
     {
       "id": "pearl_body",

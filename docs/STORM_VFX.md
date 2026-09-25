@@ -1,11 +1,15 @@
-# Threatening storm effect
+# Stitched thunderhead
 
-The lightning encounter uses `Dream Again/Resources/Weather/storm-threat.png`, generated with the built-in image generation tool. Original 1536 × 1024 PNG alpha is retained (519,176 pixels have alpha below 10); the runtime card preserves its 3:2 aspect ratio. This is a camera-facing photographic VFX layer, not volumetric cloud simulation. It is a representation of the existing cloud family, not an extra registered world family.
+The lightning encounter uses `Dream Again/Resources/Weather/storm-stitched.png`, an original 1536 × 1024 transparent cutout. Layered lavender, dusty rose and pearl-cyan folds with warm-gold seams replace the rejected charcoal storm photograph. It is a representation of the existing cloud family, not an additional world-asset family.
 
-The image is preloaded once per renderer and shared. The cloud now rolls and breathes with an independently drifting translucent scud layer reusing the same texture. Flickering internal electrical branches and a low-intensity charge light precede the timed strike. Local rain strengthens on approach, alongside daylight/fill attenuation. An opaque irregular charcoal footprint and dim ember fissures replace the former translucent shade bands; nearby track footing is reinforced. All animation reuses existing entities. Thin dim fissures replace the bright ground ring while preserving the warning footprint. No hazard timing, damage or thunder changes.
+`StormVFX` loads the image once, then shares its texture with each encounter. The transparent card is camera-facing and scaled to 8.4 × 5.6 world units above the strike point. The card gently breathes and rolls while local rain, dim ground fissures, charge arcs, a brief bolt and a point-light flash communicate the fixed lightning target. The thunder sound, strike timing, damage and dodge contract are unchanged. The scene's daylight/fill recover after the encounter.
 
-Final generation prompt:
+Lightning hazards use live model instances rather than cached empty prototypes so a cloud placed before the asynchronous texture load still receives the image when loading completes. The focused simulator test covers that path, the bolt light and lighting recovery.
 
-> Create a production game VFX sprite: one hyper-realistic menacing supercell thunderstorm cloud, seen from ground level looking slightly upward, huge low hanging turbulent shelf cloud with charcoal black underside, slate grey anvil, complex photographic billowing vapor detail and wispy ragged edges. Isolated on actual transparent background with clean natural alpha falloff, NO scenery, no ground, no rectangle, no sky background, no text, no stylized toy spheres. Wide roughly 3:2 silhouette fully contained with small transparent margins, darker central underside, subtle cold silver rim light, faint pale internal electrical glow but NO protruding lightning bolt (game draws bolt separately). Extremely threatening approaching-death atmosphere, convincing volumetric storm photography, dark but visible vapor detail. Deliver a transparent PNG asset suitable for layering over bright or dark game backgrounds.
+Preview after installing a Debug simulator build:
 
-Reproduce the simulator views using `python3 tools/capture_storm.py <booted-simulator-id>` after installing a Debug build. Capture mode cannot earn rewards. Sustained performance and subjective threat remain unmeasured. The owner prohibits physical iPhone testing; further verification must use the simulator.
+```sh
+python3 tools/capture_storm.py <booted-simulator-id>
+```
+
+The script captures far approach, 22-meter warning, five-meter close and strike views in `evidence/storm-rework-*.png`. The gallery's `obstacle-lightning*.png` views now show this design. Visual captures were reviewed on the iPhone 16 Pro Max simulator; no physical-device test or sustained thermal measurement was performed.

@@ -21,7 +21,7 @@ public struct DreamScaleComposition:Equatable,Sendable {
         var rng=identity.stream("relative-scale-event",scene)
         let roll=rng.below(100)
         let event:DreamScaleEvent=roll<60 ? .none:roll<75 ? .miniature:roll<94 ? .oversized:roll<99 ? .monumental:.absurd
-        let concepts:[AssetID]=[.horse,.moon,.chair,.house,.tree,.window,.arch]
+        let concepts:[AssetID]=[.horse,.moon,.house,.tree,.arch]
         let concept=concepts[Int(rng.below(UInt64(concepts.count)))],framingRoll=rng.below(100)
         let selected=override ?? event
         let large=selected == .monumental || selected == .absurd

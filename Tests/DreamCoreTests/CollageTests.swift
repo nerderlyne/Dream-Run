@@ -4,9 +4,9 @@ import XCTest
 final class CollageTests:XCTestCase {
     func testKitCountsAndMetadata() {
         let kit=DreamCollageKit.assets
-        XCTAssertEqual(kit.count,54+DreamPlateLibrary.assets.count);XCTAssertEqual(Set(kit.map(\.id )).count,kit.count)
+        XCTAssertEqual(kit.count,DreamOwnerObjectKit.assets.count+DreamPlateLibrary.assets.count);XCTAssertEqual(Set(kit.map(\.id )).count,kit.count)
         XCTAssertEqual(kit.filter(\.isPlate).count,DreamPlateLibrary.assets.count)
-        for (concept,count) in [(AssetID.horse,5),(.tree,5),(.house,5),(.cloud,6),(.moon,3),(.arch,3),(.window,2)] {
+        for (concept,count) in [(AssetID.horse,3),(.tree,2),(.house,2),(.cloud,1),(.moon,2),(.arch,1),(.window,0)] {
             XCTAssertEqual(kit.filter{$0.concept == concept}.count,count)
         }
         for asset in kit {
@@ -57,16 +57,16 @@ final class CollageTests:XCTestCase {
 
 
 extension CollageTests {
-    func testPilotScenesAreLayerableAndApparitionsStayRare() {
-        XCTAssertEqual(DreamPilotKit.assets.count,20)
-        XCTAssertEqual(DreamRepostKit.assets.count,8)
-        XCTAssertEqual(DreamPilotKit.assets.filter{$0.concept == .seaCreatures}.count,6)
+    func testOwnerPhotoScenesAreLayerableAndApparitionsStayRare() {
+        XCTAssertEqual(DreamOwnerObjectKit.assets.count,22)
+        XCTAssertFalse(DreamCollageKit.assets.contains{$0.orientation == "forumRepost"})
+        XCTAssertEqual(DreamOwnerObjectKit.assets.filter{$0.concept == .seaCreatures}.count,1)
         for seed:UInt64 in 0..<20 {
             let identity=DreamIdentity.current(seed:seed)
             for block in 0..<20 {
                 let scenes=(block*5..<block*5+5).map{DreamVignette.selected(identity:identity,cell:$0)}
                 XCTAssertEqual(Set(scenes).count,5)
-                XCTAssertEqual(scenes.filter{$0 == .midnightKitchen}.count,1)
+                XCTAssertEqual(scenes.filter{$0 == .littleLostThings}.count,1)
             }
             for scene in DreamVignette.allCases {
                 for part in 0..<4 {
@@ -78,33 +78,17 @@ extension CollageTests {
             }
         }
     }
-    func testMidnightKitchenMixesOriginalObjectsWithSeededReposts() {
-        let repostIDs=Set(DreamRepostKit.assets.map(\.id))
-        var seen=Set<String>()
+    func testLittleLostThingsUsesFourOwnerPhotos() {
+        let expected=DreamVignette.littleLostThings.ingredients
         for seed:UInt64 in 0..<20 {
             let identity=DreamIdentity.current(seed:seed)
             for cell in 0..<20 {
-                let ids=DreamVignette.midnightKitchen.ingredients(identity:identity,cell:cell)
-                XCTAssertEqual(ids.count,4)
-                XCTAssertEqual(ids.filter{repostIDs.contains($0)}.count,2)
+                let ids=DreamVignette.littleLostThings.ingredients(identity:identity,cell:cell)
+                XCTAssertEqual(ids,expected)
                 XCTAssertEqual(Set(ids).count,4)
-                XCTAssertEqual(ids,DreamVignette.midnightKitchen.ingredients(identity:identity,cell:cell))
-                seen.formUnion(ids.filter{repostIDs.contains($0)})
-                let scale=DreamScaleComposition.plan(identity:identity,distance:Double(cell)*640)
-                let repostExtents=ids.enumerated().filter{repostIDs.contains($0.element)}.map{DreamScaleComposition.extent(scale.role(slot:16+$0.offset))}
-                let allExtents=(0..<4).map{DreamScaleComposition.extent(scale.role(slot:16+$0))}.sorted(by:>)
-                XCTAssertEqual(repostExtents.sorted(by:>),Array(allExtents.prefix(2)))
-                let posts=(0..<4).map{DreamVignette.midnightKitchen.placement(identity:identity,distance:Double(cell)*640+150,part:$0)}.filter{$0.representation.orientation == "forumRepost"}
-                XCTAssertEqual(posts.count,2)
-                XCTAssertLessThan(posts[0].lateral*posts[1].lateral,0)
-                XCTAssertTrue(posts.allSatisfy{$0.elevation>0 && !$0.mirrored})
+                XCTAssertTrue(ids.allSatisfy { $0.hasPrefix("owner_") })
+                XCTAssertTrue(ids.allSatisfy { id in DreamCollageKit.assets.contains(where: { $0.id == id }) })
             }
-        }
-        XCTAssertEqual(seen,repostIDs)
-        for asset in DreamRepostKit.assets {
-            XCTAssertEqual(asset.concept,.culturalApparitions)
-            XCTAssertEqual(asset.orientation,"forumRepost")
-            XCTAssertTrue(asset.backgroundOnly);XCTAssertFalse(asset.interactive)
         }
     }
     func testSceneryDeckAvoidsImmediateRepetitionAndCoversNewFamilies() {
@@ -120,10 +104,10 @@ extension CollageTests {
                 seen.insert(previous)
             }
         }
-        for asset in DreamPilotKit.assets where asset.concept != .culturalApparitions {XCTAssertTrue(seen.contains(asset.id),asset.id)}
+        for asset in DreamOwnerObjectKit.assets where asset.concept != .culturalApparitions {XCTAssertTrue(seen.contains(asset.id),asset.id)}
     }
     func testBackgroundMotionIsBoundedDeterministicAndCanBeDisabled() {
-        for asset in DreamPilotKit.assets {
+        for asset in DreamOwnerObjectKit.assets {
             let frozen=DreamScenicMotion.sample(id:asset.id,seconds:123,slot:3,reduced:true)
             XCTAssertEqual(frozen.offset,.zero);XCTAssertEqual(frozen.roll,0);XCTAssertEqual(frozen.scale,1)
             for time in stride(from:0.0,to:21600,by:137) {

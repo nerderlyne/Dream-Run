@@ -51,10 +51,11 @@ The original synthesized 3.6-second strike is preloaded and amplitude-bounded. S
 
 ## Curated background integration — September 15, 2026
 
-- Current batch includes 102 unique images from the 103 source files present at verification. Later copied photos require rerunning `swift tools/import_dream_plates.swift` and rebuilding. Originals are untouched.
-- Optimized backgrounds add approximately 97 MiB of JPEG resources. The runtime cache holds at most three photos, but device GPU memory, frame pacing and thermal behavior have not been measured in this pass.
+- Current batch includes 122 unique images from 123 source files. Later copied photos require rerunning `swift tools/import_dream_plates.swift` and rebuilding. Originals are untouched.
+- Optimized backgrounds add approximately 113 MiB of JPEG resources. The runtime cache holds at most three photos, but device GPU memory, frame pacing and thermal behavior have not been measured in this pass.
 - Aspect fill deliberately crops wide images on portrait screens. Backgrounds are photographic cards, so perspective inside a source photograph does not change with the runner; existing foreground/collage layers provide motion and depth.
-- Source filenames and hashes are recorded. Per-photo Unsplash URLs and photographer credits were not supplied.
+- Source filenames and hashes are recorded. The 20 latest plates have source URLs; the earlier 102 downloads do not have individual source links or photographer credits.
+- The September 26 photo-only collage passed core composition and native resource-load tests. A final on-screen simulator screenshot could not be obtained because computer control of Simulator was denied; visual combinations and edge quality at play speed remain unverified. The full Swift suite was interrupted after stalling, so only the 18 focused core tests are claimed.
 - This pass does not establish physical tilt, iPad visual quality, Release-device performance or App Store readiness.
 
 - Three-minute pig schedule: nominal encounters retain the existing six-second visible approach/runway reservation; timing is active simulation time. Physical-device encounter timing has not been measured in this pass. Current prerelease pig tuning replaces the old policy.
@@ -85,10 +86,10 @@ The original synthesized 3.6-second strike is preloaded and amplitude-bounded. S
 - Selected runtime screenshots are visual evidence, not approval of every asset/material/LOD,
   seed, collision encounter, hat/action combination or small-phone/iPad layout. The remaining
   procedural world families vary in polish. Full reference-quality art acceptance remains open.
-- The original pilot now includes eight small, locally generated repost cards in addition to its
-  20 cutouts. All 54 transparent textures currently preload. Measure physical-device memory and implement a bounded texture
-  working set before scaling production substantially. Rare cultural content is original generated
-  absurdist imagery and original fictional forum fragments, not imported internet memes. Motion uses transformed image cards, not GIFs,
+- The rejected generated repost cards and generated collage cutouts have been removed. The collage
+  currently includes 22 owner-photo cutouts. All 22 transparent textures preload. A bounded texture
+  working set remains future work before scaling production substantially. Rare cultural content now
+  uses owner-photo objects. Motion uses transformed image cards, not GIFs,
   skeletal swimming or a multi-frame cooking animation. Some story parts are intentionally
   occluded by other scenery; every composition is not fully visible in every portrait frame.
 - Atmosphere is layered images, not volumetric clouds/water or true planar reflections.
@@ -131,3 +132,7 @@ the rejected column build is not retained. No additional profile reset was intro
 ## Wardrobe preview — September 24, 2026
 
 The outfit catalogue currently contains headwear, ribbon/sash colors, one skirt and achievement accessories/trail. The three wardrobe categories group those existing pieces; additional tops and bottoms would need new cosmetic definitions and procedural meshes. Preview does not grant items or affect the run.
+
+## Wardrobe preview review — September 25, 2026
+
+The wardrobe lighting and halo have been reviewed on an iPhone 16 Pro Max simulator screenshot. Their appearance on other screen sizes and physical displays has not been checked.

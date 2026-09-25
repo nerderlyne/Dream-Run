@@ -35,19 +35,19 @@ public enum DreamAtmosphere {
         let primary:[String],secondary:[String]
         switch composition.arrangement {
         case .aperture:
-            primary=["arch_ruined","arch_glass","window_aqua","window_pink"]
-            secondary=["tree_dead","tree_painted","tree_blue"]
+            primary=["owner_arch_stone","owner_house_pink","owner_house_miniature","owner_house_keys"]
+            secondary=["owner_tree_bare","owner_tree_green"]
         case .canopy:
-            primary=["tree_oak","tree_blue","tree_fuzzy","flower_orchid"]
-            secondary=["window_aqua","house_stilt","arch_ruined"]
+            primary=["owner_tree_green","owner_tree_bare","owner_orchid_purple","owner_cloud_white"]
+            secondary=["owner_house_miniature","owner_arch_stone"]
         case .submerged:
-            primary=["water_curtain","jellyfish_lilac","ribbon_iridescent"]
-            secondary=["arch_ruined","house_brutal","window_aqua"]
+            primary=["owner_jellyfish_blue","owner_ribbon_iridescent","owner_seagull"]
+            secondary=["owner_arch_stone","owner_house_pink"]
         case .suspended:
-            primary=["house_brutal","house_photo","house_stilt"]
-            secondary=["tree_oak","tree_dead","flower_orchid"]
+            primary=["owner_house_pink","owner_house_miniature","owner_moai","owner_house_keys","owner_seagull"]
+            secondary=["owner_tree_green","owner_tree_bare","owner_orchid_purple"]
         }
-        let groups=[primary,secondary,["fog_lavender","cloud_tower","fog_silver","cloud_pink"]]
+        let groups=[primary,secondary,["owner_cloud_white","owner_ribbon_iridescent","owner_jellyfish_blue"]]
         var rng=identity.stream("atmospheric-collage-\(slot)",cell)
         let choices=groups[slot]
         let selectedID=choices[Int(rng.below(UInt64(choices.count)))]

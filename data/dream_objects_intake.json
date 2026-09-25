@@ -1,0 +1,964 @@
+[
+  {
+    "file": "alex-jackman-_Bk2NVFx7q4-unsplash.jpg",
+    "role": "hold",
+    "reason": "Chalk rainbow is inseparable from asphalt; reserve for a grounded texture vignette.",
+    "tags": [
+      "rainbow",
+      "chalk",
+      "pavement"
+    ],
+    "sourceURL": "https://unsplash.com/photos/_Bk2NVFx7q4",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "536e6b4e24adb6e0650cc0b70ec660feca7e0d6b04cac9aaf87d2a1d3e42b9c9",
+    "processed": false,
+    "status": "held"
+  },
+  {
+    "file": "alfonso-alberto-ramirez-alvarez-FP2Kf5DsSo8-unsplash.jpg",
+    "role": "object",
+    "reason": "Single orchid branch on light field.",
+    "tags": [
+      "orchid",
+      "flower",
+      "purple"
+    ],
+    "sourceURL": "https://unsplash.com/photos/FP2Kf5DsSo8",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "df11c541449bc77526de82cb5f29ed36242905564fbe1f97b2da3a9d7dbc3ac1",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_orchid_purple"
+  },
+  {
+    "file": "anna-hunko-TAx2WDKBwLc-unsplash.jpg",
+    "role": "plate",
+    "reason": "Eiffel Tower and night reflections form a complete city scene.",
+    "tags": [
+      "tower",
+      "night",
+      "city"
+    ],
+    "sourceURL": "https://unsplash.com/photos/TAx2WDKBwLc",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "a052720b41bd2bef0907a59ef89d7cc0f074b5756ef9a50d8a18c58304b659ee",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "annie-spratt-ueuam4rmvV0-unsplash.jpg",
+    "role": "plate",
+    "reason": "Garden path and arch create a strong spatial setting.",
+    "tags": [
+      "garden",
+      "arch",
+      "path"
+    ],
+    "sourceURL": "https://unsplash.com/photos/ueuam4rmvV0",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "0ba5da962b8cc4a22da89e76b73355443853383fc5687e34d7906e56b39573cf",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "carol-highsmith-s-america-oAo-lMp1EMI-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Beluga source is cropped through the body; the transparent extraction has a hard edge and is not suitable as a floating object.",
+    "tags": [
+      "beluga",
+      "whale",
+      "sea"
+    ],
+    "sourceURL": "https://unsplash.com/photos/oAo-lMp1EMI",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "197fa68d840ec6737ed28c7838cad6d877a34d1b2b2af2fd9f60b5f2af56a0d0",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "charlesdeluvio-7tw1GLJt7BU-unsplash.jpg",
+    "role": "object",
+    "reason": "Single orange with usable outline.",
+    "tags": [
+      "orange",
+      "fruit",
+      "small"
+    ],
+    "sourceURL": "https://unsplash.com/photos/7tw1GLJt7BU",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "391363ee3b4bdcdaf385f00b3f83103282d4335e3165ed2ccdadf50a97bbb673",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_orange"
+  },
+  {
+    "file": "daniel-lebegue-SPioxbqDeY4-unsplash.jpg",
+    "role": "object",
+    "reason": "Moai statue can float as a recognizable found object.",
+    "tags": [
+      "moai",
+      "statue",
+      "stone"
+    ],
+    "sourceURL": "https://unsplash.com/photos/SPioxbqDeY4",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "e6889d967104f79c4855a2a5391e6e00749b0d1b24a2f043a7cfbaf8abcacf6e",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_moai"
+  },
+  {
+    "file": "danila-perevoshchikov-y4EkDeDEoSE-unsplash.jpg",
+    "role": "plate",
+    "reason": "Fog and streetlights are the atmosphere.",
+    "tags": [
+      "fog",
+      "streetlight",
+      "night"
+    ],
+    "sourceURL": "https://unsplash.com/photos/y4EkDeDEoSE",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "f0f5635e69f92832c2823ce9f882dcdc1034d115753d8515f57430bce73aafef",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "darren-halstead-B_vXFdzvw3g-unsplash.jpg",
+    "role": "hold",
+    "reason": "Recognizable public figure; not selected for the scene.",
+    "tags": [
+      "person",
+      "politics"
+    ],
+    "sourceURL": "https://unsplash.com/photos/B_vXFdzvw3g",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "328854140eee0070bd6eca4955b9e1ff6c3f1399317fa1b19687034a5980cc00",
+    "processed": false,
+    "status": "held"
+  },
+  {
+    "file": "david-dibert-Huza8QOO3tc-unsplash.jpg",
+    "role": "object",
+    "reason": "Full horse silhouette.",
+    "tags": [
+      "horse",
+      "brown",
+      "animal"
+    ],
+    "sourceURL": "https://unsplash.com/photos/Huza8QOO3tc",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "704e8a096917bd5df23b8c65a09e08e8572dd88070800c349bfd6300d755b1c9",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_horse_brown"
+  },
+  {
+    "file": "david-foodphototasty-E94j3rMcxlw-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Single burger on black. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "burger",
+      "food"
+    ],
+    "sourceURL": "https://unsplash.com/photos/E94j3rMcxlw",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "b8db8d6883500906159d98f6d2553205017e3a7b2ac580df08d9416b1793083f",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "dawn-mcdonald-t1nXgJRlNbQ-unsplash.jpg",
+    "role": "object",
+    "reason": "Tree silhouette against open field.",
+    "tags": [
+      "tree",
+      "oak",
+      "green"
+    ],
+    "sourceURL": "https://unsplash.com/photos/t1nXgJRlNbQ",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "3e499a42ddfa6c67924a0a58826838a4fc690eafb9240eaf16545fb25d3beb04",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_tree_green"
+  },
+  {
+    "file": "edgar-torabyan-XrBPd_QD4nA-unsplash.jpg",
+    "role": "object",
+    "reason": "Candy cane on white.",
+    "tags": [
+      "candy",
+      "cane",
+      "red"
+    ],
+    "sourceURL": "https://unsplash.com/photos/XrBPd_QD4nA",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "0dfcc9a449418ef4bbd9142f0a5098634919e95c58c0dec24ffabdb7ba5dab8c",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_candy_cane"
+  },
+  {
+    "file": "eino-XPgQTrz3P1Q-unsplash.jpg",
+    "role": "object",
+    "reason": "Bare tree against near-white background.",
+    "tags": [
+      "tree",
+      "bare",
+      "branch"
+    ],
+    "sourceURL": "https://unsplash.com/photos/XPgQTrz3P1Q",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "eeca03bc3b6f61aa9d5d11c0715ba9846d1c8c1138beb775a52fe2d5c1d6dd06",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_tree_bare"
+  },
+  {
+    "file": "emily-campbell-gVG8cRjHF-8-unsplash.jpg",
+    "role": "object",
+    "reason": "Pink house with intact roof and walls.",
+    "tags": [
+      "house",
+      "pink",
+      "rural"
+    ],
+    "sourceURL": "https://unsplash.com/photos/gVG8cRjHF-8",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "3e4ff33add4d79839697fc49315eb85ea77e4b4ce61dbf7bfb6454fddb24d1a1",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_house_pink"
+  },
+  {
+    "file": "engin-akyurt-A9_IsUtjHm4-unsplash.jpg",
+    "role": "object",
+    "reason": "One fluffy cloud with visible edge.",
+    "tags": [
+      "cloud",
+      "white",
+      "sky"
+    ],
+    "sourceURL": "https://unsplash.com/photos/A9_IsUtjHm4",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "9b916187392c7125888a16d3ce89dfdb3d5baffa1691f4533c7b80dbb0b3429c",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_cloud_white"
+  },
+  {
+    "file": "gio-almonte-ITieOuu8Reo-unsplash.jpg",
+    "role": "object",
+    "reason": "Arc de Triomphe as architectural silhouette.",
+    "tags": [
+      "arch",
+      "monument",
+      "stone"
+    ],
+    "sourceURL": "https://unsplash.com/photos/ITieOuu8Reo",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "0b71d16f0e0e5790a12046b10322bb0fde6512b825e72311f418b690bd93c094",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_arch_stone"
+  },
+  {
+    "file": "girl-with-red-hat-gt9bbQH0uGY-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Surreal fruit-mouth composition is the subject. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "mouth",
+      "fruit",
+      "surreal"
+    ],
+    "sourceURL": "https://unsplash.com/photos/gt9bbQH0uGY",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "aaa31b059708fb8f58a4b36c4da1a6d1eadc380ff073587bb8cddf974f164c2d",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "guy-stevens-dEGu-oCuB1Y-unsplash.jpg",
+    "role": "plate",
+    "reason": "Colored umbrellas make a full-field pattern.",
+    "tags": [
+      "umbrellas",
+      "colorful",
+      "pattern"
+    ],
+    "sourceURL": "https://unsplash.com/photos/dEGu-oCuB1Y",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "ec16dde4dfaf3906c3208bd485a954f041b003511280e36815ccf5f0fa7f4e2f",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "history-in-hd-cTz5-T7voqQ-unsplash.jpg",
+    "role": "hold",
+    "reason": "Recognizable public figures; not selected for the scene.",
+    "tags": [
+      "people",
+      "politics"
+    ],
+    "sourceURL": "https://unsplash.com/photos/cTz5-T7voqQ",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "e8cf1a8adb2d6b793e60f1fe22924aca596acb05265d9966eb08d76fa09bb41b",
+    "processed": false,
+    "status": "held"
+  },
+  {
+    "file": "ishan-seefromthesky-wXt0DiISf38-unsplash.jpg",
+    "role": "plate",
+    "reason": "Underwater scale and human silhouette depend on the whole image.",
+    "tags": [
+      "underwater",
+      "swimmer",
+      "blue"
+    ],
+    "sourceURL": "https://unsplash.com/photos/wXt0DiISf38",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "eecc36a1446b5d7816a62ab1dd111650d0b959b4a6ad8b0db1bbe42c9a9d1314",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "janek-lachmann-Ymx8pnFk_s4-unsplash.jpg",
+    "role": "object",
+    "reason": "Floating iridescent ribbon.",
+    "tags": [
+      "ribbon",
+      "iridescent",
+      "fabric"
+    ],
+    "sourceURL": "https://unsplash.com/photos/Ymx8pnFk_s4",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "71a320bc4295978a0e8e7ea4a717adce655ff68ff6221d0fec4223fbf420357f",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_ribbon_iridescent"
+  },
+  {
+    "file": "johnny-kaufman-RhRu1h2NttE-unsplash.jpg",
+    "role": "plate",
+    "reason": "Moon through branches relies on layered sky and tree.",
+    "tags": [
+      "moon",
+      "branches",
+      "purple"
+    ],
+    "sourceURL": "https://unsplash.com/photos/RhRu1h2NttE",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "fe4ac70fdf2587607745a90224bcb068a5253a29c239a3ffb284c809fb38c53f",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "johnson-C3SEO9ORkMg-unsplash.jpg",
+    "role": "plate",
+    "reason": "Gateway Arch and open sky form a landscape scene.",
+    "tags": [
+      "arch",
+      "city",
+      "sky"
+    ],
+    "sourceURL": "https://unsplash.com/photos/C3SEO9ORkMg",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "0dccfecdecdaaee6619e1fe822e9678bbc6aa0d567d678dcc67115aabe54c539",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "joshua-kettle-lE7RZjA9-OU-unsplash.jpg",
+    "role": "plate",
+    "reason": "Dead tree and red desert belong together.",
+    "tags": [
+      "tree",
+      "desert",
+      "red"
+    ],
+    "sourceURL": "https://unsplash.com/photos/lE7RZjA9-OU",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "ebc50f04289e6be92d786b6b57b3431a9fc29665cad0693a5ab0e31859b3d09a",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "kevin-davis-tWdwSvtEMjE-unsplash.jpg",
+    "role": "plate",
+    "reason": "Lone tree and saturated field read as a landscape.",
+    "tags": [
+      "tree",
+      "field",
+      "blue"
+    ],
+    "sourceURL": "https://unsplash.com/photos/tWdwSvtEMjE",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "ac4e6b7e3e089f5afdfd52f0b09b09a8ae96a572dc71ee68256824c31f509b2a",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "logan-voss-5cttg1l_pDg-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Abstract silver object on black. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "abstract",
+      "silver",
+      "sculpture"
+    ],
+    "sourceURL": "https://unsplash.com/photos/5cttg1l_pDg",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "ce3d71745b576d507558d2db4f093d30fbf31825ee67ea96f0583b2d79a7c3c4",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "mackenzie-taylor-6QBEc8Pm-vQ-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Close horse portrait, useful as floating apparition. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "horse",
+      "portrait",
+      "animal"
+    ],
+    "sourceURL": "https://unsplash.com/photos/6QBEc8Pm-vQ",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "8ebe55d7c89960b474810870296910bfc477e340aac48c03029b8725bf7a4efd",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "masaru-suzuki-u5h0pSeyCYU-unsplash.jpg",
+    "role": "plate",
+    "reason": "Dinosaur silhouette is embedded in sunset scale and setting.",
+    "tags": [
+      "dinosaur",
+      "sunset",
+      "road"
+    ],
+    "sourceURL": "https://unsplash.com/photos/u5h0pSeyCYU",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "658745ff50a214c289bf48377ef5a367400959a975074706bcf7536774c0ebe6",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "mike-petrucci-uIf6H1or1nE-unsplash.jpg",
+    "role": "object",
+    "reason": "Full moon on black.",
+    "tags": [
+      "moon",
+      "gray",
+      "astronomy"
+    ],
+    "sourceURL": "https://unsplash.com/photos/uIf6H1or1nE",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "8bf55cbd72a1b5d744aa82c7a9321dffc09bba6dcfc1ce680fd10a94a729bd25",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_moon_full"
+  },
+  {
+    "file": "nasa-JHyiw_dpALk-unsplash.jpg",
+    "role": "object",
+    "reason": "Sun disc on black.",
+    "tags": [
+      "sun",
+      "orange",
+      "astronomy"
+    ],
+    "sourceURL": "https://unsplash.com/photos/JHyiw_dpALk",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "c469b18d1935c8d188f29fda984f6d2f40518a2c47fa1501e645cecfd093c6ff",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_sun"
+  },
+  {
+    "file": "nasa-hubble-space-telescope-mAW2LsHwXYY-unsplash.jpg",
+    "role": "object",
+    "reason": "Jupiter disc on black.",
+    "tags": [
+      "jupiter",
+      "planet",
+      "astronomy"
+    ],
+    "sourceURL": "https://unsplash.com/photos/mAW2LsHwXYY",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "4f991cd7319353eac8b43e7eb536671399ffc9d01a01696668ef2eb422dda17f",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_jupiter"
+  },
+  {
+    "file": "nasa-m35LirqP6y8-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Blue planet disc on black. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "neptune",
+      "planet",
+      "astronomy"
+    ],
+    "sourceURL": "https://unsplash.com/photos/m35LirqP6y8",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "beddb0ed90962674ab88ff7c2690f6ac9966cb8924c3e334c85be41c7662bc03",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "nasa-xFO2Xt33xgI-unsplash.jpg",
+    "role": "plate",
+    "reason": "Earthrise needs lunar horizon.",
+    "tags": [
+      "earth",
+      "moon",
+      "space"
+    ],
+    "sourceURL": "https://unsplash.com/photos/xFO2Xt33xgI",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "0d1548acbcef884b59e29c77c5356ee418c4843ee2cdd41b99ce6c032d0459c6",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "nik-WUTpM4iPCVA-unsplash.jpg",
+    "role": "hold",
+    "reason": "Prominent brand mark; not selected for the scene.",
+    "tags": [
+      "brand",
+      "food"
+    ],
+    "sourceURL": "https://unsplash.com/photos/WUTpM4iPCVA",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "8078b97cb46eba93ad3c41e3ae75e7a45e25dc3a5884c780d91428476faa9224",
+    "processed": false,
+    "status": "held"
+  },
+  {
+    "file": "nikolay-kovalenko-i8QdtA3dcNc-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Jellyfish tentacles are clipped by the source frame; the extraction has a hard edge and remains source-only.",
+    "tags": [
+      "jellyfish",
+      "orange",
+      "sea"
+    ],
+    "sourceURL": "https://unsplash.com/photos/i8QdtA3dcNc",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "bb5299958e203c447db46027e616614ffb403a42e5ffa5d5b48eb2178d9f3c2c",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "nikolay-kovalenko-rkrqdfLPP88-unsplash.jpg",
+    "role": "object",
+    "reason": "Single blue jellyfish.",
+    "tags": [
+      "jellyfish",
+      "blue",
+      "sea"
+    ],
+    "sourceURL": "https://unsplash.com/photos/rkrqdfLPP88",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "07f1030c5681b84f24eadd403f574f39aebb616a3e76c3ce0eac11a0d50c962b",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_jellyfish_blue"
+  },
+  {
+    "file": "nikolay-kovalenko-xcjlPPsopw8-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Single pink jellyfish. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "jellyfish",
+      "pink",
+      "sea"
+    ],
+    "sourceURL": "https://unsplash.com/photos/xcjlPPsopw8",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "0c88d4196ce82988f1386894273c2e43be7e05c1d53135c5e51fa1232c045b9a",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "noaa-UJsUJr3cgEM-unsplash.jpg",
+    "role": "plate",
+    "reason": "Towering cloud and sky form a weather scene.",
+    "tags": [
+      "cloud",
+      "sky",
+      "weather"
+    ],
+    "sourceURL": "https://unsplash.com/photos/UJsUJr3cgEM",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "2970b826937c33214727e8da448382cd9be899264f28c669e31dc2399e090856",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "noah-naf-ATnB7EbH86I-unsplash.jpg",
+    "role": "object",
+    "reason": "Seagull with full body.",
+    "tags": [
+      "seagull",
+      "bird",
+      "white"
+    ],
+    "sourceURL": "https://unsplash.com/photos/ATnB7EbH86I",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "7db10fd0466cf6bcddc0af47b12b915ae1d208dc286d36c30ee46eff302496d6",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_seagull"
+  },
+  {
+    "file": "oliver-guhr-UbUZ0temiw0-unsplash.jpg",
+    "role": "reserve",
+    "reason": "White orchid on black. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "orchid",
+      "flower",
+      "white"
+    ],
+    "sourceURL": "https://unsplash.com/photos/UbUZ0temiw0",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "6853a2a20ab0fbc22d586f99094d45b25289e4c30f3cb96c9f1309ffa0abd5cf",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "oshadha-viduranga-ykoVH1FnNI0-unsplash.jpg",
+    "role": "plate",
+    "reason": "Reed strands form a dense environmental texture.",
+    "tags": [
+      "reeds",
+      "brown",
+      "texture"
+    ],
+    "sourceURL": "https://unsplash.com/photos/ykoVH1FnNI0",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "7f10795fb50d42eef94339566c153e87fbd47412c9b23bc9d50ac4b230951e7b",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "oskar-kadaksoo-4EriTfpwOmY-unsplash.jpg",
+    "role": "object",
+    "reason": "Single dog against simple background.",
+    "tags": [
+      "dog",
+      "animal",
+      "white"
+    ],
+    "sourceURL": "https://unsplash.com/photos/4EriTfpwOmY",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "3c193826ab30e2186d65585b2ba7a70f5667bd5cba2617bd322d9ce1fd41724a",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_dog"
+  },
+  {
+    "file": "rae-galatas-EVvzhwW2M9k-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Orchid spray on blurred green. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "orchid",
+      "flower",
+      "peach"
+    ],
+    "sourceURL": "https://unsplash.com/photos/EVvzhwW2M9k",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "c0aef393089e08b4f6bdb500eaf0501a493140c31d1d1ea8da1282a278cb6740",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "robert-katzki-jbtfM0XBeRc-unsplash.jpg",
+    "role": "plate",
+    "reason": "Colored corridor works through depth and vanishing point.",
+    "tags": [
+      "corridor",
+      "rainbow",
+      "architecture"
+    ],
+    "sourceURL": "https://unsplash.com/photos/jbtfM0XBeRc",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "43b4cb84e85c750d5b31b2afa955f471bcf2658b04efd0874c92c03fd0e741c8",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "romain-water-1bh8rln6VxU-unsplash.jpg",
+    "role": "object",
+    "reason": "Surreal mouth against black.",
+    "tags": [
+      "mouth",
+      "surreal",
+      "red"
+    ],
+    "sourceURL": "https://unsplash.com/photos/1bh8rln6VxU",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "f974a3fb883b251c7c9c5a4bec571cce6ae4dd4d7c34f9802d0a5f0b4ed03edb",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_mouth"
+  },
+  {
+    "file": "rowan-heuvel-sAB4BWrQ4Y4-unsplash.jpg",
+    "role": "plate",
+    "reason": "Taj Mahal and warm sky are a complete scene.",
+    "tags": [
+      "taj-mahal",
+      "architecture",
+      "warm"
+    ],
+    "sourceURL": "https://unsplash.com/photos/sAB4BWrQ4Y4",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "f37e08c394350c8ed6155419216f6da645681392a92c2a0725807fd37f452540",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "satria-iZc4D4we2o8-unsplash.jpg",
+    "role": "object",
+    "reason": "Miniature house against wood.",
+    "tags": [
+      "house",
+      "miniature",
+      "toy"
+    ],
+    "sourceURL": "https://unsplash.com/photos/iZc4D4we2o8",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "60b3b9c3b2f0fbcdf51c23dcf9a70af31fdd8694dbd0fd1b6ce0bb7d32c7611b",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_house_miniature"
+  },
+  {
+    "file": "selcuk-ulutas-CbnogotK6P8-unsplash.jpg",
+    "role": "object",
+    "reason": "Running horse with full legs and mane.",
+    "tags": [
+      "horse",
+      "running",
+      "animal"
+    ],
+    "sourceURL": "https://unsplash.com/photos/CbnogotK6P8",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "a1d3a510e29945438d27c5a1f36c113dc4e51e01bc6390a93ebb547b92c37bf1",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_horse_running"
+  },
+  {
+    "file": "simon-lee-XnGxTBij48Q-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Orange planetary disc on black. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "planet",
+      "orange",
+      "astronomy"
+    ],
+    "sourceURL": "https://unsplash.com/photos/XnGxTBij48Q",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "36e6b3808bb490d8ba64dee3efc882ec25f0144ed97788c62cd2aa92051dc655",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "tabitha-turner-N_7hOiLpYj4-unsplash.jpg",
+    "role": "plate",
+    "reason": "Natural stone arch and desert are a landscape.",
+    "tags": [
+      "arch",
+      "desert",
+      "stone"
+    ],
+    "sourceURL": "https://unsplash.com/photos/N_7hOiLpYj4",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "82f8c634716b403e207c29c6aa4c8460719318648199d900850d0c8209627357",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "tierra-mallorca-rgJ1J8SDEAY-unsplash.jpg",
+    "role": "object",
+    "reason": "House keychain and keys as a single prop.",
+    "tags": [
+      "house",
+      "keys",
+      "miniature"
+    ],
+    "sourceURL": "https://unsplash.com/photos/rgJ1J8SDEAY",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "b900cb592db498c67f4dbdba58004eb97717c5a887b2e237146e45a9d06293a2",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_house_keys"
+  },
+  {
+    "file": "todd-kent-178j8tJrNlc-unsplash.jpg",
+    "role": "plate",
+    "reason": "Suburban house and lawn form a dream-place backdrop.",
+    "tags": [
+      "house",
+      "suburb",
+      "lawn"
+    ],
+    "sourceURL": "https://unsplash.com/photos/178j8tJrNlc",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "0381a218bea2e0ef216ce7155296a6e57ce6802029f76bd4c5e5f756e4928721",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "wilhelm-gunkel-ZIQb1OkI7Ss-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Statue source cuts off the figures at the base; the transparent extraction has a hard edge and is not suitable as a floating object.",
+    "tags": [
+      "statue",
+      "marble",
+      "figure"
+    ],
+    "sourceURL": "https://unsplash.com/photos/ZIQb1OkI7Ss",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "8070efa72bfc651117b0eefa5b34919b191279e072c0bb52e885620b8472048e",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "wolfgang-hasselmann-WA1wIGPQJvc-unsplash.jpg",
+    "role": "plate",
+    "reason": "Purple tree and green haze form a color-field landscape.",
+    "tags": [
+      "tree",
+      "purple",
+      "pastel"
+    ],
+    "sourceURL": "https://unsplash.com/photos/WA1wIGPQJvc",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "a9617146600d1c2660c83e9f66ccae590169d7021a42afb1c049be2601c708a5",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "wolfgang-hasselmann-j4CzqVzOye8-unsplash.jpg",
+    "role": "plate",
+    "reason": "Blue tree and red sky form a color-field landscape.",
+    "tags": [
+      "tree",
+      "blue",
+      "red"
+    ],
+    "sourceURL": "https://unsplash.com/photos/j4CzqVzOye8",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "436bf6b044c584fb7dd9ae788794736df0e95d82af62bab0004ab36ed756a13c",
+    "processed": true,
+    "status": "imported"
+  },
+  {
+    "file": "zeki-okur-UqKFu12hpfE-unsplash.jpg",
+    "role": "object",
+    "reason": "Trojan horse statue against sky.",
+    "tags": [
+      "horse",
+      "statue",
+      "wood"
+    ],
+    "sourceURL": "https://unsplash.com/photos/UqKFu12hpfE",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "949c64ecb1eeb7b2d564d085269234e8b9495fa1019629a85d964c3a77439732",
+    "processed": true,
+    "status": "runtime",
+    "assetID": "owner_trojan_horse"
+  },
+  {
+    "file": "zoltan-tasi-PN8Un1ywbE8-unsplash.jpg",
+    "role": "reserve",
+    "reason": "Pink orchid branch on cream. Kept as a reserve candidate after first scene curation.",
+    "tags": [
+      "orchid",
+      "flower",
+      "pink"
+    ],
+    "sourceURL": "https://unsplash.com/photos/PN8Un1ywbE8",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "0424b09da4e5a68cf65e9779a9bb22dbe2458b926d0668fd68c1d2c97c5e3f8f",
+    "processed": false,
+    "status": "source-only"
+  },
+  {
+    "file": "zoltan-tasi-RbWe2tBKCBk-unsplash.jpg",
+    "role": "plate",
+    "reason": "Red moon and dark water create a complete night scene.",
+    "tags": [
+      "moon",
+      "red",
+      "water"
+    ],
+    "sourceURL": "https://unsplash.com/photos/RbWe2tBKCBk",
+    "sourceSite": "Unsplash",
+    "licenseURL": "https://unsplash.com/license",
+    "sha256": "a6ff0cf31d01b3e57fc61abf4682eb40c5bcc9329df385b22ebad321da311ca3",
+    "processed": true,
+    "status": "imported"
+  }
+]

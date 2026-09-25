@@ -64,6 +64,33 @@ extension DreamRenderer {
         case "bow":
             ring(0,0.143,0.13,0.012,rose)
             var g=Geometry();g.ellipsoid([-0.065,0.1,0.075],[0.065,0.04,0.025]);g.ellipsoid([0.065,0.1,0.075],[0.065,0.04,0.025]);g.ellipsoid([0,0.1,0.075],[0.022,0.028,0.025]);add(g,rose)
+        case "flower_crown":
+            ring(0.025,0.127,0.117,0.008,UIColor(hex:"#7C9E82"))
+            var leaves=Geometry(),coral=Geometry(),cream=Geometry(),lilac=Geometry(),centres=Geometry()
+            for i in 0..<10 {
+                let a=Float(i)/10*2*Float.pi
+                let radial=SIMD3<Float>(cos(a),0,sin(a))
+                let tangent=SIMD3<Float>(-sin(a),0,cos(a))
+                let center=SIMD3<Float>(cos(a)*0.131,0.03+Float(i%3-1)*0.009,sin(a)*0.121)
+                leaves.ellipsoid(center+tangent*0.03-radial*0.008,[0.021,0.01,0.013],segments:8,rings:5)
+                leaves.ellipsoid(center-tangent*0.028-radial*0.008,[0.021,0.01,0.013],segments:8,rings:5)
+                for petal in 0..<5 {
+                    let t=Float(petal)/5*2*Float.pi
+                    let offset=tangent*cos(t)*0.021+SIMD3<Float>(0,sin(t)*0.021,0)
+                    let position=center+offset+radial*0.01
+                    switch i%3 {
+                    case 0: coral.ellipsoid(position,[0.016,0.017,0.015],segments:8,rings:5)
+                    case 1: cream.ellipsoid(position,[0.016,0.017,0.015],segments:8,rings:5)
+                    default: lilac.ellipsoid(position,[0.016,0.017,0.015],segments:8,rings:5)
+                    }
+                }
+                centres.ellipsoid(center+radial*0.021,[0.006,0.006,0.006],segments:8,rings:5)
+            }
+            add(leaves,UIColor(hex:"#A4BFA2"),10)
+            add(coral,UIColor(hex:"#E7A5A5"))
+            add(cream,UIColor(hex:"#F5DFBA"))
+            add(lilac,UIColor(hex:"#BEB0D5"))
+            add(centres,gold,10)
         case "moon_hat","beyond_crown","lucky_pig_hat","balloon_hat":
             ring(0,0.145,0.132,0.014,id == "balloon_hat" ? rose : gold)
             if id == "moon_hat" {

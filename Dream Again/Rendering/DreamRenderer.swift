@@ -13,6 +13,7 @@ import simd
     let art=DreamArtDirection()
     let evolution=PaletteEvolution()
     let wardrobeLight=PointLight()
+    let wardrobeFill=PointLight(), wardrobeHalo=Entity()
     let storm=StormVFX()
     let daylight=DirectionalLight(),ambientFill=PointLight()
     var chunks: [Int:Entity]=[:], hazards: [String:Entity]=[:], pickups: [String:Entity]=[:]
@@ -45,8 +46,43 @@ import simd
         camera.camera.far=8000
         let light=daylight; light.light.intensity=4200; light.light.color=UIColor(hex:"#FFF0E4"); light.look(at:[0,0,0],from:[-6,10,8],relativeTo:nil); light.shadow = .init();anchor.addChild(light)
         let fill=ambientFill; fill.light.intensity=750; fill.light.attenuationRadius=80; fill.position=[4,9,8]; anchor.addChild(fill)
-        wardrobeLight.light.intensity=1600;wardrobeLight.light.attenuationRadius=12;wardrobeLight.position=[-1,2.5,-3];wardrobeLight.isEnabled=false;anchor.addChild(wardrobeLight)
+        wardrobeLight.light.intensity=6000;wardrobeLight.light.attenuationRadius=12;wardrobeLight.position=[-1.8,2.8,-2.5];wardrobeLight.isEnabled=false;anchor.addChild(wardrobeLight)
+        wardrobeFill.light.intensity=4800;wardrobeFill.light.attenuationRadius=10;wardrobeFill.light.color=UIColor(hex:"#DCE9FF");wardrobeFill.position=[1.8,1.3,-2.2];wardrobeFill.isEnabled=false;anchor.addChild(wardrobeFill)
+        wardrobeHalo.name="wardrobe-halo";wardrobeHalo.isEnabled=false;anchor.addChild(wardrobeHalo)
+        buildWardrobeHalo()
         buildStrawDoll()
+    }
+    private func buildWardrobeHalo() {
+        let size=512
+        var pixels=[UInt8](repeating:0,count:size*size*4)
+        for y in 0..<size { for x in 0..<size {
+            let dx=(Double(x)+0.5)/Double(size)*2-1
+            let dy=(Double(y)+0.5)/Double(size)*2-1
+            let falloff=exp(-4.5*(dx*dx+dy*dy))
+            var hash=UInt32(truncatingIfNeeded:(x &* 374_761_393) ^ (y &* 668_265_263))
+            hash=(hash ^ (hash >> 13)) &* 1_274_126_177
+            hash ^= hash >> 16
+            let dither=Double(hash & 0xffff)/65535-0.5
+            let offset=(y*size+x)*4
+            pixels[offset]=226;pixels[offset+1]=222;pixels[offset+2]=236
+            pixels[offset+3]=UInt8(max(0,min(255,(0.055*falloff*255+dither).rounded())))
+        } }
+        guard let provider=CGDataProvider(data:Data(pixels) as CFData),
+              let image=CGImage(width:size,height:size,bitsPerComponent:8,bitsPerPixel:32,bytesPerRow:size*4,space:CGColorSpaceCreateDeviceRGB(),bitmapInfo:CGBitmapInfo(rawValue:CGImageAlphaInfo.last.rawValue),provider:provider,decode:nil,shouldInterpolate:true,intent:.defaultIntent),
+              let texture=try? TextureResource(image:image,options:.init(semantic:.color)) else {return}
+        var mesh=MeshDescriptor(name:"Wardrobe soft halo")
+        mesh.positions = .init([[-2,0,0],[2,0,0],[2,4.2,0],[-2,4.2,0]])
+        mesh.normals = .init(Array(repeating:SIMD3<Float>(0,0,-1),count:4))
+        mesh.textureCoordinates = .init([[0,0],[1,0],[1,1],[0,1]])
+        mesh.primitives = .triangles([0,1,2,0,2,3])
+        guard let resource=try? MeshResource.generate(from:[mesh]) else {return}
+        var material=UnlitMaterial(applyPostProcessToneMap:false)
+        material.color = .init(tint:.white,texture:.init(texture))
+        material.blending = .transparent(opacity:.init(floatLiteral:1))
+        material.faceCulling = .none
+        let card=ModelEntity(mesh:resource,materials:[material]);card.position=[0,-0.95,1.25]
+        card.components.set(DynamicLightShadowComponent(castsShadow:false))
+        wardrobeHalo.addChild(card)
     }
     /// Called while preparing a run, before its active clock starts.
     func prepareGameplay() {
@@ -60,12 +96,11 @@ import simd
     }
     func dress(_ equipped:[String:String]) {
         guard equipped != equippedCache else {return};equippedCache=equipped
-        let skirt=equipped["bottom"] == "straw_skirt"
         headAttachment.children.removeAll()
         runner.children.filter{$0.name == "equipped-trail"}.forEach{$0.removeFromParent()}
         let colors=["pearl_body":"#E9E6E2","rose_body":"#CBA6B7","mint_body":"#ACCFBE"]
         let bodyColor=UIColor(hex:colors[equipped["top"] ?? ""] ?? "#B5C8C3")
-        strawCostume(feminine:skirt,color:bodyColor)
+        strawCostume(top:equipped["top"] ?? "bare_top",bottom:equipped["bottom"] ?? "plain_bottom",color:bodyColor)
         if equipped["trail"] == "void_ribbon" {
             var g=Geometry();g.tube([[0,0.5,0.2],[0.15,0.35,0.65],[-0.1,0.2,1.1]],radius:0.03)
             if let mesh=try? g.resource() {let trail=ModelEntity(mesh:mesh,materials:[factory.material(UIColor(hex:"#D5C6D6").withAlphaComponent(0.25),style:0)]);trail.name="equipped-trail";runner.addChild(trail)}
@@ -79,7 +114,7 @@ import simd
     func local(_ sample:RouteSample,origin:RouteSample,lateral:Double = 0) -> SIMD3<Float> { [Float(sample.x-origin.x+lateral*cos(sample.yaw)),Float(sample.y-origin.y),Float(sample.z-origin.z+lateral*sin(sample.yaw))] }
     func render(_ run:RunState,equipped:[String:String],menu:Bool = false,lowPower:Bool = false) {
         let surfacePalettes=vividPalettes
-        wardrobeLight.isEnabled=false
+        wardrobeLight.isEnabled=false;wardrobeFill.isEnabled=false;wardrobeHalo.isEnabled=false
         let threat=run.hazards.filter{$0.encounter == .lightning}.map {h -> Float in
             let d=h.distance-run.distance
             return d < -5 ? 0:Float(max(0,min(1,(42-d)/30)))
@@ -119,9 +154,12 @@ import simd
         trackAlphas=trackAlphas.filter{active.contains($0.key)}
         for c in run.chunks where chunks[c.id] == nil {
             let root=Entity(),p=surfacePalettes[palette]
-            let pattern=artPattern ?? TrackArt.pattern(identity:run.identity,distance:c.start)
+            let pattern=artPattern ?? (c.id == 0 ? .checker : TrackArt.pattern(identity:run.identity,distance:c.start))
             var light=Geometry(),dark=Geometry(),rim=Geometry(),deck=Geometry()
-            for n in 0..<24 {
+            // The camera starts behind route distance zero. Give the opening
+            // section a visual apron so the near edge never cuts across the
+            // bottom of the screen while the run is waiting for Ready.
+            for n in (c.id == 0 ? -24 : 0)..<24 {
                 let s=c.start+Double(n), middle=s+0.5
                 if !cinematic && c.gap?.contains(middle) == true { continue }
                 // Every missing surface is backed by a real simulation gap.
@@ -267,7 +305,12 @@ import simd
         }
         let cameraPosition=local(generator.sample(visualDistance-4.8),origin:origin,lateral:run.player.lateral*0.2)+[0,2.8,0]
         let target=local(generator.sample(visualDistance+9),origin:origin)+[0,0.7,0]
-        camera.look(at:target,from:cameraPosition,relativeTo:nil)
+        let drift=menu ? .still : DreamCameraDrift.sample(run:run,reducedMotion:art.collage.reducedMotion)
+        let direction=simd_normalize(target-cameraPosition)
+        let side=simd_normalize(simd_cross(direction,SIMD3<Float>(0,1,0)))
+        let translation=side*drift.side+SIMD3<Float>(0,drift.height,0)
+        camera.look(at:target+translation+side*drift.aim,from:cameraPosition+translation,relativeTo:nil)
+        camera.orientation=camera.orientation*simd_quatf(angle:drift.roll,axis:[0,0,1])
         art.collage.update(run:run,origin:origin,world:world,camera:camera,aspect:Float(view.bounds.width/max(1,view.bounds.height)),lowPower:lowPower,voidWeight:evolution.voidWeight(seconds:run.seconds))
         if !cinematic {
             evolution.update(seconds:run.seconds,palettes:surfacePalettes,art:art)
@@ -296,16 +339,20 @@ import simd
         }
         for child in entity.children {whiten(child,amount:amount)}
     }
-    func previewAvatar(equipped:[String:String],wardrobe:Bool = false) {
-        wardrobeLight.isEnabled=true
+    func rotateWardrobe(to angle:Float) {
+        runner.orientation=simd_quatf(angle:angle,axis:[0,1,0])
+    }
+    func previewAvatar(equipped:[String:String],wardrobe:Bool = false,rotation:Float = 0) {
+        wardrobeLight.isEnabled=true;wardrobeFill.isEnabled=wardrobe;wardrobeHalo.isEnabled=wardrobe
         art.invalidateEnvironment()
         world.children.removeAll();chunks.removeAll();hazards.removeAll();pickups.removeAll();lastRun=nil
-        runner.isEnabled=true;runner.position = .zero;runner.orientation=simd_quatf(angle:0,axis:[0,1,0]);dress(equipped)
+        runner.isEnabled=true;runner.position = .zero;rotateWardrobe(to:rotation);dress(equipped)
         for e in legs+arms+knees+elbows {e.orientation=simd_quatf(angle:0,axis:[1,0,0])}
-        camera.look(at:wardrobe ? [0,-1.15,0] : [0,1,0],from:wardrobe ? [2,-0.55,-6.7] : [1.4,1.5,-3.3],relativeTo:nil)
-        view.environment.background = .color(UIColor(hex:"#686378"))
+        camera.look(at:wardrobe ? [0,-0.9,0] : [0,1,0],from:wardrobe ? [0,-0.3,-6.7] : [1.4,1.5,-3.3],relativeTo:nil)
+        view.environment.background = .color(UIColor(hex:"#777288"))
     }
     func preview(_ id:AssetID,palette:Int,style:Int,lod:Int,colliders:Bool = false) {
+        wardrobeLight.isEnabled=false;wardrobeFill.isEnabled=false;wardrobeHalo.isEnabled=false
         art.invalidateEnvironment()
         world.children.removeAll(); chunks.removeAll(); terrainKeys.removeAll();trackAlphas.removeAll(); hazards.removeAll(); pickups.removeAll(); gallery=nil; runner.isEnabled=false; lastRun=nil
         let e=factory.build(id,palette:palette,style:style,lod:lod); world.addChild(e); gallery=e

@@ -94,11 +94,11 @@ In DEBUG, open **Lab** and select any obstacle. Use **run**, **freeze**, and **a
 practice its actual collision behavior without earning rewards. For a static lightning
 strike preview, launch with `--art-review --design-review --obstacle lightning --strike`.
 
-The background pilot adds 20 transparent ingredients and five animated compositions. In DEBUG Lab,
-select Whale Cottage, Jelly Garden, Inverted Procession, Floating Bedroom or Midnight Kitchen.
+The background collage uses 22 owner-photo cutouts and five seeded compositions. In DEBUG Lab,
+select Horse at Home, Sea Garden, Uninvited Monuments, Borrowed Address or Little Lost Things.
 Launch a specific one with `--art-review --design-review --vignette 0` (0–4), optionally
-`--collage-moving`. See [runtime gallery and motion clip](evidence/pilot-gallery.html) and
-[exact prompts and provenance](docs/COLLAGE_PILOT.json). These previews earn no rewards.
+`--collage-moving`. Source links and curation notes are in
+[the DreamObjects intake](data/dream_objects_intake.json). These previews earn no rewards.
 
 Relative scale previews: DEBUG Lab → Quiet scale / Miniature / Oversized / Monumental / Absurd.
 Use `--art-review --design-review --scale-event 0` (0–4) for matched captures.

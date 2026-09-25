@@ -53,8 +53,8 @@ public struct Profile: Codable, Sendable {
     public var schema = 1
     public var lots: [WalletLot] = []
     public var ledger: [WalletEntry] = []
-    public var owned: Set<String> = ["bare_head", "plain_ribbon", "plain_bottom", "straw_skirt"]
-    public var equipped: [String:String] = ["hat":"bare_head", "top":"plain_ribbon", "bottom":"plain_bottom"]
+    public var owned: Set<String> = ["bare_head", "bare_top", "plain_ribbon", "plain_bottom", "straw_skirt"]
+    public var equipped: [String:String] = ["hat":"bare_head", "top":"bare_top", "bottom":"plain_bottom"]
     public var achievements: Set<String> = []
     public var settled: [String:Int] = [:]
     public var records: [String:UInt64] = [:]

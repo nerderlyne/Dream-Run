@@ -27,7 +27,11 @@ def main() -> None:
     json_paths = sorted((ROOT/'data').glob('*.json'))
     for path in json_paths:
         json.loads(path.read_text())
-    require(len(json_paths) == 8, 'All eight JSON contract and asset manifest files parse')
+    require(len(json_paths) == 9, 'All nine JSON contract and asset manifest files parse')
+    intake = load('dream_objects_intake.json')
+    require(len(intake) == 59 and len({entry['file'] for entry in intake}) == 59 and all(entry['sourceURL'].startswith('https://unsplash.com/photos/') for entry in intake), 'Owner photo intake has unique files and Unsplash source URLs')
+    owner_cutouts = [entry for entry in intake if entry['status'] == 'runtime']
+    require(len(owner_cutouts) == 22 and len({entry['assetID'] for entry in owner_cutouts}) == 22 and all((ROOT/'Dream Again'/'Resources'/'DreamCollage'/(entry['assetID']+'.png')).exists() for entry in owner_cutouts), 'All 22 owner photo cutouts have bundled resources')
     plates = load('dream_plates.json')
     require(bool(plates) and len({p['id'] for p in plates}) == len(plates), 'Curated plate IDs are unique and nonempty')
     require(all(0 < p['width'] <= 2048 and 0 < p['height'] <= 2048 for p in plates), 'Curated photos respect the 2048 pixel limit')

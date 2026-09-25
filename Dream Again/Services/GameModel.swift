@@ -51,6 +51,9 @@ import UIKit
     var artReview=false
     var previousTime=0.0
     var clock=FixedStepClock()
+    private var idleSceneRunID:UUID?
+    private var idleSceneTextureCount = -1
+    private var idleSceneViewport = CGSize.zero
     private let horizonWarmup=HorizonWarmup()
     @Published var provider:any RewardedContinueProvider = DisabledRewardProvider()
     var active:Bool { screen == "gameplay" }
@@ -423,6 +426,21 @@ import UIKit
             previousTime=0;return
         }
         guard active, renderer != nil else { previousTime=0; return }
+        if [.ready,.paused].contains(run.phase),let renderer {
+            // The first scene pass may run before the ARView has its final size,
+            // and collage textures arrive asynchronously. Refresh the still
+            // scene as each resource arrives instead of waiting for Ready.
+            let textureCount=renderer.art.collage.loadedTextureCount
+            let viewport=renderer.view.bounds.size
+            if idleSceneRunID != run.id || idleSceneTextureCount != textureCount || idleSceneViewport != viewport {
+                renderer.render(run,equipped:profile.equipped,lowPower:settings.lowPower)
+                idleSceneRunID=run.id
+                idleSceneTextureCount=textureCount
+                idleSceneViewport=viewport
+            }
+            previousTime=0
+            return
+        }
         #if DEBUG
         if let recorder=performanceRun, !recorder.complete {
             recorder.begin()
@@ -548,13 +566,19 @@ import UIKit
             if h.encounter == .lightning {h.strikeTick=simulation.state.activeTicks+(striking ? 0:164)}
             return h
         }
-        if ProcessInfo.processInfo.arguments.contains("--obstacle-close"),let hazard=simulation.state.hazards.first {simulation.state.distance=hazard.distance-5}
+        if let hazard=simulation.state.hazards.first {
+            let args=ProcessInfo.processInfo.arguments
+            if let index=args.firstIndex(of:"--obstacle-ahead"),args.indices.contains(index+1),let ahead=Double(args[index+1]) {
+                simulation.state.distance=hazard.distance-max(1,ahead)
+            } else if args.contains("--obstacle-close") {simulation.state.distance=hazard.distance-5}
+        }
         renderer?.lastRun=nil;renderer?.render(run,equipped:profile.equipped)
     }
     func labDesign(theme:Int,pose:String="run",variant:Int=0,sky:String=DreamCollageKit.skyIDs[0],pattern:TrackPattern = .checker,mirror:Bool=false,contrast:Bool=false) {
         labCollage(index:0)
         renderer?.artPalette=max(0,min(palettes.count-1,theme));renderer?.artPattern=pattern
         renderer?.art.collage.previewPlate=sky
+        renderer?.art.collage.reset()
         let looks:[[String:String]]=[[:],["bottom":"straw_skirt","hat":"bow","top":"rose_body"],["bottom":"straw_skirt","hat":"nightcap","top":"pearl_body"],["hat":"moon_hat","top":"mint_body"],["hat":"beyond_crown","top":"pearl_body"]]
         artEquipped=looks[((variant%looks.count)+looks.count)%looks.count]
         artIdle=pose == "idle"

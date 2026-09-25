@@ -6,6 +6,12 @@ import CryptoKit
 
 let root=URL(fileURLWithPath:FileManager.default.currentDirectoryPath)
 let source=root.appendingPathComponent("DreamPlates")
+let intakeManifest=root.appendingPathComponent("data/dream_objects_intake.json")
+let intakeEntries=(try? JSONSerialization.jsonObject(with:Data(contentsOf:intakeManifest))) as? [[String:Any]] ?? []
+let intakeByFile=Dictionary(uniqueKeysWithValues:intakeEntries.compactMap { entry -> (String,[String:Any])? in
+    guard let file=entry["file"] as? String else {return nil}
+    return (file,entry)
+})
 let output=root.appendingPathComponent("Dream Again/Resources/DreamPlates")
 try FileManager.default.createDirectory(at:output,withIntermediateDirectories:true)
 let files=try FileManager.default.contentsOfDirectory(at:source,includingPropertiesForKeys:nil).filter{["jpg","jpeg","png","heic"].contains($0.pathExtension.lowercased())}.sorted{$0.lastPathComponent<$1.lastPathComponent}
@@ -23,7 +29,13 @@ for url in files {
         CGImageDestinationAddImage(dest,cg,[kCGImageDestinationLossyCompressionQuality:0.84,kCGImagePropertyOrientation:1] as CFDictionary)
         guard CGImageDestinationFinalize(dest) else {fatalError("Cannot write \(id)")}
     }
-    entries.append(["id":id,"sourceFile":url.lastPathComponent,"sha256":digest,"width":cg.width,"height":cg.height,"source":"Owner-curated Unsplash download; original photo URL and photographer not supplied"])
+    var record:[String:Any]=["id":id,"sourceFile":url.lastPathComponent,"sha256":digest,"width":cg.width,"height":cg.height,"source":"Owner-curated Unsplash download; original photo URL and photographer not supplied"]
+    if let intake=intakeByFile[url.lastPathComponent],intake["role"] as? String == "plate" {
+        record["source"]=intake["sourceURL"]
+        record["licenseURL"]=intake["licenseURL"]
+        record["tags"]=intake["tags"]
+    }
+    entries.append(record)
     lines.append("        .init(id:\"\(id)\",concept:nil,medium:.photographic,orientation:\"environmentPlate\",moods:[\"dreamlike\",\"atmospheric\"],paletteTags:[],depths:[.background],backgroundOnly:true,interactive:false,rarity:1,alphaBounds:[0,0,\(cg.width-1),\(cg.height-1)],pixelSize:[\(cg.width),\(cg.height)],recommendedScaleRange:[1000,6000])")
     let thumb=CGImageSourceCreateThumbnailAtIndex(src,0,[kCGImageSourceCreateThumbnailFromImageAlways:true,kCGImageSourceCreateThumbnailWithTransform:true,kCGImageSourceThumbnailMaxPixelSize:240] as CFDictionary)!
     thumbs.append((String(entries.count-1)+" · "+String(url.lastPathComponent.prefix(8)),thumb))

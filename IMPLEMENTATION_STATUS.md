@@ -1,30 +1,40 @@
 # Dreamlooper implementation status
 
+## Owner Unsplash batch curation — September 26, 2026
+
+- Reviewed all 59 owner downloads by composition. Imported 20 as full DreamPlates, bringing the background library to 122. Source URLs, license URLs, hashes, tags and per-image decisions are in `data/dream_objects_intake.json`.
+- Isolated and visually reviewed 22 photographs as transparent cutouts. Rebuilt all five vignettes and the atmospheric layer from them, then removed all 46 superseded generated collage PNGs and their metadata. Thirteen other photos remain source-only reserves. Four public-figure, brand, or scene-dependent images were held out.
+- Untouched originals stay in ignored root `DreamObjects/`; optimized resources are bundled. No physical iPhone tests were performed.
+- Verification: 18 focused Swift core tests passed (collage, atmosphere, scale and track art), the native simulator resource-load test passed, and the built app bundle contains 22 owner cutouts plus 122 plates with no superseded generated collage PNGs. `python3 tools/validate_spec.py` passed 56 checks. The full Swift suite was interrupted after it stalled; no full-suite result is claimed. Final on-screen simulator review remains untested because computer control of Simulator was denied and the CLI screenshot showed the home screen.
+
+## Owner photo intake and rejected repost removal — September 26, 2026 (superseded by curation above)
+
+- Created `Dream Again/Resources/DreamObjects/` for owner-selected source photos and source links. No new photos have been supplied yet, so no isolation, tagging or scene review has been completed.
+- Removed the eight rejected fictional repost PNGs, their generator, metadata and runtime selection. Midnight Kitchen again uses its four original cutouts. The current catalog has 46 cutouts and 102 owner-curated plates. Recognizable repost parodies are pending owner references.
+- Verification: `swift test --filter CollageTests` passed 8 tests; `python3 tools/validate_spec.py` passed 54 checks. Native simulator build and visual review have not been rerun for this removal.
+
+## Run-start scene continuity — September 25, 2026
+
+- Extended the first procedural track section behind the starting camera and
+  gave its opening surface a readable checker pattern. The near edge no longer
+  cuts across the bottom of the screen while the Ready panel is open.
+- The paused/ready scene now refreshes when its viewport changes or an
+  asynchronous collage texture finishes loading, so the background becomes
+  visible before active play begins.
+- Verified on the iPhone 16 Pro Max iOS 26.5 simulator: the focused UI test
+  passed with a lower-screen contrast assertion; screenshot:
+  `evidence/run-start-viewport-fixed.png`. `swift test --filter TrackArtTests`
+  passed 3 tests; `python3 tools/validate_spec.py` passed 54 checks. Physical
+  iPhone testing was not performed.
+
 Native SwiftUI + non-AR RealityKit first playable, with a separate deterministic Swift core,
 shared Xcode scheme, offline progression, save/share, suspend/resume, achievements and audio.
 Exactly 42 procedural world families remain; pig is #42. Balloons buy cosmetics only.
 Pigs now arrive every three active minutes with 1/3 lucky odds (1/6 after continue). The nonterminal three-hour evolution remains unchanged.
 
-## Reposted dream fragments — September 22, 2026
+## Reposted dream fragments — September 22, 2026 (removed September 26)
 
-- Added eight original low-resolution forum cards built solely from existing project-owned
-  creatures and objects. The local generator adds deliberate JPEG damage, bad crops, displaced
-  repost ghosts, scanlines, fictional handles/timestamps, cache filenames and reply fragments.
-- Midnight Kitchen occurrences now deterministically mix two unframed cultural objects with two
-  unique repost cards. They remain world-space scenery with perspective, parallax, fades and the
-  existing density/void behavior; none are HUD overlays or gameplay colliders. Starter-pack layouts
-  and third-party memes, people, characters, logos and website branding are excluded.
-- Family #23 remains Cultural Apparitions and the world-family count remains exactly 42. The fixed
-  25-card entity pool is unchanged; eight small preloaded textures raise transparent ingredients
-  from 46 to 54. Assets are reproducible with `tools/generate_repost_cards.swift`.
-- Verification: 11 focused Release core tests passed (4.034 seconds), covering deterministic
-  selection, full-deck coverage, two-post/two-object composition, scale priority, opposing visible
-  placement, metadata, plate selection and track art. Two focused native simulator tests passed
-  (13.200 seconds), loading every bundled image and preserving the 42-family registry and bounded
-  25-entity pool. The final positioning refinement then received a successful simulator build and
-  visual inspection in `evidence/repost-dream.png`. Specification validator: 54 checks passed.
-  Logs: `evidence/reposts-core.log`, `reposts-native.log`, `reposts-build.log`, `reposts-spec.log`.
-  No physical-device test, full-suite rerun or sustained performance measurement in this pass.
+The eight fictional forum cards were rejected and removed from code, resources, generator and review evidence. Recognizable parody references remain a separate design task.
 
 ## Floating stair progression — September 22, 2026
 
@@ -326,36 +336,13 @@ were run for this isolated mesh correction.
 
 ## Current visual implementation
 
-- One current collage renderer and one Swift catalog: 54 transparent ingredients and 102 owner-curated background plates (156 images total).
-- Six additional atmosphere plates: space, underwater, aurora, mirage, lavender mist, opal dawn.
-- Slim reed/twine straw doll, one articulated rig, modular ribbons, skirt/apron/lace and fitted hats.
-- Rear run, tucked jump and back slide; five DEBUG cosmetic review looks.
-- Twelve vivid track palette pairs; lacquer material, dominant checkerboard, occasional stripes/solids.
-- Rectangular black mirror interior fitted inside a gold frame.
-- Retained object pool and staggered palette updates; no whole-world rebuild at ordinary boundaries.
-- Removed obsolete sky dome, cloud/horizon renderer, generic mannequin, unused USDZ adapter,
-  old presentation-version branches, duplicate manifest, quarantined experiments and historic reviews.
+- One collage renderer and one Swift catalog: 22 owner-photo transparent objects and 122 owner-curated background plates. The earlier generated collage art and pilot review outputs were removed.
+- Slim reed/twine straw doll, one articulated rig, modular outfits and fitted hats.
+- Rear run, tucked jump and back slide; DEBUG cosmetic review looks.
+- Track palette pairs, lacquer material and checkerboard/stripe/solid variations.
+- Retained 25-card object pool and staggered palette updates; no whole-world rebuild at ordinary boundaries.
+- Five photo-object vignettes, with source records in `data/dream_objects_intake.json`.
 - DEBUG reviews and tests use isolated temporary profiles; no production rewards.
-
-## Background variety pilot
-
-- Twenty original, independently layerable PNGs: six sea creatures, four cultural apparitions,
-  and ten domestic/natural ingredients. Exact generation prompts and provenance:
-  `docs/COLLAGE_PILOT.json`; runtime metadata: `DreamPilotKit.swift`.
-- Five seeded compositions: Whale Cottage, Jelly Garden, Inverted Procession, Floating Bedroom,
-  Midnight Kitchen. Four separate cards per composition, world-space parallax and bounded drift,
-  bob, rotation or pulse. Reduced Motion disables local animation; Low Power omits story cards.
-- Every five 640 m cells visit all five compositions. The kitchen occurs once per 3,200 m;
-  cultural apparitions are excluded from ordinary scenery selection. Per-slot shuffled decks
-  prevent immediate repetition and expose all eligible images before repeating a deck.
-- Exactly 42 families: curved/straight stairs share #4, mountains share rock #22, freeing #5
-  for sea creatures and #23 for cultural apparitions. Pig remains #42; no compatibility aliases.
-- Fixed 22-card pilot pool including two skies. All transparent cutouts preload; background plates retain their bounded on-demand cache; no new background colliders.
-- Twenty PNGs add 4,942,083 bytes, 20 MiB decoded RGBA / estimated 26.67 MiB with full mipmaps.
-  These are arithmetic budgets, not measured resident GPU memory. All alpha audits passed,
-  with transparent margins and zero occupied edge pixels (`evidence/pilot-alpha.jsonl`).
-- Five actual simulator screenshots and a moving capture: `evidence/pilot-gallery.html`.
-  DEBUG Lab exposes each composition and cannot grant production rewards.
 
 ## Current difficulty and obstacle implementation
 
@@ -419,3 +406,64 @@ The G2/R2 prerelease uses a fresh `profile-g2-r2.json` development profile. The 
 - The Google adapter refreshes consent, loads a rewarded ad, records an earned callback against the run that offered it, and reloads after dismissal. Settings exposes UMP privacy options when required.
 - The Debug Lab can request Google's test rewarded unit without granting a production continue. Live inventory stays disabled pending owner consent setup and explicit authorization.
 - `python3 tools/validate_spec.py`, plist lint, and Debug and Release arm64 iOS Simulator builds passed. No live ad or on-device test was performed.
+
+## Wardrobe rotation and lighting — September 25, 2026
+
+- The wardrobe now reserves a fixed try-on stage beneath its header. Horizontal dragging rotates the same RealityKit straw doll; Turn left, Turn right and Reset view are accessible alternatives. Trying on another item preserves the chosen viewing angle.
+- The preview uses brighter front and fill lights, a lighter background, and a subtle procedural halo behind the doll. These presentation elements are disabled during gameplay and the asset lab.
+- A simulator Debug build and the focused wardrobe UI test passed. The test exercised both turn buttons, drag rotation and an unpurchased hat preview. The screenshot is `evidence/wardrobe-rotation-preview.png`; it shows clear header spacing and a side view after dragging. No physical-device test was performed.
+
+## Wardrobe halo refinement — September 25, 2026
+
+- Replaced concentric halo meshes with one procedural alpha-gradient card behind the straw looper and centered the wardrobe camera to remove perspective parallax.
+- The focused wardrobe UI test passed on the iPhone 16 Pro Max simulator; `evidence/wardrobe-rotation-preview.png` was refreshed from that run and visually checked for centering and soft falloff.
+
+## Wardrobe halo falloff — September 25, 2026
+
+- Reduced the procedural halo's peak opacity, increased its spread, moved its tint closer to the preview background, and used fine dither to prevent visible alpha bands or a circular cutoff.
+- The focused wardrobe UI test passed on the iPhone 16 Pro Max simulator. `evidence/wardrobe-rotation-preview.png` is the updated screenshot reviewed for the softer fade.
+
+## Dream whispers — September 25, 2026
+
+- Replaced the tutorial capsule toast with a centered, lower top-of-screen Marker Felt scrawl: white lettering, thin black outline and a soft shadow. The overlay does not intercept gameplay gestures. The tutorial prompts pair a short instruction with dreamlike copy.
+- Fresh and Revisit runs now receive brief, deterministic whispers after the tutorial. Selection can reflect a nearby rabbit, a prior visit or mirror, collected pigs, missing straw, a continue or the later visual phase. The separate seed stream does not alter world generation or rewards. Rabbit eyes now match the red-eyed warning.
+- Focused Swift core tests: 2 passed. Focused iPhone 16 Pro Max simulator UI test: 1 passed. `python3 tools/validate_spec.py`: 54 checks passed. `git diff --check`: passed. The UI capture `evidence/dream-whisper-tutorial.png` was inspected for complete two-line text and contrast. The later timed whispers were verified in core tests, not a long rendered simulator run; no physical-device test was performed.
+- Refined the scrawl to blend its fill from the active palette's accent and track light, with a dark plum tint drawn from the palette's track dark. It now rises and fades in, then lifts and fades out; Reduced Motion uses a short fade only. The focused iPhone 16 Pro Max simulator UI test passed again, and `evidence/dream-whisper-tutorial.png` was refreshed from the pale citrus scene. The animation path is implemented but was not captured as video.
+- Replaced the Marker Felt lettering after visual review with Baskerville SemiBold in lowercase. A narrow palette-plum edge and close soft shadow keep the blush text readable over changing collage backgrounds without the former heavy black outline. The focused simulator UI test passed; `evidence/dream-whisper-tutorial.png` shows the revised type over a noisy dark-green scene. A dark-ink-only version and an unedged pale italic version were rejected after simulator captures because each lost contrast in one scene.
+
+## Camera drift prototype — September 25, 2026
+
+- Gameplay's close third-person camera now has small, slow, seed-stable lateral/vertical drift and a slight roll. Motion gently grows near a mirror or after a soft stumble, then settles. It does not change the player route, collision state, or camera framing target beyond a small aim offset.
+- The camera remains steady in menus, Debug review and with Reduced Motion enabled. Pure core tests passed for bounds, frame-to-frame continuity, mirror emphasis and disabled states. A focused iPhone 16 Pro Max simulator renderer test passed for the enabled/reduced-motion camera positions, and the Debug iOS Simulator build succeeded. `python3 tools/validate_spec.py` passed 54 checks. No physical-device comfort test or recorded motion comparison was performed.
+
+## Stitched storm redesign — September 25, 2026
+
+- Replaced the photographic charcoal `storm-threat.png` with the original transparent `storm-stitched.png`: layered lavender/rose thundercloud with a muted plum underside, pearl-cyan charge and fine gold seams. The rejected source art was removed. This remains the registered cloud family; no new world asset was added.
+- Kept the thunder sound, deterministic strike timing, collision and route warning. Retuned local rain and the ground char toward the scene's lilac palette. Lightning instances attach directly to the scene so an asynchronous texture load can fill an already visible hazard.
+- The Debug iOS Simulator build and two focused native storm tests passed. The 22-meter warning view and approach/close/strike captures were visually reviewed; `evidence/storm-rework-warning.png` shows the final scale. The gallery's earlier lightning screenshots were replaced. No physical-device or sustained performance test was performed.
+- A separate clean Debug iOS Simulator build also succeeded after deleting the rejected image. Its app bundle contains `storm-stitched.png` and no `storm-threat.png`. `python3 tools/validate_spec.py` passed 54 checks and `git diff --check` passed.
+
+## Hawaiian tutu bottom — September 25, 2026
+
+- Added a 700-balloon Hawaiian tutu to the Bottom wardrobe category. It can be tried on before purchase; buying and equipping remain separate.
+- The original straw rig now wears open seafoam raffia fringe, a woven waistband and small coral flowers for this item. The plain bottom and straw skirt retain their own looks.
+- Focused renderer and wardrobe UI tests passed on the iPhone 16 Pro Max simulator. The preview screenshot was visually checked and saved as `evidence/hawaiian-tutu-preview.png`. `python3 tools/validate_spec.py` passed 54 checks, and `git diff --check` passed. No physical-device test was performed.
+
+## Dream narrator copy and cadence — September 25, 2026
+
+- Tutorial prompts use the user's playful wording while retaining tilt, swipe and rabbit safety instructions. General lines mix genuine encouragement with a sweet, possessive wish for the looper to stay in the dream.
+- General whispers have a four-second window at 2 minutes, then every 4 minutes. State-dependent lines have a one-in-five deterministic opportunity every 45 seconds. Nearby rabbit and lucky clover-pig lines each get a stable one-in-five roll per encounter, so frame-by-frame evaluation cannot make them inevitable.
+- Four focused Swift core tests passed, including cadence and encounter-gating checks. A Debug iOS Simulator build succeeded. `python3 tools/validate_spec.py` passed 54 checks and `git diff --check` passed. No physical-device test was performed.
+- The user revised four general narrator lines to: “u can do this. stay.”, “u will make it. go! go! go!”, “i will always be here”, and “i'm rooting for u. always. promise”. The four focused Swift tests and `git diff --check` passed again after this copy edit.
+
+## Coordinated wardrobe outfits — September 25, 2026
+
+- Added a free No ribbon top and made bare straw the default top for new profiles. Ribbon choices remain wearable, but their sash and bow no longer appear under the coconut bra or office jacket. The straw skirt's apron now uses its own neutral color.
+- Added a coconut bra top, a fitted flower crown, an ink-plum office tuxedo jacket, and matching tuxedo pants with shoes. Garment sleeves and pant legs attach to the existing articulated straw limbs; no body shape or gender option was added.
+- Wardrobe selections now persist across Head, Top and Bottom during a try-on, so users can assemble whole outfits without buying any piece. The selected item in each category stays highlighted, and the preview's accessibility value names all three pieces.
+- Focused native and UI simulator tests passed for ribbon removal, garment switching, hat fit and unpaid cross-category combinations. The combined tutu look and office look were visually reviewed in `evidence/wardrobe-island-outfit.png` and `evidence/wardrobe-office-outfit.png`. A final Debug iOS Simulator build succeeded. `python3 tools/validate_spec.py` passed 54 checks; the two cosmetics catalogs match and `git diff --check` passed. No physical-device test was performed.
+
+## Background cutout sourcing audit — September 26, 2026
+
+- Added `docs/BACKGROUND_ASSET_REPLACEMENT.md` to distinguish the 102 owner-curated full-frame photos from the 54 generated transparent collage cutouts and to prioritize the large atmospheric silhouettes for owner sourcing.
+- Checked the manifest count (102), cross-checked all 54 cutout IDs against the sourcing list, and ran `git diff --check`. This is a sourcing guide only; no runtime imagery was replaced in this pass.
